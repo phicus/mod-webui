@@ -25,18 +25,8 @@
 # along with Shinken.  If not, see <http://www.gnu.org/licenses/>.
 
 
-WEBUI_VERSION = "2.4.2c"
-WEBUI_COPYRIGHT = "(c) 2009-2016 - License GNU AGPL as published by the FSF, minimum version 3 of the License."
-WEBUI_RELEASENOTES = """
-Worlmap based on OSM/Leaflet
-Dashboard currently view
-Global notifications enable/disable widget
-Use Alignak backend (experimental)
-Fix bugs found in 2.3.2
-Groups (hosts, services, contacts) management
-Element availability graphs tab
-Hosts nad services SLA panels in dashboard currently
-"""
+WEBUI_VERSION = "2.5.3"
+WEBUI_COPYRIGHT = "(c) 2009-2017 - License GNU AGPL as published by the FSF, minimum version 3 of the License."
 
 
 """
@@ -83,6 +73,7 @@ from submodules.auth import AuthMetaModule
 from submodules.logs import LogsMetaModule
 from submodules.graphs import GraphsMetaModule
 from submodules.helpdesk import HelpdeskMetaModule
+from submodules.krillui import KrillUIMetaModule
 
 try:
     from frontend import FrontEnd
@@ -94,8 +85,8 @@ except ImportError:
     )
     frontend_available = False
 
-# Default bottle app
 root_app = bottle.default_app()
+
 # WebUI application
 webui_app = bottle.Bottle()
 
@@ -110,7 +101,7 @@ properties = {
     'daemons': ['broker', 'scheduler'],
     'type': 'webui2',
     'phases': ['running'],
-    'external': True}
+    'external': True }
 
 
 # called by the plugin manager to get an instance
@@ -285,7 +276,8 @@ class Webui_broker(BaseModule, Daemon):
         # Web UI information
         self.app_version = getattr(modconf, 'about_version', WEBUI_VERSION)
         self.app_copyright = getattr(modconf, 'about_copyright', WEBUI_COPYRIGHT)
-        self.app_release = getattr(modconf, 'about_release', WEBUI_RELEASENOTES)
+
+        self.proxy_sufix = getattr(modconf, 'proxy_sufix', None)
 
         # We will save all widgets
         self.widgets = {}
@@ -359,6 +351,8 @@ class Webui_broker(BaseModule, Daemon):
         self.logs_module = LogsMetaModule(LogsMetaModule.find_modules(self.modules_manager.get_internal_instances()), self)
         self.graphs_module = GraphsMetaModule(GraphsMetaModule.find_modules(self.modules_manager.get_internal_instances()), self)
         self.helpdesk_module = HelpdeskMetaModule(HelpdeskMetaModule.find_modules(self.modules_manager.get_internal_instances()), self)
+        # KrillUI
+        self.krillui_module = KrillUIMetaModule(KrillUIMetaModule.find_modules(self.modules_manager.get_internal_instances()), self) # @jgomez
 
         # Data manager
         self.datamgr = WebUIDataManager(self.rg, self.frontend, self.alignak_backend_objects)
@@ -515,6 +509,7 @@ class Webui_broker(BaseModule, Daemon):
     # -----------------------------------------------------
     # We want a lock manager version of the plugin functions
     def lockable_function(self, f):
+        logger.warning("[WebUI] lockable_function, someone want lock!!!!")
         def lock_version(**args):
             self.wait_for_no_writers()
             try:
@@ -578,7 +573,7 @@ class Webui_broker(BaseModule, Daemon):
                     self.nb_writers -= 1
                     self.global_lock.release()
 
-            logger.debug("[WebUI] time to manage %s broks (time %.2gs)", len(l), time.clock() - start)
+            logger.debug("[WebUI] time to manage %s broks (time %.2gs) readers=%d/writers=%d", len(l), time.clock() - start, self.nb_readers, self.nb_writers)
 
         logger.debug("[WebUI] manage_brok_thread end ...")
 
@@ -657,7 +652,8 @@ class Webui_broker(BaseModule, Daemon):
                     # Ok, we will just use the lock for all
                     # plugin page, but not for static objects
                     # so we set the lock at the function level.
-                    f = webui_app.route(route, callback=self.lockable_function(f), method=method, name=name, search_engine=search_engine)
+                    # f = webui_app.route(route, callback=self.lockable_function(f), method=method, name=name, search_engine=search_engine)
+                    f = webui_app.route(route, callback=f, method=method, name=name, search_engine=search_engine)
 
                 # If the plugin declare a static entry, register it
                 # and remember: really static! because there is no lock
@@ -940,7 +936,7 @@ def login_required():
     logger.debug("[WebUI] login_required, getting user cookie ...")
     cookie_value = bottle.request.get_cookie(str(app.session_cookie), secret=app.auth_secret)
     if not cookie_value and not app.allow_anonymous:
-        bottle.redirect(app.get_url("GetLogin"))
+        bottle.redirect(app.get_url("GetLogin")+'?path='+request.urlparts.path)
     if cookie_value:
         # For alignak backend
         if app.alignak_backend_endpoint:
@@ -951,9 +947,9 @@ def login_required():
                 if not app.frontend.is_logged_in():
                     try:
                         if not app.frontend.connect(app.user_session):
-                            bottle.redirect(app.get_url("GetLogin"))
+                            bottle.redirect(app.get_url("GetLogin")+'?path='+request.urlparts.path)
                     except Exception:
-                        bottle.redirect(app.get_url("GetLogin"))
+                        bottle.redirect(app.get_url("GetLogin")+'?path='+request.urlparts.path)
 
             if 'info' in cookie_value:
                 app.user_info = cookie_value['info']
@@ -978,11 +974,11 @@ def login_required():
     else:
         # Only the /dashboard/currently should be accessible to anonymous users
         if request.urlparts.path != "/dashboard/currently":
-            bottle.redirect("/user/login")
+            bottle.redirect("/user/login"+"?path="+request.urlparts.path)
         contact = app.datamgr.get_contact(name='anonymous')
 
     if not contact:
-        bottle.redirect(app.get_url("GetLogin"))
+        bottle.redirect(app.get_url("GetLogin")+'?path='+request.urlparts.path)
 
     user = User.from_contact(contact, app.user_picture, app.gravatar)
     if app.user_session and app.user_info:
@@ -993,4 +989,3 @@ def login_required():
     logger.debug("[WebUI] update current user: %s", user)
     request.environ['USER'] = user
     bottle.BaseTemplate.defaults['user'] = user
-
