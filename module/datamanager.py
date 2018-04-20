@@ -233,7 +233,7 @@ class WebUIDataManager(DataManager):
             hosts = [item for item in elts if item.__class__.my_type == 'host']
         else:
             hosts = self.get_hosts(user=user)
-        logger.debug("[WebUI - datamanager] get_hosts_synthesis, %d hosts", len(hosts))
+        # logger.info("[WebUI - datamanager] get_hosts_synthesis, %d hosts", len(hosts))
 
         h = dict()
         h['nb_elts'] = len(hosts)
@@ -253,7 +253,7 @@ class WebUIDataManager(DataManager):
             for host in hosts:
                 if host.state.lower() in ['down', 'unreachable'] and not host.problem_has_been_acknowledged:
                     h['nb_problems'] += 1
-                    logger.debug("[WebUI - datamanager] get_hosts_synthesis: %s: %s, %s, %s", host.get_name(), host.state, host.is_problem, host.problem_has_been_acknowledged)
+                    # logger.debug("[WebUI - datamanager] get_hosts_synthesis: %s: %s, %s, %s", host.get_name(), host.state, host.is_problem, host.problem_has_been_acknowledged)
 
             h['pct_problems'] = round(100.0 * h['nb_problems'] / h['nb_elts'], 2)
             h['nb_ack'] = sum(1 for host in hosts if host.is_problem and host.problem_has_been_acknowledged)
@@ -266,7 +266,7 @@ class WebUIDataManager(DataManager):
                 h['nb_' + state] = 0
                 h['pct_' + state] = 0
 
-        logger.debug("[WebUI - datamanager] get_hosts_synthesis: %s", h)
+        # logger.info("[WebUI - datamanager] get_hosts_synthesis: %s", h)
         return h
 
     ##
@@ -294,16 +294,16 @@ class WebUIDataManager(DataManager):
                     'host_name': hname, 'service_description': sname
                 })
             }
-            logger.debug("[WebUI - datamanager] get_service, backend parameters: %s", parameters)
+            # logger.debug("[WebUI - datamanager] get_service, backend parameters: %s", parameters)
 
             services = self.fe.get_services(parameters=parameters, all_elements=False, update=True)
             if services:
-                logger.debug("[WebUI - datamanager] get_service, found: %s", services[0])
+                # logger.debug("[WebUI - datamanager] get_service, found: %s", services[0])
                 return self._only_related_to(services[0], user)
 
             return None
 
-        services = self.search_hosts_and_services('type:service host:^%s$ service:^%s$' % (hname, sname), user=user)
+        services = self.search_hosts_and_services('type:service host:^%s$ service:"^%s$"' % (hname, sname), user=user)
         return services[0] if services else None
 
     def get_percentage_service_state(self, user=None, problem=False):
@@ -331,7 +331,7 @@ class WebUIDataManager(DataManager):
             services = [item for item in elts if item.__class__.my_type == 'service']
         else:
             services = self.get_services(user=user)
-        logger.debug("[WebUI - datamanager] get_services_synthesis, %d services", len(services))
+        # logger.info("[WebUI - datamanager] get_services_synthesis, %d services", len(services))
 
         s = dict()
         s['nb_elts'] = len(services)
@@ -351,7 +351,7 @@ class WebUIDataManager(DataManager):
             for service in services:
                 if service.state.lower() in ['warning', 'critical'] and not service.problem_has_been_acknowledged:
                     s['nb_problems'] += 1
-                    logger.debug("[WebUI - datamanager] get_services_synthesis: %s: %s, %s, %s", service.get_name(), service.state, service.is_problem, service.problem_has_been_acknowledged)
+                    # logger.debug("[WebUI - datamanager] get_services_synthesis: %s: %s, %s, %s", service.get_name(), service.state, service.is_problem, service.problem_has_been_acknowledged)
 
             s['pct_problems'] = round(100.0 * s['nb_problems'] / s['nb_elts'], 2)
             s['nb_ack'] = sum(1 for service in services if service.is_problem and service.problem_has_been_acknowledged)
@@ -364,7 +364,7 @@ class WebUIDataManager(DataManager):
                 s['nb_' + state] = 0
                 s['pct_' + state] = 0
 
-        logger.debug("[WebUI - datamanager] get_services_synthesis: %s", s)
+        # logger.info("[WebUI - datamanager] get_services_synthesis: %s", s)
         return s
 
     ##
@@ -375,17 +375,12 @@ class WebUIDataManager(DataManager):
             :name: Must be "host" or "host/service"
         """
         if '/' in name:
-            return self.get_service(name.split('/')[0], name.split('/')[1], user)
+            return self.get_service(name.split('/')[0], '/'.join(name.split('/')[1:]), user)
         else:
             host = self.get_host(name, user)
             if not host:
                 return self.get_contact(name=name, user=user)
             return host
-
-    def get_synthesis(self, elts=None):
-        logger.debug("[WebUI - datamanager] get_synthesis")
-
-        return {'hosts': self.get_hosts_synthesis(elts), 'services': self.get_services_synthesis(elts)}
 
     ##
     # Searching
@@ -426,12 +421,31 @@ class WebUIDataManager(DataManager):
                 _append_host_and_its_services(new_items, i)
 
 
-        def _filter_item(item):
+        def _filter_item(i):
             if pat.search(i.get_full_name()) or pat.search(i.output):
                 return True
             for v in i.customs.values():
                 if pat.search(v):
                     return True
+
+            try:
+                h = i if i.__class__.my_type == 'host' else i.host
+                if h.address and pat.search(h.address):
+                    return True
+                if h.cpe_address and pat.search(h.cpe_address):
+                    return True
+                if h.cpe_registration_host and pat.search(h.cpe_registration_host):
+                    return True
+                if h.cpe_registration_id and pat.search(h.cpe_registration_id):
+                    return True
+                if h.cpe_registration_state and pat.search(h.cpe_registration_state):
+                    return True
+                if h.cpe_ipleases and pat.search(h.cpe_ipleases):
+                    return True
+            except Exception, exc:
+                logger.warning("[WebUI - datamanager] _filter_item: (%s) - %s / %s", exc, type(h.cpe_ipleases), h.cpe_ipleases)
+
+
             return False
 
         # Make user an User object ... simple protection.
@@ -512,7 +526,9 @@ class WebUIDataManager(DataManager):
                         _append_based_on_filtered_by_type(new_items, i, filtered_by_type)
                     else:
                         for j in (i.impacts + i.source_problems):
-                            if pat.search(j.get_full_name()):
+                            if (pat.search(j.get_full_name()) or
+                                (j.__class__.my_type == 'host' and
+                                 j.alias and pat.search(j.alias))):
                                 new_items.append(i)
 
                 if not new_items:
@@ -540,7 +556,7 @@ class WebUIDataManager(DataManager):
                 items = new_items
                 logger.debug("[WebUI - datamanager] host:%s, %d matching items", s, len(items))
                 # for item in items:
-                #     logger.debug("[WebUI - datamanager] item %s is %s", item.get_name(), item.__class__)
+                #     logger.info("[WebUI - datamanager] item %s is %s", item.get_name(), item.__class__)
 
             if (t == 's' or t == 'service') and s.lower() != 'all':
                 logger.debug("[WebUI - datamanager] searching for a service %s", s)
@@ -552,8 +568,8 @@ class WebUIDataManager(DataManager):
 
                 items = new_items
                 logger.debug("[WebUI - datamanager] service:%s, %d matching items", s, len(items))
-                for item in items:
-                    logger.debug("[WebUI - datamanager] item %s is %s", item.get_name(), item.__class__)
+                # for item in items:
+                #     logger.info("[WebUI - datamanager] item %s is %s", item.get_name(), item.__class__)
 
             if (t == 'c' or t == 'contact') and s.lower() != 'all':
                 logger.debug("[WebUI - datamanager] searching for a contact %s", s)
@@ -568,14 +584,14 @@ class WebUIDataManager(DataManager):
             if (t == 'hg' or t == 'hgroup') and s.lower() != 'all':
                 logger.debug("[WebUI - datamanager] searching for items in the hostgroup %s", s)
                 new_items = []
-                for x in s.split(','):
+                for x in s.split('|'):
                     group = self.get_hostgroup(x)
                     if not group:
                         return []
                     # Items have a item.get_groupnames() method that returns a comma separated string ... strange format!
                     for item in items:
-                        if group.get_name() in item.get_groupnames().split(', '):
-                            logger.debug("[WebUI - datamanager] => item %s is a known member!", item.get_name())
+                        #if group.get_name() in item.get_groupnames().split(', '):
+                            # logger.info("[WebUI - datamanager] => item %s is a known member!", item.get_name())
 
                         if group.get_name() in item.get_groupnames().split(', '):
                             new_items.append(item)
@@ -587,22 +603,22 @@ class WebUIDataManager(DataManager):
                 if not group:
                     return []
                 # Items have a item.get_groupnames() method that returns a comma+space separated string ... strange format!
-                for item in items:
-                    if group.get_name() in item.get_groupnames().split(', '):
-                        logger.debug("[WebUI - datamanager] => item %s is a known member!", item.get_name())
-                items = [i for i in items if group.get_name() in i.get_groupnames().split(', ')]
+                # for item in items:
+                #     if group.get_name() in item.get_groupnames().split(','):
+                #         logger.debug("[WebUI - datamanager] => item %s is a known member!", item.get_name())
+                items = [i for i in items if group.get_name() in i.get_groupnames().split(',')]
 
             #@mohierf: to be refactored!
             if (t == 'cg' or t == 'cgroup') and s.lower() != 'all':
-                logger.info("[WebUI - datamanager] searching for items related with the contactgroup %s", s)
+                # logger.info("[WebUI - datamanager] searching for items related with the contactgroup %s", s)
                 group = self.get_contactgroup(s, user)
                 if not group:
                     return []
                 # Items have a item.get_groupnames() method that returns a comma+space separated string ... strange format!
-                for item in items:
-                    for contact in item.contacts:
-                        if group.get_name() in contact.get_groupnames().split(', '):
-                            logger.debug("[WebUI - datamanager] => contact %s is a known member!", contact.get_name())
+                #for item in items:
+                #    for contact in item.contacts:
+                #        if group.get_name() in contact.get_groupnames().split(', '):
+                #            logger.info("[WebUI - datamanager] => contact %s is a known member!", contact.get_name())
 
                 contacts = [c for c in self.get_contacts(user=user) if c in group.members]
                 items = list(set(itertools.chain(*[self._only_related_to(items, self.rg.contacts.find_by_name(c)) for c in contacts])))
@@ -626,9 +642,9 @@ class WebUIDataManager(DataManager):
             if t == 'type' and s.lower() != 'all':
                 filtered_by_type = True
                 items = [i for i in items if i.__class__.my_type == s]
-                logger.debug("[WebUI - datamanager] type:%s, %d matching items", s, len(items))
-                for item in items:
-                    logger.debug("[WebUI - datamanager] item %s is %s", item.get_name(), item.__class__)
+                # logger.info("[WebUI - datamanager] type:%s, %d matching items", s, len(items))
+                # for item in items:
+                #     logger.info("[WebUI - datamanager] item %s is %s", item.get_name(), item.__class__)
 
             if t == 'bp' or t == 'bi':
                 if s.startswith('>='):
@@ -729,8 +745,8 @@ class WebUIDataManager(DataManager):
                 items = [i for i in items if i.customs.get('_TECH') == s]
 
             if t == 'perf':
-                match = re.compile('(?P<attr>[\w_]+)(?P<operator>>=|>|==|<|<=)(?P<value>[\d\.]+)').match(s)
-                operator_str2function = {'>=':operator.ge, '>':operator.gt, '==':operator.eq, '<':operator.lt, '<=':operator.le}
+                match = re.compile('(?P<attr>[\w_]+)(?P<operator>>=|>|==|<|<=)(?P<value>[-\d\.]+)').match(s)
+                operator_str2function = {'>=':operator.ge, '>':operator.gt, '=':operator.eq, '==':operator.eq, '<':operator.lt, '<=':operator.le}
                 oper = operator_str2function[match.group('operator')]
                 new_items = []
                 if match:
@@ -745,8 +761,10 @@ class WebUIDataManager(DataManager):
 
             if t == 'reg':
                 new_items = []
+                # logger.info("[WebUI-REG] s=%s -> len(items)=%d", s.split(','), len(items))
+                # pat = re.compile(s, re.IGNORECASE)
                 for i in items:
-                    l1 = s.split(',')
+                    l1 = s.split('|')
                     if i.__class__.my_type == 'service':
                         l2 = i.host.cpe_registration_tags.split(',')
                     elif i.__class__.my_type == 'host':
@@ -754,19 +772,34 @@ class WebUIDataManager(DataManager):
                     else:
                         l2 = []
 
-                    # l2 = i.customs.get('_REGTAGS', '').split(',')
-                    logger.info("[WebUI-REG] item %s -> regtags: %s", i, l2)
+                    # logger.info("[WebUI-REG] item %s -> regtags: %s", i, l2)
                     found = [x for x in l1 if x in l2]
                     if found:
                         # logger.info("[WebUI-REG] found %s", i)
                         _append_based_on_filtered_by_type(new_items, i, filtered_by_type)
 
-                logger.info("[WebUI-REG] s=%s -> len(new_items)=%d", s.split(','), len(new_items))
+                # logger.info("[WebUI-REG] s=%s -> len(new_items)=%d", s.split(','), len(new_items))
                 items = new_items
 
             if t == 'loc':
                 items = [i for i in items if i.customs.get('_LOCATION') in s.split(',')]
 
+            if t == 'his':
+                new_items = []
+                # logger.info("[WebUI-HIS] his s=%s -> len(items)=%d", s, len(items))
+                for i in items:
+                    if i.__class__.my_type == 'service':
+                        found = len(s) == 1 and i.host.state_id == int(s) or i.host.state == s.upper()
+                        if found:
+                            _append_based_on_filtered_by_type(new_items, i, filtered_by_type)
+                        
+                    elif i.__class__.my_type == 'host':
+                        found = len(s) == 1 and i.state_id == int(s) or i.state == s.upper()
+                        if found:
+                            _append_based_on_filtered_by_type(new_items, i, filtered_by_type)
+
+                # logger.info("[WebUI-HIS] s=%s -> len(new_items)=%d", s, len(new_items))
+                items = new_items
 
             # :COMMENT:maethor:150616: Legacy filters, kept for bookmarks compatibility
             if t == 'ack':
@@ -788,8 +821,8 @@ class WebUIDataManager(DataManager):
         logger.debug("[WebUI - datamanager] search_hosts_and_services, found %d matching items", len(items))
 
         logger.debug("[WebUI - datamanager] ----------------------------------------")
-        for item in items:
-            logger.debug("[WebUI - datamanager] item %s is %s", item.get_name(), item.__class__)
+        # for item in items:
+        #     logger.debug("[WebUI - datamanager] item %s is %s", item.get_name(), item.__class__)
         logger.debug("[WebUI - datamanager] ----------------------------------------")
 
         return items
@@ -835,13 +868,13 @@ class WebUIDataManager(DataManager):
             :param name: only this element
             :returns: List of elements related to the user
         """
-        logger.debug("[WebUI - datamanager] get_commands, name: %s, user: %s", name, user)
+        # logger.info("[WebUI - datamanager] get_commands, name: %s, user: %s", name, user)
         items = []
         if self.alignak:
             items = self.fe.commands
         else:
             items = self.rg.commands
-        logger.debug("[WebUI - datamanager] got %d commands", len(items))
+        # logger.info("[WebUI - datamanager] got %d commands", len(items))
 
         if name:
             return items.find_by_name(name)
@@ -907,18 +940,18 @@ class WebUIDataManager(DataManager):
     def set_contactgroups_level(self, user):
         # All known contactgroups are level 0 groups ...
         for group in self.get_contactgroups(user=user):
-            logger.debug("[WebUI - datamanager] set_contactgroups_level, group: %s", group)
+            # logger.info("[WebUI - datamanager] set_contactgroups_level, group: %s", group)
             if not hasattr(group, 'level'):
                 self.set_contactgroup_level(group, 0, user)
 
     def set_contactgroup_level(self, group, level, user):
-        logger.debug("[WebUI - datamanager] set_contactgroup_level, group: %s, level: %d", group, level)
+        # logger.info("[WebUI - datamanager] set_contactgroup_level, group: %s, level: %d", group, level)
         setattr(group, 'level', level)
 
         for g in sorted(group.get_contactgroup_members()):
             if not g:
                 continue
-            logger.debug("[WebUI - datamanager] set_contactgroup_level, g: %s", g)
+            # logger.info("[WebUI - datamanager] set_contactgroup_level, g: %s", g)
             try:
                 child_group = self.get_contactgroup(g, user=user)
                 self.set_contactgroup_level(child_group, level + 1, user)
@@ -932,7 +965,7 @@ class WebUIDataManager(DataManager):
             :param name: only this element
             :returns: List of elements related to the user
         """
-        logger.debug("[WebUI - datamanager] get_contactgroups, name: %s, members: %s", name, members)
+        # logger.info("[WebUI - datamanager] get_contactgroups, name: %s, members: %s", name, members)
         items = []
         if parent:
             group = self.get_contactgroups(user=user, name=parent)
@@ -945,7 +978,7 @@ class WebUIDataManager(DataManager):
                 items = self.fe.contactgroups
             else:
                 items = self.rg.contactgroups
-        logger.debug("[WebUI - datamanager] got %d contactgroups", len(items))
+        # logger.info("[WebUI - datamanager] got %d contactgroups", len(items))
 
         if name:
             return items.find_by_name(name)
@@ -963,7 +996,7 @@ class WebUIDataManager(DataManager):
             name = name.decode('utf8', 'ignore')
         except UnicodeEncodeError:
             pass
-        logger.debug("[WebUI - datamanager] get_contactgroup, name: %s", name)
+        # logger.info("[WebUI - datamanager] get_contactgroup, name: %s", name)
 
         return self._only_related_to(self.get_contactgroups(user=user, name=name, members=members), user)
 
@@ -987,14 +1020,16 @@ class WebUIDataManager(DataManager):
     ##
     def set_hostgroups_level(self, user):
         # All known hostgroups are level 0 groups ...
+        # logger.info("[WebUI - datamanager] set_hostgroups_level user=%s...", user)
         for group in self.get_hostgroups(user=user):
             logger.debug("[WebUI - datamanager] set_hostgroups_level, group: %s", group)
             if not hasattr(group, 'level'):
                 self.set_hostgroup_level(group, 0, user)
+        # logger.info("[WebUI - datamanager] set_hostgroups_level!!!")
 
     def set_hostgroup_level(self, group, level, user):
         setattr(group, 'level', level)
-        logger.debug("[WebUI - datamanager] set_hostgroup_level, group: %s, level: %d", group, level)
+        # logger.info("[WebUI - datamanager] set_hostgroup_level, group: %s, level: %d ...", group, level)
 
         for g in sorted(group.get_hostgroup_members()):
             if not g:
@@ -1005,6 +1040,7 @@ class WebUIDataManager(DataManager):
                 self.set_hostgroup_level(child_group, level + 1, user)
             except AttributeError:
                 pass
+        # logger.info("[WebUI - datamanager] set_hostgroup_level, group: %s, level: %d !!!", group, level)
 
     def get_hostgroups(self, user=None, name=None, parent=None):
         """ Get a list of known hosts groups
@@ -1013,7 +1049,7 @@ class WebUIDataManager(DataManager):
             :param name: only this element
             :returns: List of elements related to the user
         """
-        logger.debug("[WebUI - datamanager] get_hostgroups, name: %s", name)
+        # logger.info("[WebUI - datamanager] get_hostgroups, name: %s", name)
         items = []
         if parent:
             group = self.get_hostgroups(user=user, name=parent)
@@ -1026,7 +1062,7 @@ class WebUIDataManager(DataManager):
                 items = self.fe.hostgroups
             else:
                 items = self.rg.hostgroups
-        logger.debug("[WebUI - datamanager] got %d hostgroups", len(items))
+        # logger.info("[WebUI - datamanager] got %d hostgroups", len(items))
 
         if name:
             return items.find_by_name(name)
@@ -1152,7 +1188,7 @@ class WebUIDataManager(DataManager):
     ##
     def get_host_tags(self):
         ''' Get the hosts tags sorted by names. '''
-        logger.debug("[WebUI - datamanager] get_host_tags")
+        # logger.info("[WebUI - datamanager] get_host_tags")
         items = []
         if self.alignak:
             names = self.fe.hosts_tags.keys()
@@ -1163,7 +1199,7 @@ class WebUIDataManager(DataManager):
         for name in names:
             items.append((name, self.rg.tags[name]))
 
-        logger.debug("[WebUI - datamanager] got %d hosts tags", len(items))
+        # logger.debug("[WebUI - datamanager] got %d hosts tags", len(items))
         return items
 
     def get_hosts_tagged_with(self, tag, user):
@@ -1185,7 +1221,7 @@ class WebUIDataManager(DataManager):
         for name in names:
             items.append((name, self.rg.services_tags[name]))
 
-        logger.debug("[WebUI - datamanager] got %d services tags", len(items))
+        # logger.debug("[WebUI - datamanager] got %d services tags", len(items))
         return items
 
     def get_services_tagged_with(self, tag, user):
@@ -1209,17 +1245,17 @@ class WebUIDataManager(DataManager):
                     })
                 }
 
-            logger.info("[WebUI - datamanager] get_realms, backend parameters: %s", parameters)
+            # logger.info("[WebUI - datamanager] get_realms, backend parameters: %s", parameters)
             resp = self.fe.get_objects('contactgroup', parameters=parameters)
             total = 0
             if '_meta' in resp:
                 total = int(resp['_meta']['total'])
                 page_number = int(resp['_meta']['page'])
-                logger.info("[WebUI - datamanager] get_realms, total %d realms", total)
+                # logger.info("[WebUI - datamanager] get_realms, total %d realms", total)
 
             if '_items' in resp:
                 for item in resp['_items']:
-                    logger.info("[WebUI - datamanager] get_realms, found realm: %s", item['name'])
+                    # logger.info("[WebUI - datamanager] get_realms, found realm: %s", item['name'])
                     items.append(Realm(item))
                 return self._only_related_to(items, user)
 
