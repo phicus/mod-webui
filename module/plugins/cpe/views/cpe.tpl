@@ -26,11 +26,11 @@ Invalid element name
   %cpe_type = 'None'
 %end
 
-%if hasattr(cpe, 'host'):
+%if cpe_type=='host':
   %cpe_host = cpe if cpe_type=='host' else cpe.host
   %cpe_name = cpe.host_name if cpe_type=='host' else cpe.host.host_name+'/'+cpe.service_description
   %cpe_display_name = cpe_host.display_name if cpe_type=='host' else cpe_service.display_name+' on '+cpe_host.display_name
-  %cpe_graphs = helper.get_graphs_for_cpe(cpe_host.host_name, cpe.customs.get('_TECH'));
+  %cpe_graphs = helper.get_graphs_for_cpe(cpe_host.host_name, cpe.customs.get('_TECH'))
 %else:
   %cpe_host = cpe
   %cpe_display_name = "none"
@@ -108,7 +108,7 @@ var services = [];
     state: '{{service.state}}',
     state_id: '{{service.state_id}}',
     last_state_change: '{{service.last_state_change}}',
-    url: '/service/{{cpe_host.host_name}}/{{service.display_name}}'
+    url: '/service/{{cpe_host.host_name}}/{{service.service_description}}'
   });
 %end
 
@@ -590,17 +590,13 @@ function poll_cpe() {
 </div>
 
 
-<div id="element" class="row container-fluid">
 
-</div>
-<div class="row container-fluid">
+<!-- cpe_graphs: {{ helper.get_graphs_for_cpe(cpe_host.host_name, cpe.customs.get('_TECH')) }} -->
 
 
-
-</div>
 <div class="row container-fluid">
     %for graph in cpe_graphs:
-    <div class="col-md-6">
+    <div class="col-md-12">
         <div class="panel panel-default">
             <div class="panel-heading"><h4 class="panel-title">{{graph['title']}}</h4></div>
             <div class="panel-body">
@@ -613,7 +609,6 @@ function poll_cpe() {
     </div>
     %end
 </div>
-
 
 
 %#End of the element exist or not case
