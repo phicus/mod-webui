@@ -91,6 +91,15 @@ var proxy_prefix = "h";
 var proxy_prefix = "";
 %end
 
+
+%if str(cpe.customs.get('_CPE_MODEL', 'ffffffff')) in ('HG8010H+ACS', 'HG8310H+ACS'):
+var proxy_prefix = "";
+%end
+
+
+
+
+
 var cpe = {
     name: '{{ cpe_host.host_name }}',
     state: '{{ cpe_host.state if hasattr(cpe_host,"state") else "UNK" }}',
@@ -414,6 +423,9 @@ function poll_cpe() {
             %if str(cpe.customs.get('_TECH') if hasattr(cpe,'customs') else cpe.tech) in ('gpon'):
             <button id="btn-factrestore" type="button" class="btn btn-default" {{'disabled' if not reboot_available else ''}} ><i class="fa fa-fast-backward" aria-hidden="true"></i>&nbsp; Factory</button>
             <button id="btn-unprovision" type="button" class="btn btn-default" {{'disabled' if not reboot_available else ''}} ><i class="fa fa-reply" aria-hidden="true"></i>&nbsp; Unprovision</button>
+            %end
+            %if (str(cpe.customs.get('_TECH') if hasattr(cpe,'customs') else cpe.tech) in ('gpon')) or hasattr(cpe, 'cpe_connection_request_url'):
+            <button id="btn-factrestore" type="button" class="btn btn-default" {{'disabled' if not reboot_available else ''}} ><i class="fa fa-fast-backward" aria-hidden="true"></i>&nbsp; Factory</button>
             <button id="btn-tr069"       type="button" class="btn btn-default" {{'disabled' if not tr069_available else  ''}} ><i class="fa fa-gears" aria-hidden="true"></i>&nbsp; Reconfig (TR069)</button>
             %end
         </div>
