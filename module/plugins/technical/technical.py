@@ -59,6 +59,10 @@ def show_technical_json():
         if not hosts.get(_host):
             hosts[_host] = dict()
 
+            hosts[_host]['state_id'] = h.state_id
+            hosts[_host]['display_name'] = h.display_name
+
+
         if hasattr(h,'perf_data'):
             perfdatas = PerfDatas(h.perf_data)
             for m in perfdatas:
@@ -73,6 +77,15 @@ def show_technical_json():
                     if not _groups.get('host'):
                         _groups['host'] = list()
                     _groups['host'].append(_name)
+
+
+        if hasattr(h,'cpe_registration_host'):
+            # if not _groups.get('reg'):
+            #     _groups['reg'] = list()
+            #     _groups['reg'].append('reg')
+            hosts[_host]['reg'] =  h.cpe_registration_host
+
+
 
         for s in h.services:
             _group = s.get_name()

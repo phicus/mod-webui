@@ -21,9 +21,23 @@
 <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/1.5.1/js/buttons.html5.min.js"></script>
 <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/1.5.1/js/buttons.print.min.js"></script>
 
+
+<style>
+.hoststate0 {background-color: #5bb75b; color: #fff;}
+.hoststate1 {background-color: #da4f49; color: #fff;}
+.hoststate2 {background-color: #faa732; color: #fff;}
+.hoststate3 {background-color: #49afcd; color: #fff;}
+.hoststate0 a { color: #fff; }
+.hoststate1 a { color: #fff; }
+.hoststate2 a { color: #fff; }
+.hoststate3 a { color: #fff; }
+td.highlight { background-color: whitesmoke !important; }
+</style>
+
 <div id="technical">
 
 <!--<input type="text" id="search" value="{{ search }}" />-->
+
 
 <table id="myTable" class="table table-bordered table-condensed" style="text-align: right;">
 
@@ -135,6 +149,9 @@ $(document).ready( function (){
 
         row = '<thead><tr><th></th>';
         _headers.push('host');
+
+        data.groups['host'].push('reg');
+
         $.each(data.groups, function(k,v){
            if (v.length > 0) {
              row = row + '<th colspan="'+v.length+'">' + k + "</th>";
@@ -143,10 +160,15 @@ $(document).ready( function (){
         row = row + '</tr><tr>';
         row = row + '<th>Host</th>';
 
+
         $.each(data.groups, function(k,v){
            $.each(v, function(kk,vv){
              _headers.push(vv)
-             row = row + '<th style="width: 40px; override: hidden">' + vv + "</th>";
+             if(vv == "reg") {
+               row = row + '<th style="width: 40px; override: hidden"><span title="'+vv+'" alt="'+vv+'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' + vv + '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></th>';
+             } else {
+               row = row + '<th style="width: 40px; override: hidden"><span title="'+vv+'" alt="'+vv+'">' + vv.substr(0,2) + "</span></th>";
+             }
            });
         });
         row = row + "</tr></thead>";
@@ -160,14 +182,23 @@ $(document).ready( function (){
             $.each(_headers, function(kk,i){
               cell = v[i]
               if ( i == "host" ) {
-                row = row + '<td ><a href="/cpe/' + cell +'">' + cell + '</a></td>';
+                row = row + '<td class="hoststate' + v.state_id +'"">'
+                + '<a href="/cpe/' + cell +'">'
+                + '<span class="host_name">' + cell + '</span>'
+                + '<span class="display_name hidden">' + v.display_name + '</span>'
+                + '</a></td>';
                 host = cell;
+              } else if ( i == "reg" ) {
+                row = row + '<td>'
+                + '<a href="?search=reg:' + v.reg +'">'
+                + '<span>' + v.reg + '</span>'
+                + '</a></td>';
               } else if ( cell instanceof Object ) {
-                row = row + '<td onmouseover="g(\''+host+'\',\''+cell.name+'\')">' + processMetric(cell) + '</td>';
+                row = row + '<td data-order="' + Math.round(cell.value) + '" onmouseover="g(\''+host+'\',\''+cell.name+'\')">' + processMetric(cell) +'</td>';
               } else if ( typeof cell === "undefined"){
-                 row = row + '<td>-</td>';
+                row = row + '<td data-order="0">-</td>';
               } else {
-                 row = row + "<td>" + cell + "</td>";
+                row = row + '<td data-order="0">' + cell + '</td>';
               }
             });
 
@@ -179,6 +210,7 @@ $(document).ready( function (){
         $('#myTable').append(row);
 
         var table = $('#myTable').DataTable( {
+          autoFill: true,
           lengthMenu: [[25, 50, 100, -1], [25, 50, 100, "All"]],
           searching: false,
           pageLength: 25,
@@ -187,6 +219,14 @@ $(document).ready( function (){
               'copy', 'csv', 'excel', 'pdf', 'print'
           ]
         });
+
+        table.button().add( 0, {
+            action: function ( e, dt, button, config ) {
+              $('.display_name').toggleClass('hidden');
+              $('.host_name').toggleClass('hidden');
+            },
+            text: 'Toggle Display Name'
+        } );
 
         $('#myTable tbody').on( 'click', 'tr', function () {
                if ( $(this).hasClass('selected') ) {
@@ -202,14 +242,16 @@ $(document).ready( function (){
 
   } );
 
+
+ // buttons
+ $('#toggleName').on('click', function(){
+
+ });
+
+
+
 } );
 
 </script>
-<style>
-td.highlight {
-    background-color: whitesmoke !important;
-}
-</style>
-
 
 <img id="g" src="about:blank" style="position: fixed; bottom: 0px; right: 0px;">
