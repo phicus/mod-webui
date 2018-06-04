@@ -179,9 +179,9 @@ function poll_cpe() {
 
             if (typeof data.uptime !== 'undefined') {
               d1 = Date.parse(data.uptime);
-              d2 = new Date();
+              d2 = Date.parse(new Date());
               delta = (d2 - d1) / 1000;
-              $('#uptime').html(toHHMMSS(data.uptime));
+              $('#uptime').html(toHHMMSS(delta));
             }
 
             $('#registration_state').html('<span>'+data.status+'</span>');

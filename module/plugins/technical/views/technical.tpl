@@ -107,8 +107,10 @@ function processMetric(m) {
 
     if (false) { null }
     else if (m.name == 'upbw' || m.name == 'dnbw') str = str + humanBytes(m.value);
+    else if (m.name == 'filesize') str = str + humanBytes(m.value);
     else if (m.name.includes('freq')) str = str + humanHertz(m.value);
     else if (m.uom == 's') str = str + toHHMMSS(m.value);
+    else if (m.name.includes('uptime')) str = str + toHHMMSS(m.value);
     else str = str + m.value;
 
     //if ( m.uom ) str = str +  " " + m.uom;
@@ -150,7 +152,9 @@ $(document).ready( function (){
         row = '<thead><tr><th></th>';
         _headers.push('host');
 
-        data.groups['host'].push('reg');
+        if ('host' in data.groups) {
+          data.groups['host'].push('reg');
+        }
 
         $.each(data.groups, function(k,v){
            if (v.length > 0) {
@@ -164,7 +168,7 @@ $(document).ready( function (){
         $.each(data.groups, function(k,v){
            $.each(v, function(kk,vv){
              _headers.push(vv)
-             if(vv == "reg") {
+             if(vv == "reg" || vv == "uptime" || vv == "ruptime" || vv == "luptime" ) {
                row = row + '<th style="width: 40px; override: hidden"><span title="'+vv+'" alt="'+vv+'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' + vv + '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></th>';
              } else {
                row = row + '<th style="width: 40px; override: hidden"><span title="'+vv+'" alt="'+vv+'">' + vv.substr(0,2) + "</span></th>";
