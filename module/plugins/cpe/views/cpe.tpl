@@ -182,6 +182,7 @@ function poll_cpe() {
               d2 = Date.parse(new Date());
               delta = (d2 - d1) / 1000;
               $('#uptime').html(toHHMMSS(delta));
+              $('#last_state_change').html( (new Date(d1)).toString() )
             }
 
             $('#registration_state').html('<span>'+data.status+'</span>');
@@ -502,6 +503,7 @@ function poll_cpe() {
 
 
             <dt>Registration tags</dt><dd>{{cpe.cpe_registration_tags if hasattr(cpe, 'cpe_registration_tags') else ''  }}</dd>
+            <dt>Last status change</dt><dd><span id="last_state_change">Unknown</span></dd>
           </dl>
         </div>
 
