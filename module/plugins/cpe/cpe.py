@@ -55,11 +55,11 @@ def show_cpe(cpe_name):
 
     cpe = app.datamgr.get_host(cpe_name, user) #or app.redirect404()
 
-    if not cpe:
-        cpe = datamanager.get_cpehost_by_hostname(cpe_name)
-
-    if not cpe:
-         app.redirect404()
+    try:
+        if not cpe:
+            cpe = datamanager.get_cpehost_by_hostname(cpe_name)
+    except:
+        app.redirect404()
 
     if hasattr(cpe, 'cpe_registration_host'):
         parent = app.datamgr.get_host(cpe.cpe_registration_host, user)

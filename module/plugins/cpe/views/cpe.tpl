@@ -96,10 +96,6 @@ var proxy_prefix = "";
 var proxy_prefix = "";
 %end
 
-
-
-
-
 var cpe = {
     name: '{{ cpe_host.host_name }}',
     state: '{{ cpe_host.state if hasattr(cpe_host,"state") else "UNK" }}',

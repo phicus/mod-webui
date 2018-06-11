@@ -79,13 +79,10 @@ def show_technical_json():
                     _groups['host'].append(_name)
 
 
-        if hasattr(h,'cpe_registration_host'):
-            # if not _groups.get('reg'):
-            #     _groups['reg'] = list()
-            #     _groups['reg'].append('reg')
+        if hasattr(h,'cpe_registration_host') and h.cpe_registration_host:
             hosts[_host]['reg'] =  h.cpe_registration_host
-
-
+        elif hasattr(h,'address') and h.address:
+            hosts[_host]['reg'] = h.address
 
         for s in h.services:
             _group = s.get_name()
