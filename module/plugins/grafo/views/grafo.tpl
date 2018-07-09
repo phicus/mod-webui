@@ -4,201 +4,180 @@
 html, body {
   height: 100%;
   width: 100%;
+  font: 14px helvetica neue, helvetica, arial, sans-serif;
 }
 
 #grafo {
   width: 100%;
   height: 100%;
-}
-
-#debug {
-  background: #ddd;
-}
-
-.links line {
-  stroke: #999;
-  stroke-opacity: 0.6;
-}
-
-.nodes circle {
-  stroke: #fff;
-  stroke-width: 1.5px;
+  position: absolute;
+  left: 0;
+  top: 0;
 }
 
 </style>
-<input  id="txtSearch" type="text" value="type:host bp:>1">
-<button id="btnSearch">Search</button>
-<div id="debug">debug</div>
-<svg id="grafo"></svg>
-<script src="https://d3js.org/d3.v4.min.js"></script>
+<input  id="txtSearch" type="hidden" value="{{ search }}">
+
+<div id="grafo"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.2.14/cytoscape.min.js"></script>
+<script src="https://cytoscape.github.io/cytoscape.js-cxtmenu/cytoscape-cxtmenu.js"></script>
+<script src="https://cytoscape.github.io/cytoscape.js-cose-bilkent/cytoscape-cose-bilkent.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+
 
 <script>
 
-var svg = d3.select("svg"),
-    width  = parseInt(svg.style('width')),
-    height = parseInt(svg.style('height'));
+var username = '{{ user.get_name() }}';
 
-var color = d3.scaleOrdinal(d3.schemeCategory20);
+function index_php(data) {
+var cy = cytoscape({
+  container: document.getElementById('grafo'),
 
+  boxSelectionEnabled: false,
+  autounselectify: true,
 
-var COLOR_OK        = '#8BC34A';
-var COLOR_WARNING   = '#FAA732';
-var COLOR_CRITICAL  = '#FF7043';
-var COLOR_UNKONWN   = '#49AFCD';
+  style: cytoscape.stylesheet()
+    .selector('node')
+      .css({
+        'content': 'data(id)',
+        'background-color': 'data(color)'
+      })
+    .selector('node > node')
+      .css({
+        'width': 'data(size)',
+        'height': 'data(size)',
+        'border-color': 'data(border_color)',
+        'border-width': 5,
+        'background-color': 'data(color)',
+        'font-family': 'proxima-nova, Roboto, sans-serif',
+        'text-transform': 'uppercase',
+        'font-size': '20px'
+      })
 
-var krill = {
-  host_state_color: function(val){
-    if(val == 0) {
-  		return COLOR_OK;
-  	} else if ( val == 1 ) {
-  		return COLOR_CRITICAL;
-  	} else if ( val == 2 ) {
-  		return COLOR_WARNING;
-  	} else if ( val == 3 ) {
-  		return COLOR_UNKONWN;
-  	}
-  }
-};
+    .selector(':parent')
+      .css({
+        'background-opacity': 0.333,
+        'font-size': '40 px',
+        'text-valign': 'bottom',
+        'text-halign': 'center',
+      })
 
+    .selector('edge')
+      .css({
+        'label': 'data(label)',
+        'curve-style': 'bezier',
+        'target-arrow-shape': 'triangle',
+        'width': 4,
+        'line-color': 'data(color)',
+        'target-arrow-color': 'data(color)'
+      }),
 
-var simulation = d3.forceSimulation()
-    .force("link", d3.forceLink().id(function(d) { return d.id; }))
-    .force("charge", d3.forceManyBody())
-    .force("center", d3.forceCenter(width / 2, height / 2));
+  elements: data,
 
-function draw(search) {
-  svg.selectAll("*").remove();
-  d3.json("grafo.json?search=" + search, function(error, graph) {
-    if (error) throw error;
-
-    var link = svg.append("g")
-        .attr("class", "links")
-      .selectAll("line")
-      .data(graph.links)
-      .enter().append("line")
-        .attr("stroke-width", function(d) { return Math.sqrt(d.value); });
-
-    var node = svg.append("g")
-        .attr("class", "nodes")
-      .selectAll("circle")
-      .data(graph.nodes)
-      .enter().append("circle")
-        .attr("r",    function(d) { return 3 * d.business_impact; })
-        //.attr("width",    function(d) { return 3 * d.business_impact; })
-        //.attr("height",    function(d) { return 3 * d.business_impact; })
-        .attr("fill", function(d) { return krill.host_state_color(d.state_id); })
-        // .on("click", function(d){
-        //   console.log(d)
-        //   $('#txtSearch').val(d.id)
-        //   draw(""+d.id)
-        // })
-        .call(d3.drag()
-            .on("start", dragstarted)
-            .on("drag", dragged)
-            .on("end", dragended));
-
-    node.append("title")
-        .text(function(d) { return d.id; });
-
-    simulation
-        .nodes(graph.nodes)
-        .on("tick", ticked);
-
-    simulation.force("link")
-        .links(graph.links);
-
-    function ticked() {
-      link
-          .attr("x1", function(d) { return d.source.x; })
-          .attr("y1", function(d) { return d.source.y; })
-          .attr("x2", function(d) { return d.target.x; })
-          .attr("y2", function(d) { return d.target.y; });
-
-      node
-          .attr("cx", function(d) { return d.x; })
-          .attr("cy", function(d) { return d.y; });
-    }
-  });
-}
+  layout: {
+            name: 'cose-bilkent',
+            randomize: false,
+            gravityRangeCompound: 0.25,
+            nodeDimensionsIncludeLabels: false,
+            nodeRepulsion: 1000 * 1000,
+            tile: true
+          }
 
 
-function draw_add(search) {
-  d3.json("grafo.json?search=" + search, function(error, graph) {
-    if (error) throw error;
 
-    var link = svg.sele("g")
-        .attr("class", "links")
-      .selectAll("line")
-      .data(graph.links)
-      .enter().append("line")
-        .attr("stroke-width", function(d) { return Math.sqrt(d.value); });
-
-    var node = svg.append("g")
-        .attr("class", "nodes")
-      .selectAll("circle")
-      .data(graph.nodes)
-      .enter().append("circle")
-        .attr("r",    function(d) { return 3 * d.business_impact; })
-        //.attr("width",    function(d) { return 3 * d.business_impact; })
-        //.attr("height",    function(d) { return 3 * d.business_impact; })
-        .attr("fill", function(d) { return krill.host_state_color(d.state_id); })
-        .on("click", function(d){
-          console.log(d)
-          $('#txtSearch').val(d.id)
-          draw(""+d.id)
-        })
-        .call(d3.drag()
-            .on("start", dragstarted)
-            .on("drag", dragged)
-            .on("end", dragended));
-
-    node.append("title")
-        .text(function(d) { return d.id; });
-
-    simulation
-        .nodes(graph.nodes)
-        .on("tick", ticked);
-
-    simulation.force("link")
-        .links(graph.links);
-
-    function ticked() {
-      link
-          .attr("x1", function(d) { return d.source.x; })
-          .attr("y1", function(d) { return d.source.y; })
-          .attr("x2", function(d) { return d.target.x; })
-          .attr("y2", function(d) { return d.target.y; });
-
-      node
-          .attr("cx", function(d) { return d.x; })
-          .attr("cy", function(d) { return d.y; });
-    }
-  });
-}
-
-draw('type:host bp:>1');
-
-
-$('#btnSearch').on("click", function(){
-  draw($('#txtSearch').val())
 });
 
-function dragstarted(d) {
-  if (!d3.event.active) simulation.alphaTarget(0.3).restart();
-  d.fx = d.x;
-  d.fy = d.y;
+// {
+//   name: 'cose',
+//   // Called on `layoutready`
+//   ready               : function() {},
+//   // Called on `layoutstop`
+//   stop                : function() {},
+//   // Whether to animate while running the layout
+//   animate             : false,
+//   // Number of iterations between consecutive screen positions update (0 -> only updated on the end)
+//   refresh             : 1,
+//   // Whether to fit the network view after when done
+//   fit                 : true,
+//   // Padding on fit
+//   padding             : 10,
+//   // Constrain layout bounds; { x1, y1, x2, y2 } or { x1, y1, w, h }
+//   boundingBox         : undefined,
+//   // Whether to randomize node positions on the beginning
+//   randomize           : true,
+//   // Whether to use the JS console to print debug messages
+//   debug               : false,
+//   // Node repulsion (non overlapping) multiplier
+//   nodeRepulsion       : 900000,    // Node repulsion (overlapping) multiplier
+//   nodeOverlap         : 10,
+//   // Ideal edge (non nested) length
+//   idealEdgeLength     : 10,
+//   // Divisor to compute edge forces
+//   edgeElasticity      : 100,
+//   // Nesting factor (multiplier) to compute ideal edge length for nested edges
+//   nestingFactor       : 5,
+//   // Gravity force (constant)
+//   gravity             : 250,
+//   // Maximum number of iterations to perform
+//   numIter             : 30,
+//   // Initial temperature (maximum node displacement)
+//   initialTemp         : 200,
+//   // Cooling factor (how the temperature is reduced between consecutive iterations
+//   coolingFactor       : 0.95,
+//   // Lower temperature threshold (below this point the layout will end)
+//   minTemp             : 1.0
+// }
+
+
+cy.cxtmenu({
+commands: [
+    {
+    content: 'Search',
+    select: function(){
+      index_search(this.data('id'))
+    }
+  },
+  {
+    content: 'View',
+    select: function(){
+      top.location.href= "/cpe/" +  this.data('id');
+    }
+  },
+  {
+    content: 'Winbox',
+    select: function(){
+      top.location.href= "winbox://" + username + "@" +  this.data('address') + ':8291';
+    }
+  },
+  {
+    content: 'SSH',
+    select: function(){
+      top.location.href= "krillssh://" + username + "@" +  this.data('address') + ':22';
+    }
+  }
+]
+});
+
+
 }
 
-function dragged(d) {
-  d.fx = d3.event.x;
-  d.fy = d3.event.y;
+function index_search(txt) {
+  $.getJSON( "grafo.json?search=" + txt, function( data ) {
+
+    console.log(data);
+
+    index_php(data);
+  });
 }
 
-function dragended(d) {
-  if (!d3.event.active) simulation.alphaTarget(0);
-  d.fx = null;
-  d.fy = null;
-}
+
+
+index_search( $('#txtSearch').val() );
+//
+// setInterval( function(){
+//   index_search( $('#txtSearch').val() );
+// }, 30000);
+
 
 </script>
