@@ -18,14 +18,21 @@
         <i class="fa fa-search"></i><span>{{ search_name }}</span></span>
 
       <ul class="dropdown-menu dropdown-menu-left" role="menu">
-        <li><a role="menuitem" href="/all?search={{ app.get_search_string() }}"><span class="btn fa fa-search"></span>All</a></li>
-        <li><a role="menuitem" href="/impacts?search={{ app.get_search_string() }}"><span class="btn fa fa-bolt"></span>Impacts</a></li>
-        <li><a role="menuitem" href="/worldmap?search={{ app.get_search_string() }}"><span class="btn fa fa-map"></span>Worldmap</a></li>
-        <li><a role="menuitem" href="/minemap?search={{ app.get_search_string() }}"><span class="btn fa fa-table"></span>Minemap</a></li>
-        <li><a role="menuitem" href="/technical?search={{ app.get_search_string() }}"><span class="btn fa fa-th-large"></span>Matrix</a></li>
-        <li><a role="menuitem" href="/grafo?search={{ app.get_search_string() }}" target="_blank"><span class="btn fa fa-th-large"></span>Graph</a></li>
-        <li><a role="menuitem" href="/wall?search={{ app.get_search_string() }}"><span class="btn fa fa-th-large"></span>Wall</a></li>
-        <li><a role="menuitem" href="/availability?search={{ app.get_search_string() }}"><span class="btn fa fa-bar-chart"></span>Availability</a></li>
+        <li><a role="menuitem" href="/all?search={{ app.get_search_string() }}">
+          <span class="btn fa fa-search"></span>All</a></li>
+        <li><a role="menuitem" href="/impacts?search={{ app.get_search_string() }}">
+          <span class="btn fa fa-bolt"></span>Impacts</a></li>
+        <li><a role="menuitem" href="/worldmap?search={{ app.get_search_string() }}">
+          <span class="btn fa fa-map"></span>Worldmap</a></li>
+        <li><a role="menuitem" href="/minemap?search={{ app.get_search_string() }}">
+          <span class="btn fa fa-table"></span>Minemap</a></li>
+        <li><a role="menuitem" href="/wall?search={{ app.get_search_string() }}">
+          <span class="btn fa fa-th-large"></span>Wall</a></li>
+        <li><a role="menuitem" href="/technical?search={{ app.get_search_string() }}">
+          <span class="btn fa fa-th"></span>Matrix</a></li>
+        <li><a role="menuitem" href="/trivial?search={{ app.get_search_string() }}">
+          <span class="btn fa fa-code-fork"></span>Trivial</a></li>
+        <!--<li><a role="menuitem" href="/availability?search={{ app.get_search_string() }}"><span class="btn fa fa-bar-chart"></span>Availability</a></li>-->
       </ul>
 
       <input class="form-control" type="search" id="search" name="search" value="{{ app.get_search_string() }}">

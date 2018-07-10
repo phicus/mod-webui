@@ -211,10 +211,10 @@
             <li> <a href="{{ app.get_url('Minemap') }}"> <span class="fa fa-table"></span> Minemap </a> </li>
             <li> <a href="{{ app.get_url('Worldmap') }}"> <span class="fa fa-globe"></span> World map </a> </li>
             <li> <a href="{{ app.get_url('Wall') }}"> <span class="fa fa-th-large"></span> Wall </a> </li>
-            <li> <a href="/technical"> <span class="fa fa-th-large"></span> Matrix </a> </li>
-            <li> <a href="/grafo"> <span class="fa fa-th-large"></span> Graph </a> </li>
+            <li> <a href="/technical"> <span class="fa fa-th"></span> Matrix </a> </li>
+            <li> <a href="/trivial"> <span class="fa fa-code-fork"></span> Trivial </a> </li>
             %if app.logs_module.is_available():
-            <li> <a href="{{ app.get_url('Availability') }}"> <span class="fa fa-bar-chart"></span> Availability </a> </li>
+            <!-- <li> <a href="{{ app.get_url('Availability') }}"> <span class="fa fa-bar-chart"></span> Availability </a> </li>-->
             %end
           </ul>
         </li>
