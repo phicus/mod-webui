@@ -794,9 +794,13 @@ function generateTable(rowsData, titles, type, _class) {
           rowsData.forEach(function (row, index) {
               var $tr = $("<tr>");
               row.forEach(function (html) {
-                  $("<td>").html(html).appendTo($tr);
+                  if(html) {
+                    $("<td>").html(html).appendTo($tr);
+                  }
               });
-              $tr.appendTo($tbody);
+              if ( $tr.children('td').length ) {
+                $tr.appendTo($tbody);
+              }
           });
       }
 
@@ -854,12 +858,12 @@ function parsePerfdataTable2(metric) {
       while(tmp[key].length < max) {
         tmp[key].push('')
       }
-      console.log(metric[i]);
+      //console.log(metric[i]);
       //console.log( max + ":" + key + "[" + index + "]=" + value )
       tmp[key][index] = Krill.processMetric(metric[i]); // value
     }
   }
-  console.log(tmp)
+  //console.log(tmp)
   return tmp
 }
 
