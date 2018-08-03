@@ -105,6 +105,24 @@ function g(host,metric) {
 function processMetric(m) {
     str = "";
 
+    if (Array.isArray(m)) {
+      nm = {
+        'name': m[0],
+        'value': m[1],
+        'uom' : m[2],
+      }
+      if ( m.length >= 5 ) {
+        nm['warning'] = m[3];
+        nm['critical'] = m[4];
+      }
+      if ( m.length >= 7 ) {
+        nm['min'] = m[5]
+        nm['max'] = m[6]
+      }
+      m = nm;
+    }
+
+
     if (false) { null }
     else if (m.name == 'upbw' || m.name == 'dnbw') str = str + humanBytes(m.value);
     else if (m.name == 'filesize') str = str + humanBytes(m.value);

@@ -225,7 +225,7 @@ function poll_cpe() {
             }
 
             if (typeof data.status_id !== "undefined") {
-              $('#registration_state').css('color', getColorState(data.status_id) );
+              $('#registration_state').css('color', Krill.getColorState(data.status_id) );
               $('#status2').html(getHTMLState(data.status_id));
             }
 
@@ -252,36 +252,38 @@ function poll_cpe() {
               var upstreams   = Krill.parsePerfdata(data.perfdatas.upstream);
               var qoss        = Krill.parsePerfdata(data.perfdatas.qos);
 
+
               for (var i = 0; i < downstreams; i++) {
                 if (downstreams[i][0] == 'dnrx') {
-                  data.dnrx = parseFloat(downstreams[i][1])
+                  //data.dnrx = parseFloat(downstreams[i][1])
+                  data.dnrx = Krill.parsePerfdata(downstreams[i])
+
                 }
               }
 
               for (var i = 0; i < upstreams; i++) {
                 if (upstreams[i][0] == 'uptx') {
-                  data.uptx = parseFloat(upstreams[i][1])
+                  data.uptx = Krill.parsePerfdata(upstreams[i][1])
                 }
               }
 
 
               for (var i = 0; i < qoss; i++) {
                 if (qoss[i][0] == 'dncorr') {
-                  data.dncorr = parseFloat(upstreams[i][1])
+                  data.dncorr = Krill.parsePerfdata(upstreams[i][1])
                 }
                 if (qoss[i][0] == 'dnko') {
-                  data.dnko = parseFloat(upstreams[i][1])
+                  data.dnko = Krill.parsePerfdata(upstreams[i][1])
                 }
               }
 
 
-
-              qoss_table          = parsePerfdataTable(qoss)
+              qoss_table          = parsePerfdataTable2(qoss)
               qoss_table_titles   = Object.keys(qoss_table)
               qoss_table_rows     = Object.values(qoss_table)
 
-              downstreams_table        = parsePerfdataTable(downstreams)
-              upstreams_table          = parsePerfdataTable(upstreams)
+              downstreams_table        = parsePerfdataTable2(downstreams)
+              upstreams_table          = parsePerfdataTable2(upstreams)
 
               downstreams_table.dncorr = qoss_table.dncorr
               downstreams_table.dnko   = qoss_table.dnko
@@ -290,7 +292,6 @@ function poll_cpe() {
 
               downstreams_table_titles = Object.keys(downstreams_table)
               downstreams_table_rows   = Object.values(downstreams_table)
-
 
               upstreams_table_titles   = Object.keys(upstreams_table)
               upstreams_table_rows     = Object.values(upstreams_table)
@@ -684,9 +685,10 @@ function poll_cpe_timeout() {
 }
 
 // lazy start
-window.setTimeout(function(){
-      poll_cpe_timeout();
-}, 1000);
-
+$(function(){
+  window.setTimeout(function(){
+        poll_cpe_timeout();
+  }, 1000);
+});
 
 </script>

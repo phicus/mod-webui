@@ -6,6 +6,46 @@
 var timeline;
 
 
+function humanBytes(fileSizeInBytes) {
+
+    var i = -1;
+    var byteUnits = ['kb', 'Mb', 'Gb', 'Tb', 'Pb', 'Eb', 'Zb', 'Yb'];
+    do {
+        fileSizeInBytes = fileSizeInBytes / 1024;
+        i++;
+    } while (fileSizeInBytes > 1024);
+
+    return Math.max(fileSizeInBytes, 0.1).toFixed(1) + byteUnits[i];
+};
+
+function humanHertz(frequency) {
+
+    var i = 0;
+    var byteUnits = ['Hz', 'kHz', 'MHz', 'GHz'];
+    do {
+        frequency = frequency / 1000;
+        i++;
+    } while (frequency > 1000);
+
+    return Math.max(frequency, 0).toFixed(0) + byteUnits[i];
+};
+
+function toHHMMSS(num) {
+    var sec_num = parseInt(num, 10); // don't forget the second param
+    var days    = Math.floor(sec_num / (3600 * 24));
+    var hours   = Math.floor((sec_num / 3600) % 24);
+    var minutes = Math.floor((sec_num / 60) % 60);
+    var seconds = sec_num % 60;
+
+    if (days    >  1) {days    = days + "d " } else { days = ""}
+    if (hours   < 10) {hours   = "0"+hours;}
+    if (minutes < 10) {minutes = "0"+minutes;}
+    if (seconds < 10) {seconds = "0"+seconds;}
+    return days+hours+':'+minutes+':'+seconds;
+};
+
+
+
 function copyToClipboard(elem) {
 	  // create hidden text element, if it doesn't already exist
     var targetId = "_hiddenCopyText_";
@@ -58,6 +98,19 @@ var Krill = {
   // label=valUOM;warn;crit;min;max
   PERFDATA_PATTERN: /([^=]+)=([\d\.\-]+)([\w%]*);?([\d\.\-:~@]+)?;?([\d\.\-:~@]+)?;?([\d\.\-]+)?;?([\d\.\-]+)?\s*/,
 
+  getColorState: function(val) {
+  	if(val == 0) {
+  		return COLOR_OK;
+  	} else if ( val == 1 ) {
+  		return COLOR_WARNING;
+  	} else if ( val == 2 ) {
+  		return COLOR_CRITICAL;
+  	} else if ( val == 3 ) {
+  		return COLOR_UNKONWN;
+  	}
+
+  },
+
   parsePerfdata: function(perfdata) {
     var parsed = [];
 
@@ -89,7 +142,54 @@ var Krill = {
 
     }
     return parsed
+  },
+
+
+  processMetric: function(m) {
+      var str = "";
+
+
+      if (Array.isArray(m)) {
+        var nm = {
+          'name': m[0],
+          'value': parseFloat(m[1]),
+          'uom' : m[2],
+        }
+        if ( m.length >= 5 ) {
+          nm['warning'] = m[3];
+          nm['critical'] = m[4];
+        }
+        if ( m.length >= 7 ) {
+          nm['min'] = m[5]
+          nm['max'] = m[6]
+        }
+        m = nm;
+      }
+
+      if (m.name == 'upbw' || m.name == 'dnbw') str = str + humanBytes(m.value);
+      else if (m.name == 'filesize') str = str + humanBytes(m.value);
+      else if (m.name.includes('freq')) str = str + humanHertz(m.value);
+      else if (m.uom == 's') str = str + toHHMMSS(m.value);
+      else if (m.name.includes('uptime')) str = str + toHHMMSS(m.value);
+      else str = str + m.value;
+
+      //if ( m.uom ) str = str +  " " + m.uom;
+      console.log(m);
+
+      if ( m.critical && m.critical > m.warning && m.value > m.critical ) str = '<span class="font-critical">' + str + '<span>';
+      else if ( m.critical && m.critical < m.warning && m.value < m.critical ) str = '<span class="font-critical">' + str + '<span>';
+      else if ( m.warning && m.critical > m.warning && m.value > m.warning )   str = '<span class="font-warning">' + str + '<span>';
+      else if ( m.warning && m.critical < m.warning && m.value < m.warning )   str = '<span class="font-warning">' + str + '<span>';
+      else if ( m.warning == null && m.critical == null) str = '<span>' + str + '<span>'
+      else  str = '<span class="font-ok">' + str + '<span>';
+
+      return str
+
   }
+
+
+
+
 }
 
 //$.fn.dataTable.ext.errMode = 'none';
@@ -730,6 +830,37 @@ function generatePerfTable(titles, rows) {
     tb = Array()
   }
   return tb;
+}
+
+
+function parsePerfdataTable2(metric) {
+  var tmp = {};
+  var max = 0
+  for (var i = 0; i < metric.length; i++) {
+
+    var regex = /([a-z]+)(\d+)/g;
+    var m = regex.exec(metric[i][0])
+    if(m) {
+      var key = m[1]
+      var index = m[2] - 1
+      var value = metric[i][1]
+
+      max = Math.max(max, index)
+
+      if(typeof tmp[key] === "undefined") {
+        tmp[key] = []
+      }
+
+      while(tmp[key].length < max) {
+        tmp[key].push('')
+      }
+      console.log(metric[i]);
+      //console.log( max + ":" + key + "[" + index + "]=" + value )
+      tmp[key][index] = Krill.processMetric(metric[i]); // value
+    }
+  }
+  console.log(tmp)
+  return tmp
 }
 
 function parsePerfdataTable(metric) {
