@@ -1,20 +1,45 @@
+// layout = window.cy.makeLayout({'name': 'cose'})
+// layout.options.eles = window.cy.elements();
+// layout.run()
+
+var LAYOUT1 = {
+  name: 'cose-bilkent',
+  stop: function(){
+    console.log("cy::stop []");
+    window.cy.nodes().lock();
+  },
+  randomize: true,
+  gravityRangeCompound: 0.25,
+  nodeDimensionsIncludeLabels: false,
+  nodeRepulsion: 1000 * 1000,
+  tile: true
+}
+
+var LAYOUT2 = {
+  name: 'preset'
+}
 
 function trivial_expand(txt) {
   $.getJSON( "trivial.json?search=" + txt, function( data ) {
     console.log(data)
-    window.cy.json(data)
+    window.cy.add(data);
   });
 }
 
 function trivial_init(data) {
+
+
+
+
 var cy = cytoscape({
   container: document.getElementById('trivial'),
+
   ready: function(){
+    console.log("cy::ready []");
     window.cy = this;
   },
-  boxSelectionEnabled: false,
-  autounselectify: true,
 
+  boxSelectionEnabled: true,
   maxZoom: 2,
   minZoom: 0.125,
 
@@ -22,14 +47,7 @@ var cy = cytoscape({
 
   elements: data,
 
-  layout: {
-            name: 'cose-bilkent',
-            randomize: true,
-            gravityRangeCompound: 0.25,
-            nodeDimensionsIncludeLabels: false,
-            nodeRepulsion: 1000 * 1000,
-            tile: true
-          }
+  layout: LAYOUT1
 });
 
 
@@ -38,12 +56,19 @@ var cy = cytoscape({
 function trivial_search(txt) {
   history.pushState('trivial:'+txt, 'Trivial: '+txt, '/trivial?search='+txt);
         selector: 'node.devices',$.getJSON( "trivial.json?search=" + txt, function( data ) {
+
     trivial_init(data);
 
     window.cy.cxtmenu({
       commands: ctxmenu_commands_all
     });
 
+    window.cy.nodes().bind("mouseover", function(event){
+      var node = event.target;
+
+      //$('#resumen').load('/cpe/quickservices/' + node.data().id )
+
+    });
   });
 }
 
@@ -108,3 +133,99 @@ var ctxmenu_commands_cpe = [
 $(function(){
   trivial_search( $('#txtSearch').val() );
 })
+
+
+
+function savePosition() {
+  data = {}
+
+  $.each(window.cy.nodes(), function(k,node){
+    data[ node.data().id ] = {
+      'position': node.position()
+    };
+  });
+
+  localStorage.setItem('trivial', JSON.stringify(data));
+}
+
+function loadPosition() {
+  var loadData = JSON.parse(localStorage.getItem('trivial'))
+
+
+
+  $.each(loadData, function(k,v){
+    //console.log(v);
+    ele = window.cy.getElementById(k);
+    ele.position(v.position)
+  })
+
+  // $.each(data.nodes, function(k,v){
+  //   _id = v.data.id;
+  //   if (_id in loadData) {
+  //     console.log(_id)
+  //     position = saveData[_id].position
+  //     v['position'] = saveData[_id].position
+  //   }
+  // });
+}
+
+
+$('#load-position').hide();
+$('#save-position').hide();
+
+function workMode(){
+  $('#load-position').show();
+  $('#save-position').show();
+  $('#view-mode').show();
+  $('#work-mode').hide();
+  window.cy.nodes().unlock();
+}
+
+function viewMode(){
+  $('#load-position').hide();
+  $('#save-position').hide();
+  $('#view-mode').hide();
+  $('#work-mode').show();
+  window.cy.nodes().lock();
+}
+
+$('#work-mode').on('click', function(){
+  workMode();
+});
+
+$('#view-mode').on('click', function(){
+  viewMode();
+});
+
+
+$('#save-position').on('click', function(){
+  console.log("savePosition []")
+  savePosition();
+});
+
+$('#load-position').on('click', function(){
+  console.log("loadPosition []")
+  loadPosition();
+});
+
+
+$('#play').on('click', function(){
+//
+
+  var b = window.cy
+
+  .nodes().animate({
+    position: { x: 0, y: 0 }
+  })
+
+  .delay(1000)
+
+  .animate({
+      pan: { x: 0, y: 0 }
+  });
+
+    // a.animation().play().promise().then(function () {
+    //     b.animation().play();
+    // });
+//--
+});

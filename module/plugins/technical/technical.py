@@ -29,6 +29,19 @@ def show_technical_table():
     return {'search': search}
 
 
+def show_connection_request():
+
+    user = app.request.environ['USER']
+    #
+    search = app.request.query.get('search', "type:host hg:cpegpon")
+
+    items = app.datamgr.search_hosts_and_services(search, user, get_impacts=False)
+
+    connections = [ getattr(host,'cpe_connection_request_url','') for host in items]
+
+    return {'connections': connections}
+
+
 def show_technical_json():
 
     user = app.request.environ['USER']
@@ -146,6 +159,9 @@ pages = {
     },
     show_technical_json: {
         'name': 'technical', 'route': '/technical/json'
+    },
+    show_connection_request: {
+            'name': 'connection_request', 'route': '/technical/acs', 'view': 'connection_request', 'static': True, 'search_engine': True
     }
 
 }

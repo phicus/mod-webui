@@ -24,23 +24,23 @@ def _metric_to_json(m):
 
 def _host_state_to_color(id):
     if id == 0:
-        return '#8BC34A'
+        return '#5bb75b' #'#8BC34A'
     elif id == 1:
-        return '#FF7043'
+        return '#da4f49'
     elif id == 2:
-        return '#FAA732'
+        return '#faa732'
     else:
-        return '#49AFCD'
+        return '#49afcd'
 
 def _service_state_to_color(id):
     if id == 0:
-        return '#8BC34A'
+        return '#5bb75b' #'#8BC34A'
     elif id == 1:
-        return '#FAA732'
+        return '#faa732'
     elif id == 2:
-        return '#FF7043'
+        return '#da4f49'
     else:
-        return '#49AFCD'
+        return '#49afcd'
 
 
 def show_trivial():

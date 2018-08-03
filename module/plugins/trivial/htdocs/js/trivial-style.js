@@ -12,17 +12,15 @@ var TRIVIAL_STYLE = cytoscape.stylesheet()
   'font-family': 'proxima-nova, Roboto, sans-serif',
   'text-transform': 'uppercase',
   'font-size': '20px',
-  
   'pie-size': '80%',
-  'pie-1-background-color': '#8BC34A',
+  'pie-1-background-color': '#5bb75b',
   'pie-1-background-size': function(d) { data = d.json().data; if( data.servicen == 0) {return 0}; return (data.service0 / data.servicen) * 100 },
-  'pie-2-background-color': '#FAA732',
+  'pie-2-background-color': '#faa732',
   'pie-2-background-size': function(d) { data = d.json().data; if( data.servicen == 0) {return 0}; return (data.service1 / data.servicen) * 100 },
-  'pie-3-background-color': '#FF7043',
+  'pie-3-background-color': '#da4f49',
   'pie-3-background-size': function(d) { data = d.json().data; if( data.servicen == 0) {return 0}; return (data.service2 / data.servicen) * 100 },
-  'pie-4-background-color': '#49AFCD',
+  'pie-4-background-color': '#49afcd',
   'pie-4-background-size': function(d) { data = d.json().data; if( data.servicen == 0) {return 0}; return (data.service3 / data.servicen) * 100 },
-
 })
 
 .selector(':parent').css({
