@@ -34,12 +34,14 @@ Hola
 
 <script src="http://ajaxorg.github.io/ace-builds/src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
 
+
+<!--
 <script>
 var editor = ace.edit("editor");
 //editor.setTheme("ace/theme/monokai");
 editor.session.setMode("ace/mode/json");
 editor.getSession().setTabSize(2);
 editor.getSession().setUseWrapMode(true);
-
 editor.setValue( JSON.stringify(JSON.parse(localStorage.getItem('trivial')),null,"\t")  );
 </script>
+-->
