@@ -390,7 +390,6 @@ function labelToColor(label) {
 function createTimeline(min_date, max_date) {
     var container = document.getElementById('timeline');
     var groups = [];
-    console.log("Hola" + cpe.state_id)
     groups.push({id: cpe.name, content: '<span id="status2">'+getHostHTMLState(cpe.state_id)+'</span>' + '<a href="'+cpe.url+'">'+cpe.name+'</a>'});
     services.forEach(function(service) {
         groups.push({id: service.name, content: getHTMLState(service.state_id) + '<a href="'+service.url+'">'+service.name+'</a>'});
