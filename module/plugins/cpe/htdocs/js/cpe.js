@@ -37,7 +37,7 @@ function toHHMMSS(num) {
     var minutes = Math.floor((sec_num / 60) % 60);
     var seconds = sec_num % 60;
 
-    if (days    >  1) {days    = days + "d " } else { days = ""}
+    if (days    >  0) {days    = days + "d " } else { days = ""}
     if (hours   < 10) {hours   = "0"+hours;}
     if (minutes < 10) {minutes = "0"+minutes;}
     if (seconds < 10) {seconds = "0"+seconds;}
