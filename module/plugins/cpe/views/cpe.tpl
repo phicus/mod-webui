@@ -664,7 +664,13 @@ if (cpeMAC) {
       var html = $('ul',data);
       $('li', html).on('click', function(){
          //console.log($(this).text());
-         $('#search').val($(this).text());
+
+         var _txt = $(this).clone().children().remove().end().text();
+         _txt = _txt.split(":")
+         _txt.shift()
+         _txt = _txt.join(":")
+
+         $('#search').val( _txt  );
       });
       $('#quickservices').html( html );
 
