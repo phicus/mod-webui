@@ -654,12 +654,26 @@ if (cpeMAC) {
 }
 
 
+
+
 // Actualizador servicios
 (function worker() {
   $.ajax({
     url: '/cpe/quickservices/{{cpe_host.host_name}}',
     success: function(data) {
-      $('#quickservices').html( $('ul',data) );
+      var html = $('ul',data);
+      $('li', html).on('click', function(){
+         //console.log($(this).text());
+         $('#search').val($(this).text());
+      });
+      $('#quickservices').html( html );
+
+
+      // $('#quickservices li').on('click', function(){
+      //   console.log(  $(this) );
+      // });
+
+
     },
     complete: function() {
       setTimeout(worker, CPE_QUICKSERVICES_UPDATE_FREQUENCY);

@@ -186,10 +186,24 @@ $(document).ready( function (){
         $.each(data.groups, function(k,v){
            $.each(v, function(kk,vv){
              _headers.push(vv)
+             _sort = vv.substr(0,2);
+             if (_sort == 'dn' || _sort == 'up') {
+                _sort = vv.substr(0,5);
+             }
+
+             //if (_sort == 'dn') {
+             //    _sort = '&darr;' + vv.substr(2,2);
+             //}
+             //if (_sort == 'up') {
+            //  _sort = '&uarr;' + vv.substr(2,3);
+             //}
+
+
+
              if(vv == "reg" || vv == "uptime" || vv == "ruptime" || vv == "luptime" ) {
                row = row + '<th style="width: 40px; override: hidden"><span title="'+vv+'" alt="'+vv+'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' + vv + '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></th>';
              } else {
-               row = row + '<th style="width: 40px; override: hidden"><span title="'+vv+'" alt="'+vv+'">' + vv.substr(0,2) + "</span></th>";
+               row = row + '<th style="width: 40px; override: hidden"><span title="'+vv+'" alt="'+vv+'">' + _sort + "</span></th>";
              }
            });
         });
