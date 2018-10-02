@@ -6,7 +6,7 @@ var LAYOUT1 = {
   name: 'cose-bilkent',
   stop: function(){
     console.log("cy::stop []");
-    window.cy.nodes().lock();
+    window.cy.nodes(); //.lock();
   },
   randomize: true,
   gravityRangeCompound: 0.25,
@@ -170,43 +170,43 @@ function loadPosition() {
 }
 
 
-$('#load-position').hide();
-$('#save-position').hide();
-
-function workMode(){
-  $('#load-position').show();
-  $('#save-position').show();
-  $('#view-mode').show();
-  $('#work-mode').hide();
-  window.cy.nodes().unlock();
-}
-
-function viewMode(){
-  $('#load-position').hide();
-  $('#save-position').hide();
-  $('#view-mode').hide();
-  $('#work-mode').show();
-  window.cy.nodes().lock();
-}
-
-$('#work-mode').on('click', function(){
-  workMode();
-});
-
-$('#view-mode').on('click', function(){
-  viewMode();
-});
-
-
-$('#save-position').on('click', function(){
-  console.log("savePosition []")
-  savePosition();
-});
-
-$('#load-position').on('click', function(){
-  console.log("loadPosition []")
-  loadPosition();
-});
+// $('#load-position').hide();
+// $('#save-position').hide();
+//
+// function workMode(){
+//   $('#load-position').show();
+//   $('#save-position').show();
+//   $('#view-mode').show();
+//   $('#work-mode').hide();
+//   window.cy.nodes().unlock();
+// }
+//
+// function viewMode(){
+//   $('#load-position').hide();
+//   $('#save-position').hide();
+//   $('#view-mode').hide();
+//   $('#work-mode').show();
+//   window.cy.nodes().lock();
+// }
+//
+// $('#work-mode').on('click', function(){
+//   workMode();
+// });
+//
+// $('#view-mode').on('click', function(){
+//   viewMode();
+// });
+//
+//
+// $('#save-position').on('click', function(){
+//   console.log("savePosition []")
+//   savePosition();
+// });
+//
+// $('#load-position').on('click', function(){
+//   console.log("loadPosition []")
+//   loadPosition();
+// });
 
 
 $('#play').on('click', function(){

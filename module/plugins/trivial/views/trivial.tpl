@@ -12,16 +12,14 @@ var username = '{{ user.get_name() }}';
 
 <div id="trivial"></div>
 
+<!--
 <div id="buttons">
   <button class="btn btn-primary btn-sx" id="load-position">Load Position</button>
   <button class="btn btn-primary" id="save-position">Save Position</button>
   <button class="btn btn-primary" id="work-mode">Work Mode</button>
   <button class="btn btn-primary" id="view-mode" style="display: none;">View Mode</button>
 </div>
-
-<div id="editor">
-Hola
-</div>
+-->
 
 <script src="http://js.cytoscape.org/js/cytoscape.min.js"></script>
 <script src="https://cytoscape.github.io/cytoscape.js-cxtmenu/cytoscape-cxtmenu.js"></script>
