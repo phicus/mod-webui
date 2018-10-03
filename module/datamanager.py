@@ -791,6 +791,25 @@ class WebUIDataManager(DataManager):
                         new_items.append(i)
                 items = new_items
 
+            # @author: phicus
+            if t == 'vendor':
+                pat = re.compile(s, re.IGNORECASE)
+                new_items = []
+                for i in items:
+                    if pat.match(i.customs.get('_VENDOR', '')):
+                        new_items.append(i)
+                items = new_items
+
+            # @author: phicus
+            if t == 'model':
+                pat = re.compile(s, re.IGNORECASE)
+                new_items = []
+                for i in items:
+                    if pat.match(i.customs.get('_MODEL', '')):
+                        new_items.append(i)
+                items = new_items
+
+
             if t == 'his':
                 new_items = []
                 # logger.info("[WebUI-HIS] his s=%s -> len(items)=%d", s, len(items))
@@ -799,7 +818,7 @@ class WebUIDataManager(DataManager):
                         found = len(s) == 1 and i.host.state_id == int(s) or i.host.state == s.upper()
                         if found:
                             _append_based_on_filtered_by_type(new_items, i, filtered_by_type)
-                        
+
                     elif i.__class__.my_type == 'host':
                         found = len(s) == 1 and i.state_id == int(s) or i.state == s.upper()
                         if found:
