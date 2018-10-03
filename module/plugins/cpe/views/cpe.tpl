@@ -118,6 +118,10 @@ var services = [];
   });
 %end
 
+
+
+
+
 function notify(msg) {
   // Let's check if the browser supports notifications
   if (!("Notification" in window)) {
@@ -151,14 +155,12 @@ function poll_cpe() {
 
         if ( typeof data.hostevent !== 'undefined' ) {
           $.each(data.hostevent, function(k,v){
-
               if ( typeof v.leased_address !== 'undefined' ) {
                 alertify.log("New IP ADDRESS: " + v.leased_address, "info", 15000);
               }
 
           });
         }
-
 
         if(data && data.status) {
 
@@ -174,15 +176,34 @@ function poll_cpe() {
               $('#ccq').html(data.ccq + "%").show()
             }
 
-            if (typeof data.uptime !== 'undefined') {
+            if (typeof data.uptime === 'string') {
               d1 = Date.parse(data.uptime);
+              console.log(d1)
               d2 = Date.parse(new Date());
+              console.log(d2)
               delta = (d2 - d1) / 1000;
               $('#uptime').html(toHHMMSS(delta));
+              if(delta > window.cpe_uptime) {
+                window.cpe_uptime = delta;
+              }
               $('#last_state_change').html( (new Date(d1)).toString() )
             }
 
-            $('#registration_state').html('<span>'+data.status+'</span>');
+            if (typeof data.uptime === 'number') {
+              start = Date.parse(new Date()) - data.uptime;
+              delta = data.uptime / 1000
+              if(delta > window.cpe_uptime) {
+                window.cpe_uptime = delta;
+              }
+              $('#last_state_change').html( (new Date(start)).toString() )
+            }
+
+
+
+            if (typeof data.status_id !== "undefined") {
+              $('#registration_state').css('color', Krill.getColorState(data.status_id) );
+              $('#status2').html(getHTMLState(data.status_id));
+            }
 
 
             //console.log(data);
@@ -225,22 +246,17 @@ function poll_cpe() {
                })
             }
 
-            if (typeof data.status_id !== "undefined") {
-              $('#registration_state').css('color', Krill.getColorState(data.status_id) );
-              $('#status2').html(getHTMLState(data.status_id));
+            if (typeof data.service_ports !== "undefined") {
+              line = ""
+              $.each(data.service_ports, function(k,v){
+                 line = line + v.service_vlan + '/'+ v.user_vlan
+                 if ( typeof v.native_vlan !== 'undefined' && v.native_vlan ) {
+                   line = line + "N";
+                 }
+                 line = line + " ";
+              })
+              $('#service_ports').html(line)
             }
-
-            line = ""
-            $.each(data.service_ports, function(k,v){
-               line = line + v.service_vlan + '/'+ v.user_vlan
-               if ( typeof v.native_vlan !== 'undefined' && v.native_vlan ) {
-                 line = line + "N";
-               }
-               line = line + " ";
-            })
-
-            $('#service_ports').html(line)
-
 
             if (data.status && data.status != cpe.state) {
                 //notify("{{cpe_host.host_name}} is " + data.status);
@@ -374,15 +390,11 @@ function poll_cpe() {
         %end
     </div>
 
-    <div class="col-md-6">
+    <div class="col-md-6" style="border-left: 1px solid gray">
         %if cpe.customs.get('_CPE_ID'):
         <div style="font-size: 22px">{{ cpe.customs.get('_CUSTOMER_NAME')}} {{cpe.customs.get('_CUSTOMER_SURNAME')}}</div>
         <div style="font-size: 18px; color: #666; white-space:normal;">
-            <a href="/cpe/{{ cpe.cpe_registration_host }}" data-type="registration-host">{{ cpe.cpe_registration_host }}</a>
-            <span>/</span>
-            <a href="/all?search=type:host {{cpe.cpe_registration_id}}" data-type="registration-id">{{ cpe.cpe_registration_id }}</a>
-            <span>:</span>
-            <span id="registration_state"> <i class="fa fa-spinner fa-spin"></i> <!--{{cpe.cpe_registration_state}}--></span>
+            <a href="/cpe/{{ cpe.cpe_registration_host }}" data-type="registration-host">{{ cpe.cpe_registration_host }}</a><span>/</span><a href="/all?search=type:host {{cpe.cpe_registration_id}}" data-type="registration-id">{{ cpe.cpe_registration_id }}</a><span>:</span><span id="registration_state"><i class="fa fa-spinner fa-spin"></i> <!--{{cpe.cpe_registration_state}}--></span>
         </div>
         <div style="font-size: 18px; color: #999;">
             %if cpe.customs.get('_ACTIVE') == '1':
@@ -414,16 +426,21 @@ function poll_cpe() {
 
     <div class="col-md-4">
         <div class="btn-group pull-right" role="group">
-            %if str(cpe.customs.get('_TECH') if hasattr(cpe,'customs') else cpe.tech) in ('wimax'):
+            %tech = str(cpe.customs.get('_TECH') if hasattr(cpe,'customs') else cpe.tech)
+
+            %if False and tech in ('wifi'):
             <button id="btn-update" type="button" class="btn btn-default"><i class="fa fa-arrow-up" aria-hidden="true"></i>&nbsp; Update</button>
             <button id="btn-backup" type="button" class="btn btn-default"><i class="fa fa-save" aria-hidden="true"></i>&nbsp; Backup</button>
             %end
-            <button id="btn-reboot" type="button" class="btn btn-default" {{'disabled' if not reboot_available else ''}} ><i class="fa fa-refresh" aria-hidden="true"></i>&nbsp; Reboot</button>
-            %if str(cpe.customs.get('_TECH') if hasattr(cpe,'customs') else cpe.tech) in ('gpon'):
+            %if tech in ('gpon'):
             <button id="btn-unprovision" type="button" class="btn btn-default" {{'disabled' if not reboot_available else ''}} ><i class="fa fa-reply" aria-hidden="true"></i>&nbsp; Unprovision</button>
-            %end
-            %if (str(cpe.customs.get('_TECH') if hasattr(cpe,'customs') else cpe.tech) in ('gpon')) or hasattr(cpe, 'cpe_connection_request_url'):
             <button id="btn-factrestore" type="button" class="btn btn-default" {{'disabled' if not reboot_available else ''}} ><i class="fa fa-fast-backward" aria-hidden="true"></i>&nbsp; Factory</button>
+            %end
+            %if tech in ('gpon', 'docsis'):
+            <button id="btn-reboot" type="button" class="btn btn-default" {{'disabled' if not reboot_available else ''}} ><i class="fa fa-refresh" aria-hidden="true"></i>&nbsp; Reboot</button>
+            %end
+            %if hasattr(cpe, 'cpe_connection_request_url'):
+
             <button id="btn-tr069"       type="button" class="btn btn-default" {{'disabled' if not tr069_available else  ''}} ><i class="fa fa-gears" aria-hidden="true"></i>&nbsp; Reconfig</button>
             %end
         </div>
@@ -445,9 +462,9 @@ function poll_cpe() {
 
           <div class="pull-right">
             <span>Summary: </span>
-            <span class="fa fa-calendar"></span> <span id="uptime">-</span></span>
-            <span class="fa fa-dashboard"></span> <span id="dnbw">-</span>/<span id="upbw">-</span>
-            <span class="fa fa-signal"></span> <span id="uprx">-</span>/<span id="dnrx">-</span>dbm
+            <span class="fa fa-calendar"></span> <span id="uptime" alt="Uptime">-</span></span>
+            <span class="fa fa-dashboard"></span> <span id="dnbw" alt"Down Bandwidth">-</span>/<span id="upbw">-</span>
+            <span class="fa fa-signal"></span> <span id="uprx" alt"Up Bandwidth">-</span>/<span id="dnrx">-</span>dbm
             <span class="fa fa-signal"></span> <span id="ccq">-</span>dbm
             <span class="fa fa-reorder"></span> <span id="service_ports"></span>
             <span>&nbsp;</span>
@@ -710,6 +727,17 @@ $(function(){
   window.setTimeout(function(){
         poll_cpe_timeout();
   }, 1000);
+
+  window.cpe_uptime = null;
+
+  window.cpe_uptime_interval = setInterval(function(){
+    if(window.cpe_uptime != null) {
+      window.cpe_uptime += 1;
+      $('#uptime').html(toHHMMSS(window.cpe_uptime));
+    }
+  }, 1000);
+
+
 });
 
 </script>

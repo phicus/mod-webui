@@ -2,6 +2,87 @@
 // layout.options.eles = window.cy.elements();
 // layout.run()
 
+
+
+
+var ctxmenu_commands_all = [
+  {
+    content: 'Search',
+    select: function(){
+      trivial_search(this.data('id'))
+    }
+  },{
+    content: 'Expand',
+    select: function(){
+      trivial_expand(this.data('id'))
+    }
+  },{
+    content: 'View',
+    select: function(){
+      top.location.href= "/cpe/" +  this.data('id');
+    }
+  }
+]
+
+
+var ctxmenu_commands_mikrotik = ctxmenu_commands_all.slice()
+
+ctxmenu_commands_mikrotik.push(  {
+    content: 'Winbox',
+    select: function(){
+      top.location.href= "winbox://" + username + "@" +  this.data('address') + ':8291';
+    }
+});
+
+ctxmenu_commands_mikrotik.push({
+  content: 'SSH',
+  select: function(){
+    top.location.href= "krillssh://" + username + "@" +  this.data('address') + ':22';
+  }
+});
+
+
+var ctxmenu_commands_access = ctxmenu_commands_all.slice()
+
+ctxmenu_commands_access.push(  {
+    content: 'Enter the Matrix',
+    select: function(){
+      top.location.href= "/matrix/?search=reg:" +  this.data('id');
+    }
+});
+
+
+var ctxmenu_commands_ap = ctxmenu_commands_all.slice()
+
+ctxmenu_commands_ap.push(  {
+    content: 'Web',
+    select: function(){
+      top.location.href= "http://" + this.data('address');
+    }
+});
+
+ctxmenu_commands_ap.push(  {
+    content: 'Enter the Matrix',
+    select: function(){
+      top.location.href= "/matrix?search=reg:" +  this.data('id');
+    }
+});
+
+var ctxmenu_commands_cpe = [
+  {
+    content: 'View',
+    select: function(){
+      top.location.href= "/cpe/" +  this.data('id');
+    }
+  }
+]
+
+
+
+
+
+///Layouts
+
 var LAYOUT1 = {
   name: 'cose-bilkent',
   stop: function(){
@@ -56,14 +137,29 @@ var cy = cytoscape({
 }
 
 function trivial_search(txt) {
+  $('#search').val(txt);
   history.pushState('trivial:'+txt, 'Trivial: '+txt, '/trivial?search='+txt);
         selector: 'node.devices',$.getJSON( "trivial.json?search=" + txt, function( data ) {
 
     trivial_init(data);
 
     window.cy.cxtmenu({
-      commands: ctxmenu_commands_all
+      selector: 'node',
+      commands: function(e){
+          console.log(this)
+
+          if (e.data()['name'].search("AP") == 0) {
+            return ctxmenu_commands_ap;
+          }
+
+          return ctxmenu_commands_all;
+      }
     });
+
+    // window.cy.cxtmenu({
+    //   selector: 'node.ap',
+    //   commands: ctxmenu_commands_ap
+    // });
 
     window.cy.nodes().bind("mouseover", function(event){
       var node = event.target;
@@ -75,62 +171,8 @@ function trivial_search(txt) {
 }
 
 
-var ctxmenu_commands_all = [
-  {
-    content: 'Search',
-    select: function(){
-      trivial_search(this.data('id'))
-    }
-  },{
-    content: 'Expand',
-    select: function(){
-      trivial_expand(this.data('id'))
-    }
-  },{
-    content: 'View',
-    select: function(){
-      top.location.href= "/cpe/" +  this.data('id');
-    }
-  }
-]
 
 
-
-var ctxmenu_commands_mikrotik = ctxmenu_commands_all.slice()
-
-ctxmenu_commands_mikrotik.push(  {
-    content: 'Winbox',
-    select: function(){
-      top.location.href= "winbox://" + username + "@" +  this.data('address') + ':8291';
-    }
-});
-
-ctxmenu_commands_mikrotik.push({
-  content: 'SSH',
-  select: function(){
-    top.location.href= "krillssh://" + username + "@" +  this.data('address') + ':22';
-  }
-});
-
-
-var ctxmenu_commands_ap = ctxmenu_commands_all.slice()
-
-ctxmenu_commands_ap.push(  {
-    content: 'Web',
-    select: function(){
-      top.location.href= "http://" + this.data('address');
-    }
-});
-
-
-var ctxmenu_commands_cpe = [
-  {
-    content: 'View',
-    select: function(){
-      top.location.href= "/cpe/" +  this.data('id');
-    }
-  }
-]
 
 $(function(){
   trivial_search( $('#txtSearch').val() );

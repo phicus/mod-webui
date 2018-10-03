@@ -2,13 +2,13 @@
 
 %groupname = 'all'
 %groupalias = 'All hosts'
-%title = 'Technical for all hosts'
+%title = 'Krill - Matrix all hosts'
 
 %helper = app.helper
 
 %search_string = app.get_search_string()
 
-%rebase("layout", title='Technical for hosts/services', css=['technical/css/technical.css'], js=['technical/js/technical.js'], breadcrumb=[ ['All hosts', '/technical'] ])
+%rebase("layout", title='Krill - Matrix for hosts/services', css=['technical/css/technical.css'], js=['technical/js/technical.js'], breadcrumb=[ ['All hosts', '/technical'] ])
 
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs/dt-1.10.16/datatables.min.css"/>
 
@@ -32,6 +32,14 @@
 .hoststate2 a { color: #fff; }
 .hoststate3 a { color: #fff; }
 td.highlight { background-color: whitesmoke !important; }
+
+
+
+.blue   { background-color:#0051BA !important; }
+.green  { background-color:#008751 !important; }
+.gray   { background-color:#919693 !important; }
+.yellow { background-color:#FFC61E !important; }
+
 </style>
 
 <div id="technical">
@@ -124,11 +132,13 @@ function processMetric(m) {
 
 
     if (false) { null }
-    else if (m.name == 'upbw' || m.name == 'dnbw') str = str + humanBytes(m.value);
+    //else if (m.name == 'upbw' || m.name == 'dnbw') str = str + humanBytes(m.value);
+    else if (m.name.includes('upbw') || m.name.includes('dnbw')) str = str + humanBytes(m.value);
     else if (m.name == 'filesize') str = str + humanBytes(m.value);
     else if (m.name.includes('freq')) str = str + humanHertz(m.value);
     else if (m.uom == 's') str = str + toHHMMSS(m.value);
     else if (m.name.includes('uptime')) str = str + toHHMMSS(m.value);
+    else if (m.name.includes('airtime')) str = m.value + '%';
     else str = str + m.value;
 
     //if ( m.uom ) str = str +  " " + m.uom;
@@ -167,13 +177,13 @@ $(document).ready( function (){
   $.getJSON( "/technical/json?search=" + $('#search').val(), function( data ) {
         _cache = data;
 
-        row = '<thead><tr><th></th>';
-        _headers.push('host');
 
+        _headers.push('host');
         if ('host' in data.groups) {
           data.groups['host'].push('reg');
         }
 
+        row = '<thead><tr><th></th>';
         $.each(data.groups, function(k,v){
            if (v.length > 0) {
              row = row + '<th colspan="'+v.length+'">' + k + "</th>";
@@ -187,23 +197,23 @@ $(document).ready( function (){
            $.each(v, function(kk,vv){
              _headers.push(vv)
              _sort = vv.substr(0,2);
+             _class = ""
              if (_sort == 'dn' || _sort == 'up') {
                 _sort = vv.substr(0,5);
              }
 
-             //if (_sort == 'dn') {
-             //    _sort = '&darr;' + vv.substr(2,2);
-             //}
-             //if (_sort == 'up') {
-            //  _sort = '&uarr;' + vv.substr(2,3);
-             //}
 
-
+             ['blue','green','gray','yellow'].forEach(function(c) {
+               if (vv.includes(c)) {
+                 _class = c;
+                 _sort = vv.replace(c,'');
+               }
+             });
 
              if(vv == "reg" || vv == "uptime" || vv == "ruptime" || vv == "luptime" ) {
-               row = row + '<th style="width: 40px; override: hidden"><span title="'+vv+'" alt="'+vv+'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' + vv + '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></th>';
+               row = row + '<th class="'+_class+'" style="width: 40px; override: hidden"><span title="'+vv+'" alt="'+vv+'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' + vv + '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></th>';
              } else {
-               row = row + '<th style="width: 40px; override: hidden"><span title="'+vv+'" alt="'+vv+'">' + _sort + "</span></th>";
+               row = row + '<th class="'+_class+'" style="width: 40px; override: hidden"><span title="'+vv+'" alt="'+vv+'">' + _sort + "</span></th>";
              }
            });
         });

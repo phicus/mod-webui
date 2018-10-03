@@ -46,7 +46,10 @@ def _service_state_to_color(id):
 def show_trivial():
 
     user   = app.request.environ.get('USER')
-    search = app.request.query.get('search', "type:host bp:>2")
+    search = app.request.query.get('search', None)
+    if not search:
+        search = "type:host bp:>2"
+
 
     return {'search': search, 'user': user }
 

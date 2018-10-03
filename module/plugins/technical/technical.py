@@ -22,6 +22,9 @@ def show_technical():
 def show_mavis_mode():
     return show_technical_table()
 
+def show_matrix_mode():
+    return show_technical_table()
+
 def show_technical_table():
 
     user = app.request.environ['USER']
@@ -32,8 +35,9 @@ def show_technical_table():
 def show_connection_request():
 
     user = app.request.environ['USER']
-    #
-    search = app.request.query.get('search', "type:host hg:cpegpon")
+    search = app.request.query.get('search', None)
+    if not search:
+        search = "type:host hg:cpegpon"
 
     items = app.datamgr.search_hosts_and_services(search, user, get_impacts=False)
 
@@ -148,6 +152,9 @@ def show_technical_json():
     return xdata
 
 pages = {
+    show_matrix_mode: {
+        'name': 'technical', 'route': '/matrix', 'view': 'technical', 'static': True, 'search_engine': True
+    },
     show_mavis_mode: {
         'name': 'technical', 'route': '/mavis', 'view': 'technical', 'static': True, 'search_engine': True
     },
