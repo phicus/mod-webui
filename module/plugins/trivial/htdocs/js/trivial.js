@@ -6,7 +6,7 @@ var LAYOUT1 = {
   name: 'cose-bilkent',
   stop: function(){
     console.log("cy::stop []");
-    window.cy.nodes(); //.lock();
+    window.cy.nodes().lock();
   },
   randomize: true,
   gravityRangeCompound: 0.25,
@@ -49,6 +49,8 @@ var cy = cytoscape({
 
   layout: LAYOUT1
 });
+
+
 
 
 }
@@ -149,15 +151,17 @@ function savePosition() {
 }
 
 function loadPosition() {
-  var loadData = JSON.parse(localStorage.getItem('trivial'))
+  var loadData = JSON.parse(localStorage.getItem('trivial'));
 
+  if(loadData) {
 
+    $.each(loadData, function(k,v){
+      //console.log(v);
+      ele = window.cy.getElementById(k);
+      ele.position(v.position)
+    })
 
-  $.each(loadData, function(k,v){
-    //console.log(v);
-    ele = window.cy.getElementById(k);
-    ele.position(v.position)
-  })
+  }
 
   // $.each(data.nodes, function(k,v){
   //   _id = v.data.id;
@@ -170,43 +174,43 @@ function loadPosition() {
 }
 
 
-// $('#load-position').hide();
-// $('#save-position').hide();
-//
-// function workMode(){
-//   $('#load-position').show();
-//   $('#save-position').show();
-//   $('#view-mode').show();
-//   $('#work-mode').hide();
-//   window.cy.nodes().unlock();
-// }
-//
-// function viewMode(){
-//   $('#load-position').hide();
-//   $('#save-position').hide();
-//   $('#view-mode').hide();
-//   $('#work-mode').show();
-//   window.cy.nodes().lock();
-// }
-//
-// $('#work-mode').on('click', function(){
-//   workMode();
-// });
-//
-// $('#view-mode').on('click', function(){
-//   viewMode();
-// });
-//
-//
-// $('#save-position').on('click', function(){
-//   console.log("savePosition []")
-//   savePosition();
-// });
-//
-// $('#load-position').on('click', function(){
-//   console.log("loadPosition []")
-//   loadPosition();
-// });
+$('#load-position').hide();
+$('#save-position').hide();
+
+function workMode(){
+  $('#load-position').show();
+  $('#save-position').show();
+  $('#view-mode').show();
+  $('#work-mode').hide();
+  window.cy.nodes().unlock();
+}
+
+function viewMode(){
+  $('#load-position').hide();
+  $('#save-position').hide();
+  $('#view-mode').hide();
+  $('#work-mode').show();
+  window.cy.nodes().lock();
+}
+
+$('#work-mode').on('click', function(){
+  workMode();
+});
+
+$('#view-mode').on('click', function(){
+  viewMode();
+});
+
+
+$('#save-position').on('click', function(){
+  console.log("savePosition []")
+  savePosition();
+});
+
+$('#load-position').on('click', function(){
+  console.log("loadPosition []")
+  loadPosition();
+});
 
 
 $('#play').on('click', function(){
