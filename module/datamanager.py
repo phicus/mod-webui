@@ -807,7 +807,37 @@ class WebUIDataManager(DataManager):
                 for i in items:
                     if pat.match(i.customs.get('_MODEL', '')):
                         new_items.append(i)
+                    if pat.match(i.customs.get('_CPE_MODEL', '')):
+                        new_items.append(i)
                 items = new_items
+
+
+            if t == 'city':
+                pat = re.compile(s, re.IGNORECASE)
+                new_items = []
+                for i in items:
+                    if pat.match(i.customs.get('_CUSTOMER_CITY', '')):
+                        new_items.append(i)
+                items = new_items
+
+            if t == 'isactive':
+                new_items = []
+                for i in items:
+                    if i.customs.get('_ACTIVE', '') and str(s).lower() in ('yes','1') :
+                        new_items.append(i)
+                    if not i.customs.get('_ACTIVE', '') and str(s).lower() in ('no','0') :
+                        new_items.append(i)
+                items = new_items
+
+            if t == 'isaccess':
+                new_items = []
+                for i in items:
+                    if i.customs.get('_ACCESS', '') and str(s).lower() in ('yes','1') :
+                        new_items.append(i)
+                    if not i.customs.get('_ACCESS', '') and str(s).lower() in ('no','0') :
+                        new_items.append(i)
+                items = new_items
+
 
 
             if t == 'his':

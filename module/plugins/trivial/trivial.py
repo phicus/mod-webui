@@ -82,7 +82,8 @@ def show_trivial_json():
                 "name": _host,
                 "address": getattr(h,'address'),
                 "color": _host_state_to_color(h.state_id),
-                "size": h.business_impact * 25
+                "size": h.business_impact * 25,
+                "tech": h.customs.get('_TECH',""),
             }}
 
             _loc = h.customs.get('_LOCATION')

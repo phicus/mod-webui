@@ -418,7 +418,11 @@ function poll_cpe() {
              | <span style="color: #607D8B">2<i class="fa fa-phone" aria-hidden="true"></i> {{ cpe.customs.get('_VOICE2_CLI') }}</span>
             %end
         </div>
-        <div style="font-size: 18px; color: #333;" id="ips"> </div>
+        <div style="font-size: 18px; color: #333;" id="ips">
+          %if hasattr(cpe, 'cpe_address') and cpe.cpe_address:
+          <a target="_blank" href="http://{{ '' + cpe.cpe_address + '.' + app.proxy_sufix }}">{{ cpe.cpe_address }}</a>
+          %end
+        </div>
         %else:
           <span></span>
         %end

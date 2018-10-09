@@ -30,7 +30,7 @@ var ctxmenu_commands_mikrotik = ctxmenu_commands_all.slice()
 ctxmenu_commands_mikrotik.push(  {
     content: 'Winbox',
     select: function(){
-      top.location.href= "winbox://" + username + "@" +  this.data('address') + ':8291';
+      top.location.href= "winbox://" + username + "@" +  this.data('address') + ':9291';
     }
 });
 
@@ -52,16 +52,16 @@ ctxmenu_commands_access.push(  {
 });
 
 
-var ctxmenu_commands_ap = ctxmenu_commands_all.slice()
+var ctxmenu_commands_wimax = ctxmenu_commands_all.slice()
 
-ctxmenu_commands_ap.push(  {
+ctxmenu_commands_wimax.push(  {
     content: 'Web',
     select: function(){
-      top.location.href= "http://" + this.data('address');
+      top.location.href= "http://" + this.data('address') + '.' + window.location.host.split('.')[0] + '.phicus.net';
     }
 });
 
-ctxmenu_commands_ap.push(  {
+ctxmenu_commands_wimax.push(  {
     content: 'Enter the Matrix',
     select: function(){
       top.location.href= "/matrix?search=reg:" +  this.data('id');
@@ -148,8 +148,12 @@ function trivial_search(txt) {
       commands: function(e){
           console.log(this)
 
-          if (e.data()['name'].search("AP") == 0) {
-            return ctxmenu_commands_ap;
+          if (e.data()['tech'] == "wimax") {
+            return ctxmenu_commands_wimax;
+          }
+
+          if (e.data()['name'].search('MK') == 0) {
+            return ctxmenu_commands_mikrotik;
           }
 
           return ctxmenu_commands_all;
@@ -158,7 +162,7 @@ function trivial_search(txt) {
 
     // window.cy.cxtmenu({
     //   selector: 'node.ap',
-    //   commands: ctxmenu_commands_ap
+    //   commands: ctxmenu_commands_wimax
     // });
 
     window.cy.nodes().bind("mouseover", function(event){
