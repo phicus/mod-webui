@@ -820,25 +820,11 @@ class WebUIDataManager(DataManager):
                         new_items.append(i)
                 items = new_items
 
-            if t == 'isactive':
-                new_items = []
-                for i in items:
-                    if i.customs.get('_ACTIVE', '') and str(s).lower() in ('yes','1') :
-                        new_items.append(i)
-                    if not i.customs.get('_ACTIVE', '') and str(s).lower() in ('no','0') :
-                        new_items.append(i)
-                items = new_items
-
             if t == 'isaccess':
-                new_items = []
-                for i in items:
-                    if i.customs.get('_ACCESS', '') and str(s).lower() in ('yes','1') :
-                        new_items.append(i)
-                    if not i.customs.get('_ACCESS', '') and str(s).lower() in ('no','0') :
-                        new_items.append(i)
-                items = new_items
-
-
+                if s.lower() in ('yes','1'):
+                    items = [i for i in items if i.__class__.my_type == 'host' and i.customs.get('_ACCESS', '') == '1']
+                elif s.lower() in ('no','0'):
+                    items = [i for i in items if i.__class__.my_type == 'host' and i.customs.get('_ACCESS', '') == '0']
 
             if t == 'his':
                 new_items = []
