@@ -430,6 +430,26 @@ function poll_cpe() {
 
     <div class="col-md-4">
         <div class="btn-group pull-right" role="group">
+            %vendor = str(cpe.customs.get('_VENDOR') if hasattr(cpe,'customs') else "")
+
+            %if 'Mikrotik' in vendor:
+
+            %winbox_port = ""
+            %winbox_address = cpe.address
+            %winbox_username = ""
+            %winbox_password = ""
+
+            %if hasattr(cpe,'customs') and cpe.customs.get('_MIKROTIK_WINBOX_PORT'):
+            %winbox_port = "%s" % cpe.customs.get('_MIKROTIK_WINBOX_PORT')
+            %end
+
+            %if hasattr(cpe,'customs') and cpe.customs.get('_PUBLIC_ADDRESS'):
+            %winbox_address = cpe.customs.get('_PUBLIC_ADDRESS')
+            %end
+
+            <button onclick="top.location.href='winbox://{{ winbox_username}}{{ winbox_password }}{{ winbox_address }}{{ winbox_port }}';" id="btn-winbox" type="button" class="btn btn-default"><i class="fa fa-gears" aria-hidden="true"></i>&nbsp; Winbox</button>
+            %end
+
             %tech = str(cpe.customs.get('_TECH') if hasattr(cpe,'customs') else cpe.tech)
 
             %if False and tech in ('wifi'):

@@ -30,7 +30,7 @@ var ctxmenu_commands_mikrotik = ctxmenu_commands_all.slice()
 ctxmenu_commands_mikrotik.push(  {
     content: 'Winbox',
     select: function(){
-      top.location.href= "winbox://" + username + "@" +  this.data('address') + ':9291';
+      top.location.href= "winbox://" + username + "@" +  this.data('address') + ':8291';
     }
 });
 
@@ -152,7 +152,7 @@ function trivial_search(txt) {
             return ctxmenu_commands_wimax;
           }
 
-          if (e.data()['name'].search('MK') == 0) {
+          if (e.data()['model'].search('Mikrotik') == 0) {
             return ctxmenu_commands_mikrotik;
           }
 
