@@ -10,11 +10,8 @@
 <footer>
    <nav class="navbar navbar-default navbar-fixed-bottom">
       <div class="container-fluid">
-         <div>
-            <button type="button" class="btn btn-xs btn-info" onclick="toggle_sidebar()">
-                 <span class="glyphicon glyphicon-list"></span>&nbsp;
-            </button>
-            <img src="/static/images/default_company_xxs.png" alt="Shinken Logo" onclick="display_modal('/modal/about')"/>
+         <div onclick="display_modal('/modal/about')">
+            <!--<img src="/static/images/default_company_xxs.png" alt="Shinken Logo"/>-->
             <small><em class="text-muted">
                Shinken {{VERSION}} &mdash; Web User Interface {{app.app_version}}, &copy;2011-2016
             </em></small>

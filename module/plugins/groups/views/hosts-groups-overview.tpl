@@ -2,6 +2,7 @@
 
 %rebase("layout", title='Hosts groups overview')
 
+%user = app.get_user()
 %helper = app.helper
 %h = app.datamgr.get_hosts_synthesis(user=user)
 
@@ -104,7 +105,7 @@
                   </div>
 
                   <div class="btn-group btn-group-justified" role="group" aria-label="Resources" title="View resources for all hosts">
-                     <a class="btn btn-default" href="/all?search=type:host"><i class="fa fa-ambulance"></i> <span class="hidden-xs">Resources</span></a>
+                     <a class="btn btn-default" href="/all?search=type:host"><i class="fa fa-clock-o"></i> <span class="hidden-xs">Resources</span></a>
                   </div>
 
                   <ul class="list-group">
@@ -215,7 +216,7 @@
                   </div>
 
                   <div class="btn-group btn-group-justified" role="group" aria-label="Resources" title="View resources for this group">
-                     <a class="btn btn-default" href="/all?search=type:host hg:{{'"%s"' % group.get_name()}}"><i class="fa fa-ambulance"></i> <span class="hidden-xs">Resources</span></a>
+                     <a class="btn btn-default" href="/all?search=type:host hg:{{'"%s"' % group.get_name()}}"><i class="fa fa-clock-o"></i> <span class="hidden-xs">Resources</span></a>
                   </div>
 
                   <ul class="list-group">

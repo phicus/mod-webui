@@ -23,6 +23,27 @@
 *
 **/
 
+/* NEW v2.6 */
+
+#information .table>tbody>tr>td,
+#information .table>tbody>tr>th,
+#information .table>thead>tr>td,
+#information .table>thead>tr>th {
+    border-top: 0;
+}
+
+.comment-list > dt {
+    border-bottom: 1px solid #EEE;
+    margin-bottom: 0.25em;
+    font-weight: normal;
+}
+
+.comment-list > dd {
+    margin: 0 0 1em 0;
+}
+
+/* OLD */
+
 #inner_depgraph {
   background: #FFFFFF;
   padding: 15px;
@@ -530,11 +551,3 @@ label.iOSCheckLabelOff {
   height: 100%;
   width: 100%;
   background: url('images/ios-style-checkboxes/slider_center.png'); }
-
-  /*
-
-  */
-
-  .table thead > tr > th, .table tbody > tr > th, .table tfoot > tr > th, .table thead > tr > td, .table tbody > tr > td, .table tfoot > tr > td {
-    border-top: none;
-}

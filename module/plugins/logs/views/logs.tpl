@@ -97,6 +97,8 @@
   }
 </script>
 
+<div class="panel panel-default">
+  <div class="panel-body">
    <script type="text/javascript">
       // Initial start/stop range ...
       var range_start = moment.unix({{range_start}}, 'YYYY-MM-DD');
@@ -134,7 +136,7 @@
          <tbody style="font-size:x-small;">
             %for log in records:
             <tr>
-               <td>{{time.strftime(date_format, time.localtime(log['timestamp']))}}</td>
+               <td>{{time.strftime(date_format, time.localtime(log['time']))}}</td>
                <td>{{log['message']}}</td>
             </tr>
             %end
@@ -185,4 +187,5 @@
       });
    </script>
 
+  </div>
 </div>

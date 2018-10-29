@@ -1,5 +1,25 @@
 %setdefault('with_service_name', False)
+%setdefault('with_contact_form', True)
 
+%if with_contact_form:
+<form class="form-horizontal" class="js-comment-form" action="javascript:submit_comment_form('{{ helper.get_html_id(elt) }}');">
+  <input type="hidden" id="user_{{ helper.get_html_id(elt) }}" value="{{ user.get_name() }}">
+  <input type="hidden" id="name_{{ helper.get_html_id(elt) }}" value="{{ helper.get_uri_name(elt) }}">
+  <div class="form-group">
+    <label for="comment" class="col-sm-1 hidden-xs control-label">{{ !helper.get_contact_avatar(user, with_name=False, with_link=False, size=32) }}</label>
+    <div class="col-sm-10">
+      <textarea class="form-control" id="comment_{{ helper.get_html_id(elt) }}" placeholder="Write a comment…" rows="3"></textarea>
+    </div>
+  </div>
+  <div class="form-group">
+    <div class="col-sm-offset-1 col-sm-10">
+      <input type="submit" class="btn btn-default" value="Save">
+    </div>
+  </div>
+</form>
+%end
+
+<div id="comments_{{ helper.get_html_id(elt) }}">
 %for daterange, dr_comments in helper.group_by_daterange(sorted(comments, key=lambda x: x.entry_time, reverse=True), key=lambda x: x.entry_time).items():
 %if dr_comments:
 <div class="daterange-title">{{ daterange }}</div>
@@ -11,7 +31,7 @@
       %setdefault('comment_title', 'User comment')
       %if c.entry_type == 2:
       %comment_title = 'Downtime'
-      %comment_icon = "fa-ambulance"
+      %comment_icon = "fa-clock-o"
       %elif c.entry_type == 3:
       %comment_title = 'Flapping'
       %comment_icon = "fa-cog"
@@ -29,7 +49,7 @@
       %end
       <span class="comment-time">
         %if with_service_name:
-        by 
+        by
         {{ !helper.get_contact_avatar(c.author) }}
         %else:
         commented
@@ -42,7 +62,7 @@
       </span>
       <span class="pull-right">
         %if c.persistent:
-        <i class="fa fa-flag-o" title="This comment is persistent"></i>&nbsp;
+        <i class="fa fa-sticky-note-o" title="This comment is persistent"></i>&nbsp;
         %end
         %if app.can_action():
         <a class="{{'disabled' if not app.can_action() else ''}} js-delete-comment text-danger"
@@ -61,3 +81,4 @@
 </table>
 %end
 %end
+</div>

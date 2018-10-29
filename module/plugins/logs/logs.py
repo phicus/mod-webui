@@ -26,6 +26,8 @@
 
 import time
 import datetime
+
+import json
 import urllib
 import json
 
@@ -144,14 +146,48 @@ def set_logs_type_list():
     app.bottle.redirect("/logs")
     return
 
-def get_host_history(name):
+def get_history():
     user = app.request.environ['USER']
-    name = urllib.unquote(name)
-    elt = app.datamgr.get_element(name, user) or app.redirect404()
-    logs = _get_logs(elt=elt)
-    return {'records': logs, 'elt': elt}
+
+    filters=dict()
+
+    service = app.request.GET.get('service', None)
+    host = app.request.GET.get('host', None)
+
+    if host:
+        if service:
+            app.datamgr.get_element(host + '/' + service, user) or app.redirect404()
+        else:
+            app.datamgr.get_element(host, user) or app.redirect404()
+    else:
+        user.is_administrator() or app.redirect403()
+
+    if service:
+        filters['service_description'] = service
+
+    if host:
+        filters['host_name'] = host
+
+    logclass = app.request.GET.get('logclass', None)
+    if logclass is not None:
+        filters['logclass'] = int(logclass)
+
+    command_name = app.request.GET.get('commandname', None)
+    if command_name is not None:
+        try:
+            command_name = json.loads(command_name)
+        except:
+            pass
+        filters['command_name'] = command_name
+
+    limit = int(app.request.GET.get('limit', 100))
+    offset = int(app.request.GET.get('offset', 0))
+
+    logs = _get_logs(filters=filters, limit=limit, offset=offset)
+    return {'records': logs}
 
 
+# :TODO:maethor:171017: This function should be merge in get_history
 def get_global_history():
     user = app.request.environ['USER']
     user.is_administrator() or app.redirect403()
@@ -161,12 +197,12 @@ def get_global_history():
     range_end = int(app.request.GET.get('range_end', midnight_timestamp + 86399))
     logger.debug("[WebUI-logs] get_global_history, range: %d - %d", range_start, range_end)
 
-    logs = _get_logs(elt=None, logs_type=params['logs_type'], range_start=range_start, range_end=range_end)
+    logs = _get_logs(filters={'type': {'$in': params['logs_type']}}, range_start=range_start, range_end=range_end)
 
     if logs is None:
         message = "No module configured to get Shinken logs from database!"
     else:
-        message = "%s records fetched from database" % len(logs)
+        message = ""
 
     return {'records': logs, 'params': params, 'message': message, 'range_start': range_start, 'range_end': range_end}
 
@@ -190,8 +226,8 @@ pages = {
     get_global_history: {
         'name': 'History', 'route': '/logs', 'view': 'logs', 'static': True
     },
-    get_host_history: {
-        'name': 'HistoryHost', 'route': '/logs/inner/<name:path>', 'view': 'history'
+    get_history: {
+        'name': 'HistoryHost', 'route': '/logs/inner', 'view': 'history'
     },
     form_hosts_list: {
         'name': 'GetHostsList', 'route': '/logs/hosts_list', 'view': 'form_hosts_list'

@@ -36,10 +36,8 @@ class LogsMetaModule(MetaModule):
     def is_available(self):
         return self.module is not None
 
-    def get_ui_logs(self, elt, logs_type=None, default=None, range_start=None, range_end=None, limit=200):
-        if self.is_available():
-            return self.module.get_ui_logs(elt, logs_type, range_start, range_end, limit) or default
-        return default
+    def get_ui_logs(self, *args, **kwargs):
+        return self.module.get_ui_logs(*args, **kwargs)
 
     def get_ui_availability(self, elt, range_start=None, range_end=None, default=None):
         if self.is_available():
@@ -154,50 +152,34 @@ class MongoDBLogs():
         self.conn.close()
 
     # We will get in the mongodb database the logs
-    def get_ui_logs(self, elt, logs_type=None, range_start=None, range_end=None, limit=200):
+    def get_ui_logs(self, filters={}, range_start=None, range_end=None, limit=200, offset=0):
         import pymongo
         if not self.db:
             logger.error("[mongo-logs] error Problem during init phase, no database connection")
             return None
 
-        logger.debug("[mongo-logs] get_ui_logs, name: %s", elt)
+        logger.debug("[mongo-logs] get_ui_logs")
 
         query = []
-        if elt:
-            query.append({"host_name": elt.host_name})
-            if elt.__class__.my_type == 'service':
-                query.append({"service_description": elt.service_description})
-        if logs_type and len(logs_type) > 0 and logs_type[0] != '':
-            query.append({"type": {"$in": logs_type}})
+        for k, v in filters.items():
+            query.append({k: v})
         if range_start:
             query.append({'time': {'$gte': range_start}})
         if range_end:
             query.append({'time': {'$lte': range_end}})
 
         query = {'$and': query} if query else None
-        logger.debug("[mongo-logs] Fetching records from database with query: '%s'", query)
+        logger.debug("[mongo-logs] Fetching %limit records from database with query: '%s' and offset %s", (limit, query, offset))
 
         records = []
         try:
-            for log in self.db[self.logs_collection].find(query).sort(
-                    [("time", pymongo.DESCENDING)]).limit(limit):
-                message = log['message']
-                m = re.search(r"\[(\d+)\] (.*)", message)
-                if m and m.group(2):
-                    message = m.group(2)
+            records = self.db[self.logs_collection].find(query).sort(
+                    [("time", pymongo.DESCENDING)]).skip(offset)
+            if limit:
+                records = records.limit(limit)
 
-                records.append({
-                    "timestamp":    int(log["time"]),
-                    "host":         log['host_name'],
-                    "service":      log['service_description'],
-                    "message":      message,
-                    "state":        log['state'],
-                    "state_type":   log['state_type'],
-                    "type":         log['type']
-                })
-
-            logger.debug("[mongo-logs] %d records fetched from database.", len(records))
-        except Exception as exp:
+            logger.debug("[mongo-logs] %d records fetched from database.", records.count())
+        except Exception, exp:
             logger.error("[mongo-logs] Exception when querying database: %s", str(exp))
 
         return records
@@ -231,8 +213,8 @@ class MongoDBLogs():
                 if '_id' in log:
                     del log['_id']
                 records.append(log)
-            logger.debug("[mongo-logs] %d records fetched from database.", len(records))
-        except Exception as exp:
+            logger.debug("[mongo-logs] %d records fetched from database.", records.count())
+        except Exception, exp:
             logger.error("[mongo-logs] Exception when querying database: %s", str(exp))
 
         if not records:

@@ -1,7 +1,53 @@
-.hiddenRow {
+.hiddenRow > td {
     padding: 0 !important;
     border: 0 !important;
 }
+
+.panel > table tr.hiddenRow > td {
+    padding-left: 0px !important;
+}
+
+.panel > table tr.hiddenRow > td {
+    padding-right: 0px !important;
+}
+
+.panel > table > tbody > tr:not(.hiddenRow) {
+    cursor: pointer;
+}
+
+.panel > table > tbody > tr:hover > td:first-child,
+.panel > table > tbody > tr.selected > td:first-child {
+    border-left: 1px solid #4D95BE;
+    padding-left: 19px !important;
+}
+
+.panel > table > tbody > tr:not(.collapsed) > td:first-child {
+    border-left: 4px solid #4D95BE;
+    /*margin-left: 2px;*/
+    padding-left: 18px !important;
+}
+
+.panel > table > tbody > tr:not(.collapsed) + tr.hiddenRow {
+    border-left: 4px solid #4D95BE;
+    border-top: 1px solid #eee;
+    padding-left: 0px;
+    /*border-right: 1px solid #CCC;*/
+    /*border-bottom: 1px solid #CCC;*/
+}
+
+tr.hiddenRow td {
+    border-color: transparent !important;
+}
+
+tr.hiddenRow:hover {
+    background-color: white !important;
+}
+
+
+.panel > table > tbody > tr:not(.collapsed) + tr.hiddenRow td {
+    border-top: 0px;
+}
+
 
 td, th {
     vertical-align: middle !important;
@@ -25,12 +71,68 @@ td .progress {
     margin-bottom:0px !important;
 }
 
-td .ellipsis {
-    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+.problems-table {
+    table-layout:fixed;
+    width:100%;
 }
 
-td .ellipsis > .long-output {
-    display:none;
+.problem-actions {
+    display: none;
+}
+
+.problems-table tr:hover .problem-actions {
+    display: inline;
+}
+
+
+.item-checkbox {
+    display: none;
+    width: 2em;
+    margin-top: 3px !important;
+    margin-left: 3px !important;
+    margin-right: 1px !important;
+    cursor: pointer;
+}
+
+tr.selected {
+    background-color: #D9EDF7;
+    border-right: 1px solid red;
+}
+
+tr.selected .item-icon,
+.item-state:hover .item-icon {
+    display: none;
+}
+
+tr.selected .item-checkbox,
+.item-state:hover .item-checkbox {
+    display: inline;
+}
+
+.js-select-all .onhover-label {
+    display: none;
+}
+
+.js-select-all:hover .onhover-label {
+    display: inline-block;
+    width: 200px;
+}
+
+.js-select-all:hover .original-label {
+    display: none;
+}
+
+.eltdetail-content {
+    font-size: 14px;
+    padding: 20px;
+}
+
+.eltdetail-action-buttons {
+    text-align: right;
+}
+
+@media(max-width:768px) {
+    text-align: center;
 }
 
 /*

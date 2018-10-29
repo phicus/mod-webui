@@ -26,31 +26,21 @@
 var refresh_logs=false;
 
 /* By default, we set the page to reload each period defined in WebUI configuration */
-var refresh_timeout = app_refresh_period;
 var nb_refresh_try = 0;
-if (! localStorage.getItem("refresh_active")) {
+
+if (! sessionStorage.getItem("refresh_enabled")) {
    if (refresh_logs) console.debug("Refresh active storage does not exist");
    // Store default value ...
-   //localStorage.setItem("refresh_active", refresh_timeout==0 ? '0' : '1');
-   localStorage.setItem("refresh_active", '0');
-}
-if (refresh_logs) console.debug("Refresh active is ", localStorage.getItem("refresh_active"));
-if (localStorage.getItem("refresh_active") == '1') {
-   $('#header_loading').removeClass('font-greyed');
+   sessionStorage.setItem("refresh_enabled", app_refresh_period==0 ? '0' : '1');
+
+if (refresh_logs) console.debug("Refresh active is ", sessionStorage.getItem("refresh_enabled"));
+
+if (sessionStorage.getItem("refresh_enabled") == '1') {
+    enable_refresh();
 } else {
-   $('#header_loading').addClass('font-greyed');
+    disable_refresh();
 }
 
-function postpone_refresh(){
-   // If we are not in our first try, warn the user
-   if (nb_refresh_try > 0){
-      alertify.log("The Web UI backend is not available", "info", 5000);
-   }
-   nb_refresh_try += 1;
-
-   // Start a new loop before retrying...
-   reinit_refresh();
-}
 
 // Play alerting sound ...
 function playAlertSound() {
@@ -124,32 +114,6 @@ function do_refresh(forced){
          $('#livestate-graphs').html($response.find('#livestate-graphs').html());
       }
 
-      /* Because of what is explained in the previous comment ... we must use this
-       * awful hack !
-       * Hoping this is a temporary solution ... :/P
-       *
-       * An idea : only refreshing the values in the popover would be enough!
-       */
-      // Activate the popover ...
-      $('#hosts-states-popover').popover({
-         placement: 'bottom',
-         animation: true,
-         template: '<div class="popover img-popover"><div class="arrow"></div><div class="popover-inner"><h3 class="popover-title"></h3><div class="popover-content"><p></p></div></div></div>',
-         content: function() {
-            return $('#hosts-states-popover-content').html();
-         }
-      });
-
-      // Activate the popover ...
-      $('#services-states-popover').popover({
-         placement: 'bottom',
-         animation: true,
-         template: '<div class="popover img-popover"><div class="arrow"></div><div class="popover-inner"><h3 class="popover-title"></h3><div class="popover-content"><p></p></div></div></div>',
-         content: function() {
-            return $('#services-states-popover-content').html();
-         }
-      });
-
       // Clean the DOM after refresh update ...
       $response.remove();
 
@@ -186,6 +150,11 @@ function do_refresh(forced){
          on_page_refresh(forced);
       }
 
+      if (typeof display_charts !== 'undefined' && $.isFunction(display_charts)) {
+         if (refresh_logs) console.debug('Calling display charts function ...');
+         display_charts();
+      }
+
       /*
       // Refresh bindings of actions buttons ...
       if (typeof bind_actions !== 'undefined' && $.isFunction(bind_actions)) {
@@ -193,6 +162,10 @@ function do_refresh(forced){
          bind_actions();
       }
       */
+
+      tooltips();
+
+      headerPopovers();
 
       // Look at the hash part of the URI. If it match a nav name, go for it
       if (location.hash.length > 0) {
@@ -202,103 +175,74 @@ function do_refresh(forced){
          if (refresh_logs) console.debug('Displaying first tab')
          $('.nav-tabs li a:first').trigger('click');
       }
-
-      $('#header_loading').removeClass('fa-spin');
    })
    .fail(function( jqXHR, textStatus, errorThrown ) {
       if (refresh_logs) console.error('Done: ', jqXHR, textStatus, errorThrown);
    })
    .always(function() {
-      // Set refresh icon ...
-      if (localStorage.getItem("refresh_active") == '1') {
-         $('#header_loading').removeClass('font-greyed');
-      } else {
-         $('#header_loading').addClass('font-greyed');
-      }
-      if (refresh_logs) console.debug("Refresh active is ", localStorage.getItem("refresh_active"));
-
       // Refresh is finished
       $('#header_loading').removeClass('fa-spin');
       processing_refresh = false;
    });
 }
 
-/* We will try to see if the UI is not in restating mode, and so
-   don't have enough data to refresh the page as it should ... */
-function check_UI_backend(){
+
+function check_refresh(){
+   // We first test if the backend is available
    $.ajax({
       url: '/gotfirstdata?callback=?',
       dataType: "jsonp",
       method: "GET"
    })
    .done(function( data, textStatus, jqXHR ) {
-      if (localStorage.getItem("refresh_active") == '1') {
+      if (sessionStorage.getItem("refresh_enabled") == '1') {
          // Go Refresh
          do_refresh();
       }
-
-      reinit_refresh();
    })
    .fail(function( jqXHR, textStatus, errorThrown ) {
-      if (refresh_logs) console.error('UI backend is not available, retrying later ...');
-      postpone_refresh();
+      if (refresh_logs) console.error('UI backend is not available for refresh, retrying later ...');
+      if (nb_refresh_try > 0){
+          alertify.log("The Web UI backend is not available", "info", 5000);
+      }
+      nb_refresh_try += 1;
    });
 }
 
 
-/* Each second, we check for timeout and restart page */
-function check_refresh(){
-   if (refresh_timeout < 0){
-      // We will first check if the backend is available or not. It's useless to refresh
-      // if the backend is reloading, because it will prompt for login, but waiting a little
-      // will make the data available.
-      check_UI_backend();
-   }
-   refresh_timeout = refresh_timeout - 1;
-}
-
-
-/* Someone ask us to reinit the refresh so the user will have time to
-   do something ... */
-function reinit_refresh(){
-   if (refresh_logs) console.debug("Refresh period restarted: " + app_refresh_period + " seconds");
-   refresh_timeout = app_refresh_period;
-}
-
-
-function stop_refresh() {
+function disable_refresh() {
    if (refresh_logs) console.debug("Stop refresh");
-   $('#header_loading').addClass('font-greyed');
-   localStorage.setItem("refresh_active", '0');
+   $('#header_loading').addClass('fa-striked');
+   $('#header_loading').parent().data('tooltip', false)
+                                .attr('data-original-title', "Enable auto-refresh")
+                                .tooltip({html: 'true', placement: 'bottom'});
+   //$('#header_loading').parent().prop('title', "Enable auto-refresh");
+   sessionStorage.setItem("refresh_enabled", '0');
 }
 
 
-function start_refresh() {
+function enable_refresh() {
    if (refresh_logs) console.debug("Stop refresh");
-   $('#header_loading').removeClass('font-greyed');
-   localStorage.setItem("refresh_active", '1');
+   $('#header_loading').removeClass('fa-striked');
+   $('#header_loading').parent().data('tooltip', false)
+                                .attr('data-original-title', "Disable auto-refresh")
+                                .tooltip({html: 'true', placement: 'bottom'});
+   sessionStorage.setItem("refresh_enabled", '1');
 }
 
 
-/* We will check timeout each 1s */
 $(document).ready(function(){
    // Start refresh periodical check ...
-   setInterval("check_refresh();", 1000);
-
-   if (localStorage.getItem("refresh_active") == '1') {
-      $('#header_loading').removeClass('font-greyed');
-   } else {
-      $('#header_loading').addClass('font-greyed');
-   }
+   setInterval("check_refresh();", app_refresh_period * 1000);
 
    // Toggle refresh ...
-   $('body').on("click", '[action="toggle-page-refresh"]', function (e, data) {
-      if (localStorage.getItem("refresh_active") == '1') {
-         stop_refresh();
+   $('body').on("click", '.js-toggle-page-refresh', function (e, data) {
+      if (sessionStorage.getItem("refresh_enabled") == '1') {
+         disable_refresh();
       } else {
-         start_refresh();
+         enable_refresh();
       }
-      if (refresh_logs) console.debug("Refresh active is ", localStorage.getItem("refresh_active"));
+      if (refresh_logs) console.debug("Refresh active is ", sessionStorage.getItem("refresh_enabled"));
    });
 
 });

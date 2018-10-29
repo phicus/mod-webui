@@ -33,7 +33,7 @@ import re
 
 
 def get_page():
-    app.bottle.redirect("/all?search=isnot:UP isnot:OK isnot:PENDING isnot:ACK isnot:DOWNTIME bp:>0")
+    app.bottle.redirect("/all?search=isnot:UP isnot:OK isnot:PENDING isnot:ACK isnot:DOWNTIME isnot:SOFT bp:>0")
 
 
 def get_all():
@@ -93,7 +93,7 @@ def get_pbs_widget():
     nb_elements = max(0, int(app.request.GET.get('nb_elements', '10')))
     refine_search = app.request.GET.get('search', '')
 
-    items = app.datamgr.search_hosts_and_services("isnot:UP isnot:OK isnot:PENDING isnot:ACK isnot:DOWNTIME bp:>0", user, get_impacts=False)
+    items = app.datamgr.search_hosts_and_services("isnot:UP isnot:OK isnot:PENDING isnot:ACK isnot:DOWNTIME isnot:SOFT bp:>0", user, get_impacts=False)
 
     # Sort it now
     items.sort(hst_srv_sort)
@@ -172,7 +172,7 @@ def get_last_errors_widget():
     refine_search = app.request.GET.get('search', '')
 
     # Apply search filter if exists ...
-    items = app.datamgr.search_hosts_and_services("isnot:UP isnot:OK isnot:PENDING isnot:ACK isnot:DOWNTIME bp:>0", user, get_impacts=False)
+    items = app.datamgr.search_hosts_and_services("isnot:UP isnot:OK isnot:PENDING isnot:ACK isnot:DOWNTIME isnot:SOFT bp:>0", user, get_impacts=False)
 
     # Sort it now
     items.sort(last_state_change_earlier)
@@ -229,6 +229,6 @@ pages = {
         'name': 'wid_Problems', 'route': '/widget/problems', 'view': 'widget_problems', 'static': True, 'widget': ['dashboard'], 'widget_desc': widget_desc, 'widget_name': 'problems', 'widget_picture': '/static/problems/img/widget_problems.png'
     },
     get_last_errors_widget: {
-        'name': 'wid_LastProblems', 'route': '/widget/last_problems', 'view': 'widget_last_problems', 'static': True, 'widget': ['dashboard'], 'widget_desc': last_widget_desc, 'widget_name': 'last_problems', 'widget_picture': '/static/problems/img/widget_last_problems.png'
+        'name': 'wid_LastProblems', 'route': '/widget/last_problems', 'view': 'widget_problems', 'static': True, 'widget': ['dashboard'], 'widget_desc': last_widget_desc, 'widget_name': 'last_problems', 'widget_picture': '/static/problems/img/widget_last_problems.png'
     }
 }

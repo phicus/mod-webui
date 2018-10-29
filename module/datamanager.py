@@ -134,6 +134,10 @@ class WebUIDataManager(DataManager):
         self.logged_in_user = None
         self.alignak = alignak if self.fe else False
 
+    @property
+    def is_initialized(self):
+        return len(self.get_contacts()) > 0
+
     @staticmethod
     def _is_related_to(item, user):
         """
@@ -242,10 +246,10 @@ class WebUIDataManager(DataManager):
 
             for state in 'up', 'pending':
                 h['nb_' + state] = sum(1 for host in hosts if host.state == state.upper())
-                h['pct_' + state] = round(100.0 * h['nb_' + state] / h['nb_elts'], 2)
+                h['pct_' + state] = round(100.0 * h['nb_' + state] / h['nb_elts'], 1)
             for state in 'down', 'unreachable', 'unknown':
                 h['nb_' + state] = sum(1 for host in hosts if host.state == state.upper()  and not (host.problem_has_been_acknowledged or host.in_scheduled_downtime))
-                h['pct_' + state] = round(100.0 * h['nb_' + state] / h['nb_elts'], 2)
+                h['pct_' + state] = round(100.0 * h['nb_' + state] / h['nb_elts'], 1)
 
             # h['nb_problems'] = sum(1 for host in hosts if host.is_problem and not host.problem_has_been_acknowledged)
             # Shinken does not always reflect the "problem" state ... to make UI more consistent, build our own problems counter!
@@ -255,11 +259,11 @@ class WebUIDataManager(DataManager):
                     h['nb_problems'] += 1
                     # logger.debug("[WebUI - datamanager] get_hosts_synthesis: %s: %s, %s, %s", host.get_name(), host.state, host.is_problem, host.problem_has_been_acknowledged)
 
-            h['pct_problems'] = round(100.0 * h['nb_problems'] / h['nb_elts'], 2)
+            h['pct_problems'] = round(100.0 * h['nb_problems'] / h['nb_elts'], 1)
             h['nb_ack'] = sum(1 for host in hosts if host.is_problem and host.problem_has_been_acknowledged)
-            h['pct_ack'] = round(100.0 * h['nb_ack'] / h['nb_elts'], 2)
+            h['pct_ack'] = round(100.0 * h['nb_ack'] / h['nb_elts'], 1)
             h['nb_downtime'] = sum(1 for host in hosts if host.in_scheduled_downtime)
-            h['pct_downtime'] = round(100.0 * h['nb_downtime'] / h['nb_elts'], 2)
+            h['pct_downtime'] = round(100.0 * h['nb_downtime'] / h['nb_elts'], 1)
         else:
             h['bi'] = 0
             for state in 'up', 'down', 'unreachable', 'pending', 'unknown', 'ack', 'downtime', 'problems':
@@ -340,10 +344,10 @@ class WebUIDataManager(DataManager):
 
             for state in 'ok', 'pending':
                 s['nb_' + state] = sum(1 for service in services if service.state == state.upper())
-                s['pct_' + state] = round(100.0 * s['nb_' + state] / s['nb_elts'], 2)
+                s['pct_' + state] = round(100.0 * s['nb_' + state] / s['nb_elts'], 1)
             for state in 'warning', 'critical', 'unknown':
                 s['nb_' + state] = sum(1 for service in services if service.state == state.upper()  and not (service.problem_has_been_acknowledged or service.in_scheduled_downtime))
-                s['pct_' + state] = round(100.0 * s['nb_' + state] / s['nb_elts'], 2)
+                s['pct_' + state] = round(100.0 * s['nb_' + state] / s['nb_elts'], 1)
 
             # s['nb_problems'] = sum(1 for service in services if service.is_problem and not service.problem_has_been_acknowledged)
             # Shinken does not always reflect the "problem" state ... to make UI more consistent, build our own problems counter!
@@ -353,11 +357,11 @@ class WebUIDataManager(DataManager):
                     s['nb_problems'] += 1
                     # logger.debug("[WebUI - datamanager] get_services_synthesis: %s: %s, %s, %s", service.get_name(), service.state, service.is_problem, service.problem_has_been_acknowledged)
 
-            s['pct_problems'] = round(100.0 * s['nb_problems'] / s['nb_elts'], 2)
+            s['pct_problems'] = round(100.0 * s['nb_problems'] / s['nb_elts'], 1)
             s['nb_ack'] = sum(1 for service in services if service.is_problem and service.problem_has_been_acknowledged)
-            s['pct_ack'] = round(100.0 * s['nb_ack'] / s['nb_elts'], 2)
+            s['pct_ack'] = round(100.0 * s['nb_ack'] / s['nb_elts'], 1)
             s['nb_downtime'] = sum(1 for service in services if service.in_scheduled_downtime)
-            s['pct_downtime'] = round(100.0 * s['nb_downtime'] / s['nb_elts'], 2)
+            s['pct_downtime'] = round(100.0 * s['nb_downtime'] / s['nb_elts'], 1)
         else:
             s['bi'] = 0
             for state in 'ok', 'warning', 'critical', 'pending', 'unknown', 'ack', 'downtime', 'problems':
@@ -504,7 +508,9 @@ class WebUIDataManager(DataManager):
             re.VERBOSE
             )
 
-        filtered_by_type = False
+        # Replace "NOT foo" by "^((?!foo).)*$" to ignore foo
+        search = re.sub('NOT ([^\ ]*)', r'^((?!\1).)*$', search)
+
         patterns = []
         for match in regex.finditer(search):
             if match.group('name'):
@@ -578,35 +584,30 @@ class WebUIDataManager(DataManager):
                 for i in items:
                     if i.__class__.my_type == 'contact' and pat.search(i.get_name()):
                         new_items.append(i)
+                    if i.__class__.my_type == 'host':
+                        # :TODO:maethor:171012:
+                        pass
+                    if i.__class__.my_type == 'service':
+                        # :TODO:maethor:171012:
+                        pass
 
                 items = new_items
 
             if (t == 'hg' or t == 'hgroup') and s.lower() != 'all':
                 logger.debug("[WebUI - datamanager] searching for items in the hostgroup %s", s)
-                new_items = []
-                for x in s.split('|'):
-                    group = self.get_hostgroup(x)
-                    if not group:
-                        return []
-                    # Items have a item.get_groupnames() method that returns a comma separated string ... strange format!
-                    for item in items:
-                        #if group.get_name() in item.get_groupnames().split(', '):
-                            # logger.info("[WebUI - datamanager] => item %s is a known member!", item.get_name())
+                group = self.get_hostgroup(s)
+                if not group:
+                    return []
 
-                        if group.get_name() in item.get_groupnames().split(', '):
-                            new_items.append(item)
-                items = new_items
+                items = [i for i in items if group.get_name() in [h.get_name() for h in i.get_hostgroups()]]
 
             if (t == 'sg' or t == 'sgroup') and s.lower() != 'all':
                 logger.debug("[WebUI - datamanager] searching for items in the servicegroup %s", s)
                 group = self.get_servicegroup(s)
                 if not group:
                     return []
-                # Items have a item.get_groupnames() method that returns a comma+space separated string ... strange format!
-                # for item in items:
-                #     if group.get_name() in item.get_groupnames().split(','):
-                #         logger.debug("[WebUI - datamanager] => item %s is a known member!", item.get_name())
-                items = [i for i in items if group.get_name() in i.get_groupnames().split(',')]
+
+                items = [i for i in items if i.__class__.my_type == 'service' and group.get_name() in [s.get_name() for s in i.servicegroups]]
 
             #@mohierf: to be refactored!
             if (t == 'cg' or t == 'cgroup') and s.lower() != 'all':
@@ -614,11 +615,6 @@ class WebUIDataManager(DataManager):
                 group = self.get_contactgroup(s, user)
                 if not group:
                     return []
-                # Items have a item.get_groupnames() method that returns a comma+space separated string ... strange format!
-                #for item in items:
-                #    for contact in item.contacts:
-                #        if group.get_name() in contact.get_groupnames().split(', '):
-                #            logger.info("[WebUI - datamanager] => contact %s is a known member!", contact.get_name())
 
                 contacts = [c for c in self.get_contacts(user=user) if c in group.members]
                 items = list(set(itertools.chain(*[self._only_related_to(items, self.rg.contacts.find_by_name(c)) for c in contacts])))
@@ -647,18 +643,21 @@ class WebUIDataManager(DataManager):
                 #     logger.info("[WebUI - datamanager] item %s is %s", item.get_name(), item.__class__)
 
             if t == 'bp' or t == 'bi':
-                if s.startswith('>='):
-                    items = [i for i in items if i.business_impact >= int(s[2:])]
-                elif s.startswith('<='):
-                    items = [i for i in items if i.business_impact <= int(s[2:])]
-                elif s.startswith('>'):
-                    items = [i for i in items if i.business_impact > int(s[1:])]
-                elif s.startswith('<'):
-                    items = [i for i in items if i.business_impact < int(s[1:])]
-                else:
-                    if s.startswith('='):
-                        s = s[1:]
-                    items = [i for i in items if i.business_impact == int(s)]
+                try:
+                    if s.startswith('>='):
+                        items = [i for i in items if i.business_impact >= int(s[2:])]
+                    elif s.startswith('<='):
+                        items = [i for i in items if i.business_impact <= int(s[2:])]
+                    elif s.startswith('>'):
+                        items = [i for i in items if i.business_impact > int(s[1:])]
+                    elif s.startswith('<'):
+                        items = [i for i in items if i.business_impact < int(s[1:])]
+                    else:
+                        if s.startswith('='):
+                            s = s[1:]
+                        items = [i for i in items if i.business_impact == int(s)]
+                except ValueError:
+                    items = []
 
             if t == 'duration':
                 seconds_per_unit = {"s": 1, "m": 60, "h": 3600, "d": 86400, "w": 604800}
@@ -690,10 +689,15 @@ class WebUIDataManager(DataManager):
                     items = [i for i in items if i.__class__.my_type == 'host' or (i.in_scheduled_downtime or i.host.in_scheduled_downtime)]
                 elif s.lower() == 'impact':
                     items = [i for i in items if i.is_impact]
-                elif s.lower() == 'probe':
-                    items = [i for i in items if i.customs.get('_PROBE', '0') == '1']
+                elif s.lower() == 'flapping':
+                    items = [i for i in items if i.is_flapping]
+                elif s.lower() == 'soft':
+                    items = [i for i in items if i.state_type != 'HARD']
+                elif s.lower() == 'hard':
+                    items = [i for i in items if i.state_type == 'HARD']
                 else:
                     # Manage SOFT & HARD state
+                    # :COMMENT:maethor:171006: Kept for retrocompatility
                     if s.startswith('s'):
                         s = s[1:]
                         if len(s) == 1:
@@ -721,6 +725,12 @@ class WebUIDataManager(DataManager):
                     items = [i for i in items if i.__class__.my_type == 'host' or (not i.in_scheduled_downtime and not i.host.in_scheduled_downtime)]
                 elif s.lower() == 'impact':
                     items = [i for i in items if not i.is_impact]
+                elif s.lower() == 'flapping':
+                    items = [i for i in items if not i.is_flapping]
+                elif s.lower() == 'soft':
+                    items = [i for i in items if not i.state_type != 'HARD']
+                elif s.lower() == 'hard':
+                    items = [i for i in items if not i.state_type == 'HARD']
                 else:
                     # Manage soft & hard state
                     if s.startswith('s'):
