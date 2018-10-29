@@ -23,7 +23,7 @@ var graphend={{graphend}};
       </div>
 
       <div class='well'>
-        <div id='real_graphs'>
+        <div id='real_graphs' class="text-center">
         </div>
       </div>
 
