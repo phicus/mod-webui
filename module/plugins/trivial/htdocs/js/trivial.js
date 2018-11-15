@@ -19,7 +19,9 @@ var ctxmenu_commands_all = [
   },{
     content: 'View',
     select: function(){
-      top.location.href= "/cpe/" +  this.data('id');
+      var url = "/cpe/" + this.data('id');
+      var win = window.open(url, '_blank');
+      win.focus();
     }
   }
 ]
@@ -47,7 +49,9 @@ var ctxmenu_commands_access = ctxmenu_commands_all.slice()
 ctxmenu_commands_access.push(  {
     content: 'Enter the Matrix',
     select: function(){
-      top.location.href= "/matrix/?search=reg:" +  this.data('id');
+      var url = "/matrix/?search=reg:" +  this.data('id');
+      var win = window.open(url, '_blank');
+      win.focus();
     }
 });
 
@@ -57,14 +61,18 @@ var ctxmenu_commands_wimax = ctxmenu_commands_all.slice()
 ctxmenu_commands_wimax.push(  {
     content: 'Web',
     select: function(){
-      top.location.href= "http://" + this.data('address') + '.' + window.location.host.split('.')[0] + '.phicus.net';
+      var url = "http://" + this.data('address') + '.' + window.location.host.split('.')[0] + '.phicus.net';
+      var win = window.open(url, '_blank');
+      win.focus();
     }
 });
 
 ctxmenu_commands_wimax.push(  {
     content: 'Enter the Matrix',
     select: function(){
-      top.location.href= "/matrix?search=reg:" +  this.data('id');
+      var url = "/matrix?search=reg:" +  this.data('id');
+      var win = window.open(url, '_blank');
+      win.focus();
     }
 });
 
@@ -72,7 +80,9 @@ var ctxmenu_commands_cpe = [
   {
     content: 'View',
     select: function(){
-      top.location.href= "/cpe/" +  this.data('id');
+      var url = "/cpe/" +  this.data('id');
+      var win = window.open(url, '_blank');
+      win.focus();
     }
   }
 ]
