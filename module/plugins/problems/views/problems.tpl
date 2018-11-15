@@ -164,6 +164,7 @@ Next check <strong>{{helper.print_duration(pb.next_chk)}}</strong>
                <td class="row">
                   <div class="pull-right">
                      {{!helper.get_perfdata_pies(pb)}}&nbsp;
+
                      %if app.graphs_module.is_available():
                      %if pb.perf_data:
                         <a style="text-decoration: none; color: #333;" role="button" tabindex="0" data-toggle="popover-elt-graphs"
@@ -188,7 +189,7 @@ Next check <strong>{{helper.print_duration(pb.next_chk)}}</strong>
 
                      %if True:
                      %if True:
-                        <a style="text-decoration: none; color: #333;" role="button" tabindex="1"
+                        <a style="text-decoration: none; color: #333;" role="button" tabindex="2"
                            href="{{ 'ok' }}">
                            <i class="fa fa-forward"></i>
                         </a>
