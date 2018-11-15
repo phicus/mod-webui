@@ -27,11 +27,11 @@ var refresh_logs=false;
 
 /* By default, we set the page to reload each period defined in WebUI configuration */
 var nb_refresh_try = 0;
-
 if (! sessionStorage.getItem("refresh_enabled")) {
    if (refresh_logs) console.debug("Refresh active storage does not exist");
    // Store default value ...
    sessionStorage.setItem("refresh_enabled", app_refresh_period==0 ? '0' : '1');
+}
 
 if (refresh_logs) console.debug("Refresh active is ", sessionStorage.getItem("refresh_enabled"));
 
@@ -48,7 +48,7 @@ function playAlertSound() {
    var canPlay = audio && !!audio.canPlayType && audio.canPlayType('audio/wav') != "";
    if (canPlay) {
       audio.play();
-      localStorage.setItem("sound_play", "1");
+      sessionStorage.setItem("sound_play", "1");
       $('#sound_alerting i.fa-ban').addClass('hidden');
    }
 }

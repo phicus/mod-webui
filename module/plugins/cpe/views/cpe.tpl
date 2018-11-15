@@ -73,6 +73,13 @@ Invalid element name
 
 <!--<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>-->
 
+%cpe_proxy_url  = "None"
+%if cpe.customs.get('_WEB_PORT') and hasattr(cpe, 'address'):
+  %cpe_proxy_url  = "http://{}-{}.{}".format(cpe.address, cpe.customs.get('_WEB_PORT'), app.proxy_sufix)
+%elif hasattr(cpe, 'address'):
+  %cpe_proxy_url  = "http://{}.{}".format(cpe.address, app.proxy_sufix)
+%end
+
 <script src="/static/cpe/js/jquery.flot.js" charset="utf-8"></script>
 <script src="/static/cpe/js/plots.js" charset="utf-8"></script>
 
@@ -383,7 +390,7 @@ function poll_cpe() {
 
 
             </div>
-            <div class="right" style="font-size: 22px; "><a href="http://{{ cpe.address }}.{{app.proxy_sufix}}" target=_blank>{{ cpe.address }}</a></div>
+            <div class="right" style="font-size: 22px; "><a href="{{ cpe_proxy_url }}" target=_blank>{{ cpe.address }}</a></div>
             %if cpe.customs.get('_MAC') and len(cpe.customs.get('_MAC')):
             <div title="{{ cpe.customs.get('_CPE_NOTES') }}" id="cpe-mac" style="cursor: pointer; text-align: right" class="font-fixed" style="font-size: 12px; text-align: right; color: #9E9E9E;">{{ cpe.customs.get('_MAC', '') }}</div>
             %end
@@ -464,9 +471,14 @@ function poll_cpe() {
             <button id="btn-reboot" type="button" class="btn btn-default" {{'disabled' if not reboot_available else ''}} ><i class="fa fa-refresh" aria-hidden="true"></i>&nbsp; Reboot</button>
             %end
             %if hasattr(cpe, 'cpe_connection_request_url'):
-
             <button id="btn-tr069"       type="button" class="btn btn-default" {{'disabled' if not tr069_available else  ''}} ><i class="fa fa-gears" aria-hidden="true"></i>&nbsp; Reconfig</button>
             %end
+
+
+            %if hasattr(cpe,'customs') and cpe.customs.get('_MODE') == 'ap':
+            <a href="{{ cpe_proxy_url }}"><span  id="btn-web" type="button" class="btn btn-default" ><i class="fa fa-gears" aria-hidden="true"></i>&nbsp; Web</span></a>
+            %end
+
         </div>
     </div>
 

@@ -12,6 +12,9 @@
 <form class="navbar-form navbar-left" method="get" action="{{ search_action }}">
   <div class="form-group">
     <label class="sr-only" for="search">Filter</label>
+
+
+
     <div class="input-group" id="search-group">
       <!--<span class="input-group-addon hidden-xs hidden-sm"><i class="fa fa-search"></i> {{ search_name }}</span>-->
       <input class="form-control" type="search" id="search" name="search" value="{{ app.get_search_string() }}">
@@ -51,8 +54,29 @@
               </script>
             </ul>
           </div>
+
+
+          <div class="dropdown form-group text-right">
+            <a href="#" class="dropdown-toggle" type="button" id="search_menu" data-toggle="dropdown" aria-expanded="false" title="Search"><i class="fa fa-search"></i><span class="hidden-sm hidden-xs hidden-md"></a>
+            <ul class="dropdown-menu" role="menu" aria-labelledby="search_menu">
+              <li><a role="menuitem" href="/all?search={{ app.get_search_string() }}">
+                <span class="btn fa fa-search"></span>All</a></li>
+              <li><a role="menuitem" href="/impacts?search={{ app.get_search_string() }}">
+                <span class="btn fa fa-bolt"></span>Impacts</a></li>
+              <li><a role="menuitem" href="/worldmap?search={{ app.get_search_string() }}">
+                <span class="btn fa fa-map"></span>Worldmap</a></li>
+              <li><a role="menuitem" href="/minemap?search={{ app.get_search_string() }}">
+                <span class="btn fa fa-table"></span>Minemap</a></li>
+              <li><a role="menuitem" href="/wall?search={{ app.get_search_string() }}">
+                <span class="btn fa fa-th-large"></span>Wall</a></li>
+              <li><a role="menuitem" href="/technical?search={{ app.get_search_string() }}">
+                <span class="btn fa fa-th"></span>Matrix</a></li>
+              <li><a role="menuitem" href="/trivial?search={{ app.get_search_string() }}">
+                <span class="btn fa fa-code-fork"></span>Trivial</a></li>
+            </ul>
+        </div>
+
         </span>
-        <i class="fa fa-search"></i>
       </span>
     </div>
   </div>

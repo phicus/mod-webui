@@ -107,7 +107,7 @@ Next check <strong>{{helper.print_duration(pb.next_chk)}}</strong>
                    </div>
                    <div style="display: table-cell; vertical-align: middle;">
                      <small>
-                       <strong>{{ pb.state }}</strong><br>
+                       <strong class="hidden-sm hidden-xs">{{ pb.state }}</strong><!--<br>-->
                        <!--<span title="Since {{time.strftime("%d %b %Y %H:%M:%S", time.localtime(pb.last_state_change))}}">-->
                          %if pb.state_type == 'HARD':
                          {{!helper.print_duration(pb.last_state_change, just_duration=True, x_elts=2)}}
@@ -139,14 +139,17 @@ Next check <strong>{{helper.print_duration(pb.next_chk)}}</strong>
                   %end
                </td>
                <td class="hidden-sm hidden-xs">
+                  %if pb.host_name != previous_pb_host_name:
                  <span class="hidden-lg">
                    <a href="/all?search=host:{{ pb.host_name }}" title="{{!aka}}">
                      {{ pb_host.get_name() if pb_host.display_name == '' else pb_host.display_name }}
                    </a>
+
                    %if pb.__class__.my_type == 'service':
                    /
                    %end
                  </span>
+                 %end
                   %if pb.__class__.my_type == 'service':
                   {{!helper.get_link(pb, short=True)}}
                   %end
@@ -172,6 +175,27 @@ Next check <strong>{{helper.print_duration(pb.next_chk)}}</strong>
                         </a>
                      %end
                      %end
+
+                     %if True:
+                     %if True:
+                        <a style="text-decoration: none; color: #333;" role="button" tabindex="1"
+                           href="/cpe/{{pb.host_name}}">
+                           <i class="fa fa-eye"></i>
+                        </a>
+                     %end
+                     %end
+
+
+                     %if True:
+                     %if True:
+                        <a style="text-decoration: none; color: #333;" role="button" tabindex="1"
+                           href="{{ 'ok' }}">
+                           <i class="fa fa-forward"></i>
+                        </a>
+                     %end
+                     %end
+
+
                   </div>
                   <div class="ellipsis output">
                   <!--<div class="ellipsis output" style='font-family: "Liberation Mono", "Lucida Console", Courier, monospace; color=#7f7f7f; font-size:0.917em;'>-->
@@ -189,7 +213,7 @@ Next check <strong>{{helper.print_duration(pb.next_chk)}}</strong>
 
                      <!--<br>-->
 
-                    <samp style="font-size:0.95em;">{{! pb.output}}</samp>
+                    <samp class="hidden-xs" style="font-size:0.95em;">{{! pb.output}}</samp>
                      %if pb.long_output:
                      <div class="long-output">
                         {{! pb.long_output}}

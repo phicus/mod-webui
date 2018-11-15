@@ -26,7 +26,10 @@
       </button>
       <div class="navbar-brand-div">
         <a href="/" class="logo navbar-brand">
+          <!--
            <img src="/static/logo/{{app.company_logo}}?v={{app.app_version}}" alt="Company logo" style="padding: 7px;" />
+         -->
+         <h1 style="color: white; margin-top: 5px;">Krill</h1>
         </a>
       </div>
    </div>
@@ -206,6 +209,8 @@
             <li> <a href="{{ app.get_url('Minemap') }}"> <span class="fa fa-table sidebar-icon"></span> Minemap </a> </li>
             <li> <a href="{{ app.get_url('Worldmap') }}"> <span class="fa fa-globe sidebar-icon"></span> World map </a> </li>
             <li> <a href="{{ app.get_url('Wall') }}"> <span class="fa fa-th-large sidebar-icon"></span> Wall </a> </li>
+            <li> <a href="/matrix"> <span class="fa fa-th-large sidebar-icon"></span> Matrix </a> </li>
+            <li> <a href="/trivial"> <span class="fa fa-fork sidebar-icon"></span> Trivial </a> </li>
             %if app.logs_module.is_available():
             <li> <a href="{{ app.get_url('Availability') }}"> <span class="fa fa-bar-chart sidebar-icon"></span> Availability </a> </li>
             %end

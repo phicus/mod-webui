@@ -77,9 +77,9 @@
                   </a>
                   %end
                   %end
-               </div>
-               <div>
-                  %for state in 'pending', 'unknown', 'ack', 'downtime':
+               <!--</div>
+               <div>-->
+                  %for state in 'unknown', 'ack', 'downtime':
                   %if s['nb_' + state]>0:
                   <a role="menuitem" href="/all?search=type:service is:{{state}}">
                   %end
@@ -94,6 +94,7 @@
                </div>
             </section>
 
+          <!--
             <section class="col-md-4 col-sm-6 col-xs-6">
                <section class="col-sm-12 col-xs-12">
                </section>
@@ -117,6 +118,7 @@
                   </ul>
                </section>
             </section>
+          -->
          </li>
       %end
 
@@ -176,9 +178,9 @@
                   </a>
                   %end
                   %end
-               </div>
-               <div>
-                  %for state in 'pending', 'unknown', 'ack', 'downtime':
+               <!--</div>
+               <div>-->
+                  %for state in 'unknown', 'ack', 'downtime':
                   %if s['nb_' + state]>0:
                   <a role="menuitem" href="/all?search=type:service sg:{{'"%s"' % group.get_name()}} is:{{state}}">
                   %end
@@ -208,7 +210,7 @@
                   </ul>
                   %end
                </section>
-
+              <!--
                <section class="col-sm-12 col-xs-12">
                   <div class="btn-group btn-group-justified" role="group" aria-label="Minemap" title="View minemap for this group">
                      <a class="btn btn-default" href="/minemap?search=type:service sg:{{'"%s"' % group.get_name()}}"><i class="fa fa-table"></i> <span class="hidden-xs">Minemap</span></a>
@@ -227,6 +229,7 @@
                      </li>
                   </ul>
                </section>
+             -->
             </section>
          </li>
          %#end

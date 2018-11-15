@@ -57,44 +57,31 @@
       %if level==0:
          %nHosts=h['nb_elts']
          %nGroups=len(hostgroups)
-         <li class="all_groups list-group-item clearfix {{even}} {{'alert-danger' if h['nb_elts'] == h['nb_down'] and h['nb_elts'] != 0 else ''}}">
-            <h3>
+         <li class="well all_groups list-group-item clearfix {{even}} {{'alert-danger' if h['nb_elts'] == h['nb_down'] and h['nb_elts'] != 0 else ''}}">
+
+           <section class="col-md-3 col-sm-2 col-xs-8">
+            <h4>
                <a role="menuitem" href="/all?search=type:host">
                   All hosts {{!helper.get_business_impact_text(h['bi'])}}
                </a>
-            </h3>
+            </h4>
+          </section>
             <section class="col-md-8 col-sm-6 col-xs-6">
                <div>
-                  %for state in 'up', 'unreachable', 'down', 'pending':
+                  %for state in 'up', 'unreachable', 'down','unknown', 'ack', 'downtime':
                   %if h['nb_' + state]>0:
                   <a role="menuitem" href="/all?search=type:host is:{{state}}">
-                  %end
                   <span class="{{'font-' + state if h['nb_' + state] > 0 else 'font-greyed'}}">
                     %label = "%s <i>(%s%%)</i>" % (h['nb_' + state], h['pct_' + state])
                     {{!helper.get_fa_icon_state_and_label(cls='host', state=state, label=label)}}
                   </span>
-                  %if h['nb_' + state]>0:
-                  </a>
-                  %end
-                  %end
-               </div>
-               <div>
-                  %for state in 'unknown', 'ack', 'downtime':
-                  %if h['nb_' + state]>0:
-                  <a role="menuitem" href="/all?search=type:host is:{{state}}">
-                  %end
-                  <span class="{{'font-' + state if h['nb_' + state] > 0 else 'font-greyed'}}">
-                    %label = "%s <i>(%s%%)</i>" % (h['nb_' + state], h['pct_' + state])
-                    {{!helper.get_fa_icon_state_and_label(cls='host', state=state, label=label)}}
-                  </span>
-                  %if h['nb_' + state]>0:
                   </a>
                   %end
                   %end
                </div>
             </section>
 
-
+<!--
             <section class="col-md-4 col-sm-6 col-xs-6">
                <section class="col-sm-12 col-xs-12">
                </section>
@@ -119,6 +106,7 @@
                </section>
             </section>
          </li>
+       -->
       %end
 
       %even='alt'
@@ -150,7 +138,8 @@
          %# Filter empty groups ?
          %#if nHosts > 0 or nGroups > 0:
          <li class=" list-group-item clearfix {{'alert-danger' if h['nb_elts'] == h['nb_down'] and h['nb_elts'] != 0 else ''}} {{even}}">
-            <h3>
+            <section class="col-md-3 col-sm-2 col-xs-8">
+            <h4>
                %if nGroups > 0:
                <a class="btn btn-default btn-xs" href="hosts-groups?level={{int(level+1)}}&parent={{group.get_name()}}" title="View contained groups"><i class="fa fa-angle-double-down"></i></a>
                %end
@@ -162,32 +151,18 @@
                <a role="menuitem" href="/all?search=type:host hg:{{'"%s"' % group.get_name()}}">
                   {{group.alias if group.alias != '' else group.get_name()}} {{!helper.get_business_impact_text(h['bi'])}}
                </a>
-            </h3>
+            </h2>
+          </section>
             <section class="col-md-8 col-sm-6 col-xs-6">
                <div>
-                  %for state in 'up', 'unreachable', 'down', 'pending':
+                  %for state in 'up', 'unreachable', 'down', 'unknown', 'ack', 'downtime':
                   %if h['nb_' + state]>0:
                   <a role="menuitem" href="/all?search=type:host hg:{{'"%s"' % group.get_name()}} is:{{state}}">
-                  %end
+
                   <span class="{{'font-' + state if h['nb_' + state] > 0 else 'font-greyed'}}">
                     %label = "%s <i>(%s%%)</i>" % (h['nb_' + state], h['pct_' + state])
                     {{!helper.get_fa_icon_state_and_label(cls='host', state=state, label=label)}}
                   </span>
-                  %if h['nb_' + state]>0:
-                  </a>
-                  %end
-                  %end
-               </div>
-               <div>
-                  %for state in 'unknown', 'ack', 'downtime':
-                  %if h['nb_' + state]>0:
-                  <a role="menuitem" href="/all?search=type:host hg:{{'"%s"' % group.get_name()}} is:{{state}}">
-                  %end
-                  <span class="{{'font-' + state if h['nb_' + state] > 0 else 'font-greyed'}}">
-                    %label = "%s <i>(%s%%)</i>" % (h['nb_' + state], h['pct_' + state])
-                    {{!helper.get_fa_icon_state_and_label(cls='host', state=state, label=label)}}
-                  </span>
-                  %if h['nb_' + state]>0:
                   </a>
                   %end
                   %end
@@ -210,6 +185,7 @@
                   %end
                </section>
 
+            <!--
                <section class="col-sm-12 col-xs-12">
                   <div class="btn-group btn-group-justified" role="group" aria-label="Minemap" title="View minemap for this group">
                      <a class="btn btn-default" href="/minemap?search=type:host hg:{{'"%s"' % group.get_name()}}"><i class="fa fa-table"></i> <span class="hidden-xs">Minemap</span></a>
@@ -228,6 +204,7 @@
                      </li>
                   </ul>
                </section>
+             -->
             </section>
          </li>
          %#end

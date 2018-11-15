@@ -259,7 +259,7 @@ td .ellipsis > .long-output {
 
 .navbar-inverse {
     margin-bottom:0px;
-    background-color: #3371B7;
+    background-color: #005A4E;
     border-bottom: none;
 }
 
@@ -273,7 +273,7 @@ td .ellipsis > .long-output {
 
 .navbar-nav #search,
 .navbar-nav .input-group-addon {
-    background-color: #4D95BE;
+    background-color: #148f7e;
     color: white;
     border: none;
     box-shadow: none;
@@ -372,7 +372,7 @@ td .ellipsis > .long-output {
 /*}*/
 
 .navbar-nav .btn {
-    background-color: #4D95BE;
+    background-color: #148f7e;
     color: #fff;
     padding: 6px 12px;
     font-size: 16px;
@@ -392,7 +392,7 @@ td .ellipsis > .long-output {
 .navbar-nav > li .btn:active,
 .navbar-nav > li .btn.active {
   color: #fff;
-  background-color: #4188b1;
+  background-color: #087263;
 }
 
 .navbar-nav > li a.btn:hover,
@@ -400,7 +400,7 @@ td .ellipsis > .long-output {
 .navbar-nav > li a.btn.focus,
 .navbar-nav > li a.btn:active,
 .navbar-nav > li a.btn.active {
-  background-color: #4188b1 !important;
+  background-color: #087263 !important;
 }
 
 .navbar-nav > li .btn-ico {
