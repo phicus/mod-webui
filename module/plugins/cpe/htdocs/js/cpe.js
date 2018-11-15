@@ -860,6 +860,25 @@ function parsePerfdataTable2(metric) {
       //console.log(metric[i]);
       //console.log( max + ":" + key + "[" + index + "]=" + value )
       tmp[key][index] = Krill.processMetric(metric[i]); // value
+    } else {
+      var regex = /([a-z]+)/g;
+      var m = regex.exec(metric[i][0])
+      var key = m[1]
+      var index = 0
+      var value = metric[i][1]
+
+      max = Math.max(max, index)
+
+      if(typeof tmp[key] === "undefined") {
+        tmp[key] = []
+      }
+
+      while(tmp[key].length < max) {
+        tmp[key].push('')
+      }
+      //console.log(metric[i]);
+      //console.log( max + ":" + key + "[" + index + "]=" + value )
+      tmp[key][index] = Krill.processMetric(metric[i]); // value
     }
   }
   //console.log(tmp)
