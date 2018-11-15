@@ -4,22 +4,27 @@
 
 
 
+var cy_status;
 
 var ctxmenu_commands_all = [
   {
     content: 'Search',
     select: function(){
+      cy_status = cy.nodes();
       trivial_search(this.data('id'))
     }
   },{
     content: 'Expand',
     select: function(){
+      cy_status = cy.nodes();
       trivial_expand(this.data('id'))
     }
   },{
     content: 'View',
     select: function(){
-      top.location.href= "/cpe/" +  this.data('id');
+      var url = "/cpe/" +  this.data('id');
+      var win = window.open(url, '_blank');
+      win.focus();
     }
   }
 ]
@@ -27,7 +32,7 @@ var ctxmenu_commands_all = [
 
 var ctxmenu_commands_mikrotik = ctxmenu_commands_all.slice()
 
-ctxmenu_commands_mikrotik.push(  {
+ctxmenu_commands_mikrotik.push({
     content: 'Winbox',
     select: function(){
       top.location.href= "winbox://" + username + "@" +  this.data('address') + ':8291';
@@ -47,7 +52,9 @@ var ctxmenu_commands_access = ctxmenu_commands_all.slice()
 ctxmenu_commands_access.push(  {
     content: 'Enter the Matrix',
     select: function(){
-      top.location.href= "/matrix/?search=reg:" +  this.data('id');
+      var url = "/matrix/?search=reg:" +  this.data('id');
+      var win = window.open(url, '_blank');
+      win.focus();
     }
 });
 
@@ -57,14 +64,18 @@ var ctxmenu_commands_wimax = ctxmenu_commands_all.slice()
 ctxmenu_commands_wimax.push(  {
     content: 'Web',
     select: function(){
-      top.location.href= "http://" + this.data('address') + '.' + window.location.host.split('.')[0] + '.phicus.net';
+      var url = "http://" + this.data('address') + '.' + window.location.host.split('.')[0] + '.phicus.net';
+      var win = window.open(url, '_blank');
+      win.focus();
     }
 });
 
 ctxmenu_commands_wimax.push(  {
     content: 'Enter the Matrix',
     select: function(){
-      top.location.href= "/matrix?search=reg:" +  this.data('id');
+      var url = "/matrix?search=reg:" +  this.data('id');
+      var win = window.open(url, '_blank');
+      win.focus();
     }
 });
 
@@ -72,17 +83,15 @@ var ctxmenu_commands_cpe = [
   {
     content: 'View',
     select: function(){
-      top.location.href= "/cpe/" +  this.data('id');
+      var url = "/cpe/" +  this.data('id');
+      var win = window.open(url, '_blank');
+      win.focus();
     }
   }
 ]
 
 
-
-
-
 ///Layouts
-
 var LAYOUT1 = {
   name: 'cose-bilkent',
   stop: function(){
@@ -108,69 +117,60 @@ function trivial_expand(txt) {
 }
 
 function trivial_init(data) {
+  var cy = cytoscape({
+    container: document.getElementById('trivial'),
 
+    ready: function(){
+      console.log("cy::ready []");
+      window.cy = this;
+    },
 
+    boxSelectionEnabled: true,
+    maxZoom: 2,
+    minZoom: 0.125,
 
+    style: TRIVIAL_STYLE,
 
-var cy = cytoscape({
-  container: document.getElementById('trivial'),
+    elements: data,
 
-  ready: function(){
-    console.log("cy::ready []");
-    window.cy = this;
-  },
-
-  boxSelectionEnabled: true,
-  maxZoom: 2,
-  minZoom: 0.125,
-
-  style: TRIVIAL_STYLE,
-
-  elements: data,
-
-  layout: LAYOUT1
-});
-
-
-
-
+    layout: LAYOUT1
+  });
 }
 
 function trivial_search(txt) {
-  $('#search').val(txt);
-  history.pushState('trivial:'+txt, 'Trivial: '+txt, '/trivial?search='+txt);
-        selector: 'node.devices',$.getJSON( "trivial.json?search=" + txt, function( data ) {
+    $('#search').val(txt);
+    history.pushState('trivial:'+txt, 'Trivial: '+txt, '/trivial?search='+txt);
+    $.getJSON( "trivial.json?search=" + txt, function( data ) {
+      trivial_init(data);
 
-    trivial_init(data);
+      window.cy.cxtmenu({
+        selector: 'node',
+        commands: function(e){
+            console.log(this)
 
-    window.cy.cxtmenu({
-      selector: 'node',
-      commands: function(e){
-          console.log(this)
+            if (e.data()['tech'] == "wimax") {
+              return ctxmenu_commands_wimax;
+            }
 
-          if (e.data()['tech'] == "wimax") {
-            return ctxmenu_commands_wimax;
-          }
+            if (e.data()['model'].search('Mikrotik') == 0) {
+              return ctxmenu_commands_mikrotik;
+            }
 
-          if (e.data()['model'].search('Mikrotik') == 0) {
-            return ctxmenu_commands_mikrotik;
-          }
+            return ctxmenu_commands_all;
+        }
+      });
 
-          return ctxmenu_commands_all;
-      }
-    });
+      // window.cy.cxtmenu({
+      //   selector: 'node.ap',
+      //   commands: ctxmenu_commands_wimax
+      // });
 
-    // window.cy.cxtmenu({
-    //   selector: 'node.ap',
-    //   commands: ctxmenu_commands_wimax
-    // });
+      window.cy.nodes().bind("mouseover", function(event){
+        var node = event.target;
 
-    window.cy.nodes().bind("mouseover", function(event){
-      var node = event.target;
+        //$('#resumen').load('/cpe/quickservices/' + node.data().id )
 
-      //$('#resumen').load('/cpe/quickservices/' + node.data().id )
-
-    });
+      });
   });
 }
 
@@ -279,3 +279,9 @@ $('#play').on('click', function(){
     // });
 //--
 });
+
+$(window).on('popstate', function(event) {
+  if (cy_status) {
+    cy.add(cy_status);
+  }
+ });
