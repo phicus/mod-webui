@@ -2,25 +2,25 @@
 import $ from "jquery";
 
 class Handlers {
-    constructor(cytoscape) {
+    constructor(trivial) {
         $('#load-position').hide();
         $('#save-position').hide();
         $('#work-mode').on('click', function() {
-            cytoscape.workMode();
+            trivial.workMode();
         });
         $('#view-mode').on('click', function() {
-            cytoscape.viewMode();
+            trivial.viewMode();
         });
         $('#save-position').on('click', function() {
             console.log("savePosition []");
-            cytoscape.savePosition();
+            trivial.savePosition();
         });
         $('#load-position').on('click', function() {
             console.log("loadPosition []");
-            cytoscape.loadPosition();
+            trivial.loadPosition();
         });
         $('#play').on('click', function() {
-            let b = cytoscape.cy
+            let b = trivial.cy
                 .nodes().animate({
                     position: {
                         x: 0,
@@ -40,9 +40,9 @@ class Handlers {
             //--
         });
         $(window).on('popstate', function(event) {
-            if (cytoscape.status) {
-                cytoscape.add(cytoscape.status);
-                cytoscape.zoom(0.07);
+            if (trivial.status) {
+                trivial.add(trivial.status);
+                trivial.zoom(0.07);
                 // $("#load-position").click();
             }
         });
