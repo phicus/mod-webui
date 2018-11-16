@@ -30,7 +30,7 @@ var username = '{{ user.get_name() }}';
 $(function() {
       // Hide leftmenu on trivial
       $('.sidebar').hide();
-      $('#buttons').hide()
+      //$('#buttons').hide()
       $('#loader').show()
 
 });
