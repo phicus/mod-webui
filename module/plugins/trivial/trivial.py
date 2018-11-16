@@ -200,14 +200,12 @@ def show_trivial_json():
 
 
 def set_trivial_setting():
-    data = app.request.json
-    jdata = json.dumps(data)
-
+    data = json.load(app.request.body or '{}')
     saved_data = get_trivial_setting()
-    saved_data.update(jdata)
+    saved_data.update(data)
+    app.prefs_module.set_ui_common_preference('trivial', json.dumps(saved_data))
 
-
-    app.prefs_module.set_ui_common_preference('trivial', saved_data)
+    return {'status': 'ok'}
 
 def get_trivial_setting():
     return json.loads(app.prefs_module.get_ui_common_preference('trivial') or '{}')
@@ -215,11 +213,11 @@ def get_trivial_setting():
 
 pages = {
     set_trivial_setting: {
-        'name': 'SetTrivialSetting', 'route': '/trivial/settings', 'method': 'POST'
+        'name': 'SetTrivialSetting', 'route': '/trivial/settings/save', 'method': 'POST'
     },
 
     get_trivial_setting: {
-        'name': 'GetTrivialSettings', 'route': '/trivial/settings', 'method': 'GET'
+        'name': 'GetTrivialSettings', 'route': '/trivial/settings/load', 'method': 'GET'
     },
 
     show_trivial: {

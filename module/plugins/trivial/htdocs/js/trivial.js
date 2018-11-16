@@ -97,6 +97,9 @@ var LAYOUT1 = {
   stop: function(){
     console.log("cy::stop []");
     window.cy.nodes().lock();
+    $('#loader').hide()
+    $('#buttons').show()
+
   },
   randomize: true,
   gravityRangeCompound: 0.25,
@@ -127,7 +130,7 @@ function trivial_init(data) {
 
     boxSelectionEnabled: true,
     maxZoom: 2,
-    minZoom: 0.125,
+    minZoom: 0.0625,
 
     style: TRIVIAL_STYLE,
 
@@ -185,7 +188,12 @@ $(function(){
 
 
 function savePosition() {
+
   data = {}
+
+  if( ! confirm("really?") ) {
+    return;
+  }
 
   $.each(window.cy.nodes(), function(k,node){
     data[ node.data().id ] = {
@@ -193,30 +201,36 @@ function savePosition() {
     };
   });
 
-  localStorage.setItem('trivial', JSON.stringify(data));
+  //localStorage.setItem('trivial', JSON.stringify(data));
+  $.ajax({
+    type: "POST",
+    url: '/trivial/settings/save',
+    dataType: 'json',
+    data: JSON.stringify(data),
+    success: function(data){
+      console.log(data);
+      alert("Save result:" + data.status);
+    }
+  });
+
 }
 
 function loadPosition() {
-  var loadData = JSON.parse(localStorage.getItem('trivial'));
+  //var loadData = JSON.parse(localStorage.getItem('trivial'));
 
-  if(loadData) {
+  $.ajax({
+    dataType: 'json',
+    url: '/trivial/settings/load',
+    success: function(data) {
+      $.each(data, function(k,v){
+        //console.log(v);
+        ele = window.cy.getElementById(k);
+        ele.position(v.position)
+      })
 
-    $.each(loadData, function(k,v){
-      //console.log(v);
-      ele = window.cy.getElementById(k);
-      ele.position(v.position)
-    })
+    }
+  });
 
-  }
-
-  // $.each(data.nodes, function(k,v){
-  //   _id = v.data.id;
-  //   if (_id in loadData) {
-  //     console.log(_id)
-  //     position = saveData[_id].position
-  //     v['position'] = saveData[_id].position
-  //   }
-  // });
 }
 
 
@@ -229,6 +243,8 @@ function workMode(){
   $('#view-mode').show();
   $('#work-mode').hide();
   window.cy.nodes().unlock();
+
+  $('#trivial').css('background-color', '#f3c019');
 }
 
 function viewMode(){
@@ -237,6 +253,9 @@ function viewMode(){
   $('#view-mode').hide();
   $('#work-mode').show();
   window.cy.nodes().lock();
+
+  $('#trivial').css('background-color', 'transparent');
+
 }
 
 $('#work-mode').on('click', function(){
