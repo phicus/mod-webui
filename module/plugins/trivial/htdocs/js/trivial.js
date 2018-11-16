@@ -112,6 +112,7 @@ function trivial_init(data) {
         ready: function() {
             console.log("cy::ready []");
             window.cy = this;
+            loadPosition();
         },
         boxSelectionEnabled: true,
         maxZoom: 2,
@@ -277,7 +278,6 @@ $('#play').on('click', function() {
     // });
     //--
 });
-cy.ready(function(e) {loadPosition()});
 
 $(window).on('popstate', function(event) {
     trivial_search($('#txtSearch').val());
