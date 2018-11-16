@@ -167,58 +167,74 @@ $(function() {
 
 
 function savePosition() {
-    data = {}
 
-    $.each(window.cy.nodes(), function(k, node) {
-        data[node.data().id] = {
-            'position': node.position()
-        };
-    });
+  data = {}
 
-    localStorage.setItem('trivial', JSON.stringify(data));
+  if( ! confirm("really?") ) {
+    return;
+  }
+
+  $.each(window.cy.nodes(), function(k,node){
+    data[ node.data().id ] = {
+      'position': node.position()
+    };
+  });
+
+  //localStorage.setItem('trivial', JSON.stringify(data));
+  $.ajax({
+    type: "POST",
+    url: '/trivial/settings/save',
+    dataType: 'json',
+    data: JSON.stringify(data),
+    success: function(data){
+      console.log(data);
+      alert("Save result:" + data.status);
+    }
+  });
+
 }
 
 function loadPosition() {
-    var loadData = JSON.parse(localStorage.getItem('trivial'));
+  //var loadData = JSON.parse(localStorage.getItem('trivial'));
 
-    if (loadData) {
-
-        $.each(loadData, function(k, v) {
-            //console.log(v);
-            ele = window.cy.getElementById(k);
-            ele.position(v.position)
-        })
+  $.ajax({
+    dataType: 'json',
+    url: '/trivial/settings/load',
+    success: function(data) {
+      $.each(data, function(k,v){
+        //console.log(v);
+        ele = window.cy.getElementById(k);
+        ele.position(v.position)
+      })
 
     }
+  });
 
-    // $.each(data.nodes, function(k,v){
-    //   _id = v.data.id;
-    //   if (_id in loadData) {
-    //     console.log(_id)
-    //     position = saveData[_id].position
-    //     v['position'] = saveData[_id].position
-    //   }
-    // });
 }
 
 
 $('#load-position').hide();
 $('#save-position').hide();
 
-function workMode() {
-    $('#load-position').show();
-    $('#save-position').show();
-    $('#view-mode').show();
-    $('#work-mode').hide();
-    window.cy.nodes().unlock();
+function workMode(){
+  $('#load-position').show();
+  $('#save-position').show();
+  $('#view-mode').show();
+  $('#work-mode').hide();
+  window.cy.nodes().unlock();
+
+  $('#trivial').css('background-color', '#f3c019');
 }
 
-function viewMode() {
-    $('#load-position').hide();
-    $('#save-position').hide();
-    $('#view-mode').hide();
-    $('#work-mode').show();
-    window.cy.nodes().lock();
+function viewMode(){
+  $('#load-position').hide();
+  $('#save-position').hide();
+  $('#view-mode').hide();
+  $('#work-mode').show();
+  window.cy.nodes().lock();
+
+  $('#trivial').css('background-color', 'transparent');
+
 }
 
 $('#work-mode').on('click', function() {

@@ -10,6 +10,8 @@
 var username = '{{ user.get_name() }}';
 </script>
 
+
+<div id="loader"></div>
 <div id="trivial"></div>
 
 <div id="buttons">
@@ -24,30 +26,37 @@ var username = '{{ user.get_name() }}';
 <script src="/static/trivial/js/cytoscape-cose-bilkent.js"></script>
 <script src="/static/trivial/js/cytoscape-cxtmenu.js"></script>
 
-<!--
-<script src="http://js.cytoscape.org/js/cytoscape.min.js"></script>
-<script src="https://cytoscape.github.io/cytoscape.js-cxtmenu/cytoscape-cxtmenu.js"></script>
-<script src="https://cytoscape.github.io/cytoscape.js-cose-bilkent/cytoscape-cose-bilkent.js"></script>
--->
-
-<!--
-<script src="http://cytoscape.github.io/cytoscape.js-navigator/jquery.cytoscape.js-navigator.js"></script>
-<script src="http://cdnjs.cloudflare.com/ajax/libs/qtip2/2.2.0/jquery.qtip.min.js"></script>
-<link href="http://cdnjs.cloudflare.com/ajax/libs/qtip2/2.2.0/jquery.qtip.min.css" rel="stylesheet" type="text/css" />
-<link href="http://cytoscape.github.io/cytoscape.js-navigator/jquery.cytoscape.js-navigator.css" rel="stylesheet" type="text/css" />
--->
-
-
-
-
-<!--
-<script src="http://ajaxorg.github.io/ace-builds/src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
 <script>
-var editor = ace.edit("editor");
-//editor.setTheme("ace/theme/monokai");
-editor.session.setMode("ace/mode/json");
-editor.getSession().setTabSize(2);
-editor.getSession().setUseWrapMode(true);
-editor.setValue( JSON.stringify(JSON.parse(localStorage.getItem('trivial')),null,"\t")  );
+$(function() {
+      // Hide leftmenu on trivial
+      $('.sidebar').hide();
+      $('#buttons').hide()
+      $('#loader').show()
+
+});
 </script>
--->
+
+
+<style>
+#loader {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 1;
+  width: 150px;
+  height: 150px;
+  margin: -75px 0 0 -75px;
+  border: 16px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 16px solid #005A4E;
+  width: 120px;
+  height: 120px;
+  -webkit-animation: spin 2s linear infinite;
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+</style>

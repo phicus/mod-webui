@@ -9,6 +9,7 @@ from shinken.objects.host import Host
 from collections import OrderedDict
 
 import re
+import json
 
 app = None
 
@@ -198,12 +199,37 @@ def show_trivial_json():
     return data
 
 
+def set_trivial_setting():
+    data = json.load(app.request.body or '{}')
+    saved_data = get_trivial_setting()
+    saved_data.update(data)
+    app.prefs_module.set_ui_common_preference('trivial', json.dumps(saved_data))
+
+    return {'status': 'ok'}
+
+def get_trivial_setting():
+    return json.loads(app.prefs_module.get_ui_common_preference('trivial') or '{}')
+
+
 pages = {
+    set_trivial_setting: {
+        'name': 'SetTrivialSetting', 'route': '/trivial/settings/save', 'method': 'POST'
+    },
+
+    get_trivial_setting: {
+        'name': 'GetTrivialSettings', 'route': '/trivial/settings/load', 'method': 'GET'
+    },
+
     show_trivial: {
         'name': 'trivial', 'route': '/trivial', 'view': 'trivial', 'static': True,
         'search_engine': True
     },
     show_trivial_json: {
         'name': 'trivial', 'route': '/trivial.json', 'search_engine': True
-    }
+    },
+
+
+
+
+
 }
