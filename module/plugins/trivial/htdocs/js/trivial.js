@@ -1,18 +1,15 @@
 // layout = window.cy.makeLayout({'name': 'cose'})
 // layout.options.eles = window.cy.elements();
 // layout.run()
-var cy_status;
 
 var ctxmenu_commands_all = [{
     content: 'Search',
     select: function() {
-        cy_status = cy.nodes();
         trivial_search(this.data('id'))
     }
 }, {
     content: 'Expand',
     select: function() {
-        cy_status = cy.nodes();
         trivial_expand(this.data('id'))
     }
 }, {
@@ -123,6 +120,7 @@ function trivial_init(data) {
         elements: data,
         layout: LAYOUT1
     });
+    $('#loader').hide()
 }
 
 function trivial_search(txt) {
@@ -252,7 +250,7 @@ $('#save-position').on('click', function() {
 
 $('#load-position').on('click', function() {
     console.log("loadPosition []")
-    loadPosition();
+    for (var x = 0; x < 30; x++) {loadPosition()}
 });
 
 
@@ -279,11 +277,8 @@ $('#play').on('click', function() {
     // });
     //--
 });
+cy.ready(function(e) {loadPosition()});
 
 $(window).on('popstate', function(event) {
-    if (cy_status) {
-        cy.add(cy_status);
-        cy.zoom(0.07);
-        $("#load-position").click();
-    }
+    trivial_search($('#txtSearch').val());
 });
