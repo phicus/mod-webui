@@ -13,7 +13,7 @@ var username = '{{ user.get_name() }}';
 
 <div id="loader"></div>
 
-<div id="info" style="z-index: 9999; position: absolute; left: 0; top: 0;"></div>
+<div id="info" style="z-index: 9999; position: absolute; left: 0; top: 0;"></div> 
 
 <div id="trivial" ></div>
 
@@ -30,13 +30,10 @@ var username = '{{ user.get_name() }}';
 <script src="/static/trivial/js/cytoscape-cxtmenu.js"></script>
 
 <script>
-$(function() {
-      // Hide leftmenu on trivial
-      $('.sidebar').hide();
-      //$('#buttons').hide()
-      $('#loader').show()
-
-});
+    // Hide leftmenu on trivial
+    $('.sidebar').hide();
+    //$('#buttons').hide()
+    $('#loader').show()
 </script>
 
 

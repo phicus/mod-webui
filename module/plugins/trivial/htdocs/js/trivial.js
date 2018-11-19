@@ -184,7 +184,12 @@ function trivial_init(data) {
         ready: function() {
             console.log("cy::ready []");
             window.cy = this;
-            loadPosition();
+            setTimeout(() => {
+                for (var x = 0; x < 30; x++) {
+                    loadPosition(true);
+                    console.log(`POSITION LOADED: ${x}`)
+                }
+            }, 45);
         },
         boxSelectionEnabled: true,
         maxZoom: 2,
@@ -193,7 +198,7 @@ function trivial_init(data) {
         elements: data,
         layout: LAYOUT1
     });
-    $('#loader').hide()
+    setTimeout(() => {$('#loader').hide()}, 55);
 }
 
 function trivial_search(txt) {
@@ -230,26 +235,26 @@ function trivial_search(txt) {
     //   });
 
 
-        window.cy.on('mouseover', 'node', function(event) {
-          // Very buggy
-          if (window.cy.workMode) {return}
-          var node = event.target;
+        // window.cy.on('mouseover', 'node', function(event) {
+        //   // Very buggy
+        //   if (window.cy.workMode) {return}
+        //   var node = event.target;
 
-          console.log(event.renderedPosition.x + '/' + event.renderedPosition.y );
-          console.log(node.data().id);
-          $.get('/cpe/quickservices/' + node.data().id, function(data) {
-              $('#info').show();
-              $('#info').html(data);
-              $('#info').css('left', event.renderedPosition.x + 'px');
-              $('#info').css('top', event.renderedPosition.y + 'px');
+        //   console.log(event.renderedPosition.x + '/' + event.renderedPosition.y );
+        //   console.log(node.data().id);
+        //   $.get('/cpe/quickservices/' + node.data().id, function(data) {
+        //       $('#info').show();
+        //       $('#info').html(data);
+        //       $('#info').css('left', event.renderedPosition.x + 'px');
+        //       $('#info').css('top', event.renderedPosition.y + 'px');
 
-          });
+        //   });
 
-        });
+        // });
 
-        window.cy.on('mouseout', 'node', function() {
-          $('#info').hide();
-        });
+        // window.cy.on('mouseout', 'node', function() {
+        //   $('#info').hide();
+        // });
 
 
 
@@ -350,7 +355,9 @@ $('#save-position').on('click', function() {
 
 $('#load-position').on('click', function() {
     console.log("loadPosition []")
-    loadPosition(true)
+    for (var x = 0; x < 30; x++) {
+        loadPosition(true);
+    }
 });
 
 
@@ -380,6 +387,15 @@ $('#play').on('click', function() {
 
 $(window).on('popstate', function(event) {
     trivial_search($('#txtSearch').val());
+});
+
+// TODO
+$("#nav-filters > form").submit(e => {
+    var txt = $("#search").val();
+    console.log(txt);
+    e.preventDefault();
+    trivial_search(txt);
+    console.log(txt);
 });
 
 
