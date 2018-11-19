@@ -392,6 +392,8 @@ $(window).on('popstate', function(event) {
     trivial_search($('#txtSearch').val());
 });
 
+$("#nav-filters > form").attr("action", "#")
+
 // TODO
 $("#nav-filters > form").submit(e => {
     var txt = $("#search").val();
