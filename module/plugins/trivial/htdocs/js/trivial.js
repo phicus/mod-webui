@@ -249,8 +249,8 @@ function trivial_search(txt) {
               ${typeof data}`)
               $('#info').show();
               $('#info').html(data);
-              $('#info').css('left', event.renderedPosition.x + 'px');
-              $('#info').css('top', event.renderedPosition.y + 'px');
+              $('#info').css('left', event.renderedPosition.x + 30 + 'px');
+              $('#info').css('top', event.renderedPosition.y + 30 + 'px');
           });
 
         });

@@ -60,7 +60,7 @@ var username = '{{ user.get_name() }}';
     100% { transform: rotate(360deg); }
 }
 
-* {
+body {
   overflow: hidden;
 }
 </style>
