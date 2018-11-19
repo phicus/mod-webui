@@ -2,7 +2,7 @@
 %helper = app.helper
 %search_string = app.get_search_string()
 
-%rebase("layout", title='Trivial for hosts/services', css=['trivial/css/trivial.css'], js=['trivial/js/trivial-style.js','trivial/js/trivial.js'], breadcrumb=[ ['Trivial All hosts', '/trivial'] ])
+%rebase("layout", title='Trivial for hosts/services', css=['trivial/css/trivial.css'], js=['trivial/js/trivial-style.js','trivial/js/trivial.js', 'trivial/js/cola.js', 'trivial/js/cytoscape-cola.js'], breadcrumb=[ ['Trivial All hosts', '/trivial'] ])
 
 <input  id="txtSearch" type="hidden" value="{{ search }}">
 
@@ -61,5 +61,9 @@ $(function() {
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
+}
+
+* {
+  overflow: hidden;
 }
 </style>

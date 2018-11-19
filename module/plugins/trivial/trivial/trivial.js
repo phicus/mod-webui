@@ -52,8 +52,42 @@ class Trivial {
         });
     }
 
-    load() {/* Maybe this function will have to run 30 times every time it is invoked to work */}
-    save() {}
+    load() {
+        $.ajax({
+            dataType: 'json',
+            url: '/trivial/settings/load',
+            success: function(data) {
+              $.each(data, function(k,v){
+                ele = this.cy.getElementById(k);
+                ele.position(v.position)
+              })
+        
+            }
+          });
+    }
+
+    save() {
+        data = {}
+        if(!confirm("really?")) {
+            return;
+        }
+        $.each(window.cy.nodes(), function(k,node){
+            data[ node.data().id ] = {
+                'position': node.position()
+            };
+        });
+        $.ajax({
+            type: "POST",
+            url: '/trivial/settings/save',
+            dataType: 'json',
+            data: JSON.stringify(data),
+            success: function(data){
+                console.log(data);
+                alert("Save result:" + data.status);
+            }
+        });
+    }
+
     expand() {
         // The this of this arrow function will be the this of this class
         $.getJSON("trivial.json?search=" + txt, (data) => {
@@ -109,3 +143,6 @@ class Trivial {
         $('#trivial').css('background-color', 'transparent');
     }
 }
+
+
+export default Trivial;

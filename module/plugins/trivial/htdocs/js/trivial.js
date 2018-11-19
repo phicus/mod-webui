@@ -1,18 +1,98 @@
 // layout = window.cy.makeLayout({'name': 'cose'})
 // layout.options.eles = window.cy.elements();
 // layout.run()
+var tryPromise = fn => Promise.resolve().then( fn );
+var calculateCachedCentrality = () => {
+    var nodes = cy.nodes();
+    if( nodes.length > 0 && nodes[0].data('centrality') == null ) {
+        var centrality = cy.elements().closenessCentralityNormalized();
+        nodes.forEach( n => n.data( 'centrality', centrality.closeness(n) ) );
+    }
+};
+var $layout = $('#layout');
+var maxLayoutDuration = 1500;
+var layoutPadding = 50;
+var concentric = function( node ){
+    calculateCachedCentrality();
+    return node.data('centrality');
+};
+var levelWidth = function( nodes ){
+    calculateCachedCentrality();
+    var min = nodes.min( n => n.data('centrality') ).value;
+    var max = nodes.max( n => n.data('centrality') ).value;
+    return ( max - min ) / 5;
+};
+var layouts = {
+    cola: {
+        name: 'cola',
+        padding: layoutPadding,
+        nodeSpacing: 12,
+        edgeLengthVal: 45,
+        animate: true,
+        randomize: true,
+        maxSimulationTime: maxLayoutDuration,
+        boundingBox: { // to give cola more space to resolve initial overlaps
+        x1: 0,
+        y1: 0,
+        x2: 10000,
+        y2: 10000
+        },
+        edgeLength: function( e ){
+        var w = e.data('weight');
+
+        if( w == null ){
+        w = 0.5;
+        }
+
+        return 45 / w;
+        }
+    },
+    concentricCentrality: {
+        name: 'concentric',
+        padding: layoutPadding,
+        animate: true,
+        animationDuration: maxLayoutDuration,
+        concentric: concentric,
+        levelWidth: levelWidth
+        },
+        concentricHierarchyCentrality: {
+        name: 'concentric',
+        padding: layoutPadding,
+        animate: true,
+        animationDuration: maxLayoutDuration,
+        concentric: concentric,
+        levelWidth: levelWidth,
+        sweep: Math.PI * 2 / 3,
+        clockwise: true,
+        startAngle: Math.PI * 1 / 6
+    },
+    custom: { // replace with your own layout parameters
+        name: 'preset',
+        padding: layoutPadding
+    }
+};
+var prevLayout;
+var getLayout = name => Promise.resolve( layouts[ name ] );
+var applyLayout = layout => {
+  if( prevLayout ){
+    prevLayout.stop();
+  }
+  var l = prevLayout = cy.makeLayout( layout );
+  return l.run().promiseOn('layoutstop');
+}
+var applyLayoutFromSelect = () => Promise.resolve( $layout.value ).then( getLayout ).then( applyLayout );
 
 var ctxmenu_commands_all = [{
     content: 'Search',
     select: function() {
         trivial_search(this.data('id'))
     }
-}, {
+    }, {
     content: 'Expand',
     select: function() {
         trivial_expand(this.data('id'))
     }
-}, {
+    }, {
     content: 'View',
     select: function() {
         var url = "/cpe/" + this.data('id');
@@ -20,16 +100,13 @@ var ctxmenu_commands_all = [{
         win.focus();
     }
 }]
-
 var ctxmenu_commands_mikrotik = ctxmenu_commands_all.slice()
-
 ctxmenu_commands_mikrotik.push({
     content: 'Winbox',
     select: function() {
         top.location.href = "winbox://" + username + "@" + this.data('address') + ':8291';
     }
 });
-
 ctxmenu_commands_mikrotik.push({
     content: 'SSH',
     select: function() {
@@ -37,9 +114,7 @@ ctxmenu_commands_mikrotik.push({
     }
 });
 
-
 var ctxmenu_commands_access = ctxmenu_commands_all.slice()
-
 ctxmenu_commands_access.push({
     content: 'Enter the Matrix',
     select: function() {
@@ -51,7 +126,6 @@ ctxmenu_commands_access.push({
 
 
 var ctxmenu_commands_wimax = ctxmenu_commands_all.slice()
-
 ctxmenu_commands_wimax.push({
     content: 'Web',
     select: function() {
@@ -60,7 +134,6 @@ ctxmenu_commands_wimax.push({
         win.focus();
     }
 });
-
 ctxmenu_commands_wimax.push({
     content: 'Enter the Matrix',
     select: function() {
@@ -78,7 +151,6 @@ var ctxmenu_commands_cpe = [{
         win.focus();
     }
 }]
-
 
 ///Layouts
 var LAYOUT1 = {
@@ -152,19 +224,15 @@ function trivial_search(txt) {
       //   commands: ctxmenu_commands_wimax
       // });
 
-      window.cy.nodes().bind("mouseover", function(event){
-        var node = event.target;
-        //$('#resumen').load('/cpe/quickservices/' + node.data().id )
-      });
-
-      window.cy.on('tap', 'node', function(event) {
-        var node = event.target;
-        console.log(node.data().id);
-
-      });
+    //   window.cy.on('tap', 'node', function(event) {
+    //     var node = event.target;
+    //     console.log(node.data().id);
+    //   });
 
 
         window.cy.on('mouseover', 'node', function(event) {
+          // Very buggy
+          if (window.cy.workMode) {return}
           var node = event.target;
 
           console.log(event.renderedPosition.x + '/' + event.renderedPosition.y );
@@ -219,22 +287,23 @@ function savePosition() {
       alert("Save result:" + data.status);
     }
   });
-
 }
 
-function loadPosition() {
+function loadPosition(shouldUnlock) {
   //var loadData = JSON.parse(localStorage.getItem('trivial'));
-
+  window.cy.nodes().unlock();
   $.ajax({
     dataType: 'json',
     url: '/trivial/settings/load',
     success: function(data) {
-      $.each(data, function(k,v){
+      $.each(data, function(k,v) {
         //console.log(v);
         ele = window.cy.getElementById(k);
         ele.position(v.position)
       })
-
+      if (!shouldUnlock) {
+        window.cy.nodes().lock();
+      }      
     }
   });
 
@@ -252,6 +321,7 @@ function workMode(){
   window.cy.nodes().unlock();
 
   $('#trivial').css('background-color', '#f3c019');
+  window.cy.workMode = true;
 }
 
 function viewMode(){
@@ -262,7 +332,7 @@ function viewMode(){
   window.cy.nodes().lock();
 
   $('#trivial').css('background-color', 'transparent');
-
+  window.cy.workMode = false;
 }
 
 $('#work-mode').on('click', function() {
@@ -280,7 +350,7 @@ $('#save-position').on('click', function() {
 
 $('#load-position').on('click', function() {
     console.log("loadPosition []")
-    for (var x = 0; x < 30; x++) {loadPosition()}
+    loadPosition(true)
 });
 
 
@@ -311,3 +381,8 @@ $('#play').on('click', function() {
 $(window).on('popstate', function(event) {
     trivial_search($('#txtSearch').val());
 });
+
+
+// TODO: add panel with a selector and a redo button
+// $layout.addEventListener('change', applyLayoutFromSelect);
+// $('#redo-layout').addEventListener('click', applyLayoutFromSelect);
