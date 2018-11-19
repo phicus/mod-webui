@@ -224,19 +224,15 @@ function trivial_search(txt) {
       //   commands: ctxmenu_commands_wimax
       // });
 
-      window.cy.nodes().bind("mouseover", function(event){
-        var node = event.target;
-        //$('#resumen').load('/cpe/quickservices/' + node.data().id )
-      });
-
-      window.cy.on('tap', 'node', function(event) {
-        var node = event.target;
-        console.log(node.data().id);
-
-      });
+    //   window.cy.on('tap', 'node', function(event) {
+    //     var node = event.target;
+    //     console.log(node.data().id);
+    //   });
 
 
         window.cy.on('mouseover', 'node', function(event) {
+          // Very buggy
+          if (window.cy.workMode) {return}
           var node = event.target;
 
           console.log(event.renderedPosition.x + '/' + event.renderedPosition.y );
@@ -293,7 +289,6 @@ function savePosition() {
   });
 }
 
-// FIXME: When 
 function loadPosition(shouldUnlock) {
   //var loadData = JSON.parse(localStorage.getItem('trivial'));
   window.cy.nodes().unlock();
@@ -326,6 +321,7 @@ function workMode(){
   window.cy.nodes().unlock();
 
   $('#trivial').css('background-color', '#f3c019');
+  window.cy.workMode = true;
 }
 
 function viewMode(){
@@ -336,6 +332,7 @@ function viewMode(){
   window.cy.nodes().lock();
 
   $('#trivial').css('background-color', 'transparent');
+  window.cy.workMode = false;
 }
 
 $('#work-mode').on('click', function() {
