@@ -87,12 +87,12 @@ var ctxmenu_commands_all = [{
     select: function() {
         trivial_search(this.data('id'))
     }
-}, {
+    }, {
     content: 'Expand',
     select: function() {
         trivial_expand(this.data('id'))
     }
-}, {
+    }, {
     content: 'View',
     select: function() {
         var url = "/cpe/" + this.data('id');
@@ -353,7 +353,7 @@ $('#save-position').on('click', function() {
 
 $('#load-position').on('click', function() {
     console.log("loadPosition []")
-    for (var x = 0; x < 30; x++) {loadPosition(true)}
+    loadPosition(true)
 });
 
 
