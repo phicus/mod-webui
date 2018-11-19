@@ -170,10 +170,37 @@ function trivial_search(txt) {
 
       window.cy.nodes().bind("mouseover", function(event){
         var node = event.target;
-
         //$('#resumen').load('/cpe/quickservices/' + node.data().id )
+      });
+
+      window.cy.on('tap', 'node', function(event) {
+        var node = event.target;
+        console.log(node.data().id);
 
       });
+
+
+        window.cy.on('mouseover', 'node', function(event) {
+          var node = event.target;
+
+          console.log(event.renderedPosition.x + '/' + event.renderedPosition.y );
+          console.log(node.data().id);
+          $.get('/cpe/quickservices/' + node.data().id, function(data) {
+              $('#info').show();
+              $('#info').html(data);
+              $('#info').css('left', event.renderedPosition.x + 'px');
+              $('#info').css('top', event.renderedPosition.y + 'px');
+
+          });
+
+        });
+
+        window.cy.on('mouseout', 'node', function() {
+          $('#info').hide();
+        });
+
+
+
   });
 }
 
