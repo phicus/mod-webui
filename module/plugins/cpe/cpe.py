@@ -115,13 +115,30 @@ def show_quick_services(cpe_name):
 
     return {'cpe': cpe, 'parent': parent, 'mintime': mintime, 'maxtime': maxtime}
 
+def show_quick(cpe_name):
+
+    cpe = None
+    parent = None
+
+    ''' Mostrar la ficha del CPE con nombre cpe_name.'''
+    # Ok, we can lookup it
+    user = app.bottle.request.environ['USER']
+    host = app.datamgr.get_host(host_name, user) or app.redirect404()
+
+    return {'host': host}
+
+
 pages = {
     show_cpe: {
-        'name': 'CPE', 'route': '/cpe/:cpe_name', 'view': 'cpe', 'static': True,
+        'name': 'Cpe', 'route': '/cpe/:cpe_name', 'view': 'cpe', 'static': True,
+    },
+
+    show_quick: {
+    'name': 'Quick', 'route': '/cpe/quick/:host_name', 'view': 'quick', 'static': True,
     },
 
     show_quick_services: {
-        'name': 'QUICKSERVICES', 'route': '/cpe/quickservices/:cpe_name', 'view': 'quickservices', 'static': True,
+        'name': 'QuickServices', 'route': '/cpe/quickservices/:cpe_name', 'view': 'quickservices', 'static': True,
     }
 
 }

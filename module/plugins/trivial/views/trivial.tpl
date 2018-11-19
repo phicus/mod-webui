@@ -12,7 +12,10 @@ var username = '{{ user.get_name() }}';
 
 
 <div id="loader"></div>
-<div id="trivial"></div>
+
+<div id="info" style="z-index: 9999; position: absolute; left: 0; top: 0;"></div>
+
+<div id="trivial" ></div>
 
 <div id="buttons">
   <button class="btn btn-primary btn-sx" id="load-position">Load Position</button>

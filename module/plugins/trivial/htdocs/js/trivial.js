@@ -211,24 +211,53 @@ function trivial_search(txt) {
                     return ctxmenu_commands_wimax;
                 }
 
-                if (e.data()['model'].search('Mikrotik') == 0) {
-                    return ctxmenu_commands_mikrotik;
-                }
-
-                return ctxmenu_commands_all;
+            if (e.data()['model'].search('Mikrotik') == 0) {
+              return ctxmenu_commands_mikrotik;
             }
+
+            return ctxmenu_commands_all;
+        }
+      });
+
+      // window.cy.cxtmenu({
+      //   selector: 'node.ap',
+      //   commands: ctxmenu_commands_wimax
+      // });
+
+      window.cy.nodes().bind("mouseover", function(event){
+        var node = event.target;
+        //$('#resumen').load('/cpe/quickservices/' + node.data().id )
+      });
+
+      window.cy.on('tap', 'node', function(event) {
+        var node = event.target;
+        console.log(node.data().id);
+
+      });
+
+
+        window.cy.on('mouseover', 'node', function(event) {
+          var node = event.target;
+
+          console.log(event.renderedPosition.x + '/' + event.renderedPosition.y );
+          console.log(node.data().id);
+          $.get('/cpe/quickservices/' + node.data().id, function(data) {
+              $('#info').show();
+              $('#info').html(data);
+              $('#info').css('left', event.renderedPosition.x + 'px');
+              $('#info').css('top', event.renderedPosition.y + 'px');
+
+          });
+
         });
 
-        // window.cy.cxtmenu({
-        //   selector: 'node.ap',
-        //   commands: ctxmenu_commands_wimax
-        // });
-
-        window.cy.nodes().bind("mouseover", function(event) {
-            var node = event.target;
-            //$('#resumen').load('/cpe/quickservices/' + node.data().id )
+        window.cy.on('mouseout', 'node', function() {
+          $('#info').hide();
         });
-    });
+
+
+
+  });
 }
 
 
