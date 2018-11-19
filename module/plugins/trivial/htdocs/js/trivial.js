@@ -2,158 +2,142 @@
 // layout.options.eles = window.cy.elements();
 // layout.run()
 
-
-
-var cy_status;
-
-var ctxmenu_commands_all = [
-  {
+var ctxmenu_commands_all = [{
     content: 'Search',
-    select: function(){
-      cy_status = cy.nodes();
-      trivial_search(this.data('id'))
+    select: function() {
+        trivial_search(this.data('id'))
     }
-  },{
+}, {
     content: 'Expand',
-    select: function(){
-      cy_status = cy.nodes();
-      trivial_expand(this.data('id'))
+    select: function() {
+        trivial_expand(this.data('id'))
     }
-  },{
+}, {
     content: 'View',
-    select: function(){
-      var url = "/cpe/" +  this.data('id');
-      var win = window.open(url, '_blank');
-      win.focus();
+    select: function() {
+        var url = "/cpe/" + this.data('id');
+        var win = window.open(url, '_blank');
+        win.focus();
     }
-  }
-]
-
+}]
 
 var ctxmenu_commands_mikrotik = ctxmenu_commands_all.slice()
 
 ctxmenu_commands_mikrotik.push({
     content: 'Winbox',
-    select: function(){
-      top.location.href= "winbox://" + username + "@" +  this.data('address') + ':8291';
+    select: function() {
+        top.location.href = "winbox://" + username + "@" + this.data('address') + ':8291';
     }
 });
 
 ctxmenu_commands_mikrotik.push({
-  content: 'SSH',
-  select: function(){
-    top.location.href= "krillssh://" + username + "@" +  this.data('address') + ':22';
-  }
+    content: 'SSH',
+    select: function() {
+        top.location.href = "krillssh://" + username + "@" + this.data('address') + ':22';
+    }
 });
 
 
 var ctxmenu_commands_access = ctxmenu_commands_all.slice()
 
-ctxmenu_commands_access.push(  {
+ctxmenu_commands_access.push({
     content: 'Enter the Matrix',
-    select: function(){
-      var url = "/matrix/?search=reg:" +  this.data('id');
-      var win = window.open(url, '_blank');
-      win.focus();
+    select: function() {
+        var url = "/matrix/?search=reg:" + this.data('id');
+        var win = window.open(url, '_blank');
+        win.focus();
     }
 });
 
 
 var ctxmenu_commands_wimax = ctxmenu_commands_all.slice()
 
-ctxmenu_commands_wimax.push(  {
+ctxmenu_commands_wimax.push({
     content: 'Web',
-    select: function(){
-      var url = "http://" + this.data('address') + '.' + window.location.host.split('.')[0] + '.phicus.net';
-      var win = window.open(url, '_blank');
-      win.focus();
+    select: function() {
+        var url = "http://" + this.data('address') + '.' + window.location.host.split('.')[0] + '.phicus.net';
+        var win = window.open(url, '_blank');
+        win.focus();
     }
 });
 
-ctxmenu_commands_wimax.push(  {
+ctxmenu_commands_wimax.push({
     content: 'Enter the Matrix',
-    select: function(){
-      var url = "/matrix?search=reg:" +  this.data('id');
-      var win = window.open(url, '_blank');
-      win.focus();
+    select: function() {
+        var url = "/matrix?search=reg:" + this.data('id');
+        var win = window.open(url, '_blank');
+        win.focus();
     }
 });
 
-var ctxmenu_commands_cpe = [
-  {
+var ctxmenu_commands_cpe = [{
     content: 'View',
-    select: function(){
-      var url = "/cpe/" +  this.data('id');
-      var win = window.open(url, '_blank');
-      win.focus();
+    select: function() {
+        var url = "/cpe/" + this.data('id');
+        var win = window.open(url, '_blank');
+        win.focus();
     }
-  }
-]
+}]
 
 
 ///Layouts
 var LAYOUT1 = {
-  name: 'cose-bilkent',
-  stop: function(){
-    console.log("cy::stop []");
-    window.cy.nodes().lock();
-    $('#loader').hide()
-    $('#buttons').show()
-
-  },
-  randomize: true,
-  gravityRangeCompound: 0.25,
-  nodeDimensionsIncludeLabels: false,
-  nodeRepulsion: 1000 * 1000,
-  tile: true
+    name: 'cose-bilkent',
+    stop: function() {
+        console.log("cy::stop []");
+        window.cy.nodes().lock();
+    },
+    randomize: true,
+    gravityRangeCompound: 0.25,
+    nodeDimensionsIncludeLabels: false,
+    nodeRepulsion: 1000 * 1000,
+    tile: true
 }
 
-var LAYOUT2 = {
-  name: 'preset'
-}
+// LAYAOUT2 is unused
+// var LAYOUT2 = {
+//     name: 'preset'
+// }
 
 function trivial_expand(txt) {
-  $.getJSON( "trivial.json?search=" + txt, function( data ) {
-    console.log(data)
-    window.cy.add(data);
-  });
+    $.getJSON("trivial.json?search=" + txt, function(data) {
+        console.log(data);
+        window.cy.add(data);
+    });
 }
 
 function trivial_init(data) {
-  var cy = cytoscape({
-    container: document.getElementById('trivial'),
-
-    ready: function(){
-      console.log("cy::ready []");
-      window.cy = this;
-    },
-
-    boxSelectionEnabled: true,
-    maxZoom: 2,
-    minZoom: 0.0625,
-
-    style: TRIVIAL_STYLE,
-
-    elements: data,
-
-    layout: LAYOUT1
-  });
+    var cy = cytoscape({
+        container: document.getElementById('trivial'),
+        ready: function() {
+            console.log("cy::ready []");
+            window.cy = this;
+            loadPosition();
+        },
+        boxSelectionEnabled: true,
+        maxZoom: 2,
+        minZoom: 0.125,
+        style: TRIVIAL_STYLE,
+        elements: data,
+        layout: LAYOUT1
+    });
+    $('#loader').hide()
 }
 
 function trivial_search(txt) {
     $('#search').val(txt);
-    history.pushState('trivial:'+txt, 'Trivial: '+txt, '/trivial?search='+txt);
-    $.getJSON( "trivial.json?search=" + txt, function( data ) {
-      trivial_init(data);
+    history.pushState('trivial:' + txt, 'Trivial: ' + txt, '/trivial?search=' + txt);
+    $.getJSON("trivial.json?search=" + txt, function(data) {
+        trivial_init(data);
 
-      window.cy.cxtmenu({
-        selector: 'node',
-        commands: function(e){
-            console.log(this)
+        window.cy.cxtmenu({
+            selector: 'node',
+            commands: function(e) {
+                console.log(this)
 
-            if (e.data()['tech'] == "wimax") {
-              return ctxmenu_commands_wimax;
-            }
+                if (e.data()['tech'] == "wimax") {
+                    return ctxmenu_commands_wimax;
+                }
 
             if (e.data()['model'].search('Mikrotik') == 0) {
               return ctxmenu_commands_mikrotik;
@@ -205,13 +189,9 @@ function trivial_search(txt) {
 }
 
 
-
-
-
-$(function(){
-  trivial_search( $('#txtSearch').val() );
+$(function() {
+    trivial_search($('#txtSearch').val());
 })
-
 
 
 function savePosition() {
@@ -285,49 +265,49 @@ function viewMode(){
 
 }
 
-$('#work-mode').on('click', function(){
-  workMode();
+$('#work-mode').on('click', function() {
+    workMode();
 });
 
-$('#view-mode').on('click', function(){
-  viewMode();
+$('#view-mode').on('click', function() {
+    viewMode();
+});
+
+$('#save-position').on('click', function() {
+    console.log("savePosition []")
+    savePosition();
+});
+
+$('#load-position').on('click', function() {
+    console.log("loadPosition []")
+    for (var x = 0; x < 30; x++) {loadPosition()}
 });
 
 
-$('#save-position').on('click', function(){
-  console.log("savePosition []")
-  savePosition();
-});
+$('#play').on('click', function() {
+    //
 
-$('#load-position').on('click', function(){
-  console.log("loadPosition []")
-  loadPosition();
-});
-
-
-$('#play').on('click', function(){
-//
-
-  var b = window.cy
-
-  .nodes().animate({
-    position: { x: 0, y: 0 }
-  })
-
-  .delay(1000)
-
-  .animate({
-      pan: { x: 0, y: 0 }
-  });
+    var b = window.cy
+        .nodes().animate({
+            position: {
+                x: 0,
+                y: 0
+            }
+        })
+        .delay(1000)
+        .animate({
+            pan: {
+                x: 0,
+                y: 0
+            }
+        });
 
     // a.animation().play().promise().then(function () {
     //     b.animation().play();
     // });
-//--
+    //--
 });
 
 $(window).on('popstate', function(event) {
-  if (cy_status) {
-    cy.add(cy_status);
-  }
- });
+    trivial_search($('#txtSearch').val());
+});
