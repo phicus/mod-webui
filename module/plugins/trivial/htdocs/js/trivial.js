@@ -184,6 +184,7 @@ function trivial_init(data) {
         ready: function() {
             console.log("cy::ready []");
             window.cy = this;
+            // ugly
             setTimeout(() => {
                 for (var x = 0; x < 30; x++) {
                     loadPosition(true);
@@ -198,6 +199,7 @@ function trivial_init(data) {
         elements: data,
         layout: LAYOUT1
     });
+    // ugly
     setTimeout(() => {$('#loader').hide()}, 55);
 }
 
@@ -235,26 +237,27 @@ function trivial_search(txt) {
     //   });
 
 
-        // window.cy.on('mouseover', 'node', function(event) {
-        //   // Very buggy
-        //   if (window.cy.workMode) {return}
-        //   var node = event.target;
+        window.cy.on('mouseover', 'node', function(event) {
+          // Very ugly. Maybe also buggy
+          if (window.cy.workMode) {return}
+          var node = event.target;
 
-        //   console.log(event.renderedPosition.x + '/' + event.renderedPosition.y );
-        //   console.log(node.data().id);
-        //   $.get('/cpe/quickservices/' + node.data().id, function(data) {
-        //       $('#info').show();
-        //       $('#info').html(data);
-        //       $('#info').css('left', event.renderedPosition.x + 'px');
-        //       $('#info').css('top', event.renderedPosition.y + 'px');
+          console.log(event.renderedPosition.x + '/' + event.renderedPosition.y );
+          console.log(node.data().id);
+          $.get('/cpe/quickservices/' + node.data().id, function(data) {
+              console.log(`DATA: ${data}
+              ${typeof data}`)
+              $('#info').show();
+              $('#info').html(data);
+              $('#info').css('left', event.renderedPosition.x + 'px');
+              $('#info').css('top', event.renderedPosition.y + 'px');
+          });
 
-        //   });
+        });
 
-        // });
-
-        // window.cy.on('mouseout', 'node', function() {
-        //   $('#info').hide();
-        // });
+        window.cy.on('mouseout', 'node', function() {
+          $('#info').hide();
+        });
 
 
 
@@ -392,10 +395,10 @@ $(window).on('popstate', function(event) {
 // TODO
 $("#nav-filters > form").submit(e => {
     var txt = $("#search").val();
-    console.log(txt);
+    console.log(`SEARCH: ${txt}`);
     e.preventDefault();
     trivial_search(txt);
-    console.log(txt);
+    console.log(`SEARCH: ${txt}`);
 });
 
 
