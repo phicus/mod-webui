@@ -643,6 +643,8 @@ class WebUIDataManager(DataManager):
                 # logger.info("[WebUI - datamanager] type:%s, %d matching items", s, len(items))
                 # for item in items:
                 #     logger.info("[WebUI - datamanager] item %s is %s", item.get_name(), item.__class__)
+            else:
+                filtered_by_type = False
 
             if t == 'bp' or t == 'bi':
                 try:
