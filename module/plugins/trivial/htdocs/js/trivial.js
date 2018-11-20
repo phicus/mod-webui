@@ -190,6 +190,7 @@ function trivial_init(data) {
                     loadPosition(true);
                     console.log(`POSITION LOADED: ${x}`)
                 }
+                cy.nodes().lock();
             }, 45);
         },
         boxSelectionEnabled: true,
@@ -231,10 +232,13 @@ function trivial_search(txt) {
         //   commands: ctxmenu_commands_wimax
         // });
 
-        //   window.cy.on('tap', 'node', function(event) {
-        //     var node = event.target;
-        //     console.log(node.data().id);
-        //   });
+          window.cy.on('tap', 'node', function(event) {
+            if (window.cy.workMode) {return}
+            var node = event.target;
+            var url = "/cpe/" + node.data('id');
+            var win = window.open(url, '_blank');
+            win.focus();
+          });
 
 
         window.cy.on('mouseover', 'node', function (event) {
