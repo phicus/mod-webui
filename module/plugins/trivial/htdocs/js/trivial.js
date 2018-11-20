@@ -311,6 +311,7 @@ function loadPosition(shouldUnlock, loadBackup) {
             if (loadBackup) {data = data.backup}
             else {data = data.save1}
             for (var x = 0; x < 30; x++) {
+                console.log(`LOAD: ${x}`)
                 $.each(data, (k, v) => {
                     //console.log(v);
                     ele = this.cy.getElementById(k);
@@ -379,9 +380,7 @@ $('#save-position-backup').on('click', function () {
 
 $('#load-position').on('click', function () {
     console.log("loadPosition []")
-    for (var x = 0; x < 30; x++) {
-        loadPosition(true);
-    }
+    loadPosition(true);
 });
 
 $('#load-position-backup').on('click', function () {
