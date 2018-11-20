@@ -186,10 +186,7 @@ function trivial_init(data) {
             window.cy = this;
             // ugly
             setTimeout(() => {
-                for (var x = 0; x < 30; x++) {
-                    loadPosition(true);
-                    console.log(`POSITION LOADED: ${x}`)
-                }
+                loadPosition(true);
                 cy.nodes().lock();
             }, 45);
         },
@@ -236,13 +233,13 @@ function trivial_search(txt) {
         //   commands: ctxmenu_commands_wimax
         // });
 
-          window.cy.on('tap', 'node', function(event) {
-            if (window.cy.workMode) {return}
+        window.cy.on('tap', 'node', function (event) {
+            if (window.cy.workMode) { return }
             var node = event.target;
             var url = "/cpe/" + node.data('id');
             var win = window.open(url, '_blank');
             win.focus();
-          });
+        });
 
 
         window.cy.on('mouseover', 'node', function (event) {
@@ -310,19 +307,21 @@ function loadPosition(shouldUnlock, loadBackup) {
         dataType: 'json',
         url: '/trivial/settings/load',
         success: (data) => {
-            if (loadBackup) {
-                data = data.backup
+            for (var x = 0; x < 30; x++) {
+                if (loadBackup) {
+                    data = data.backup
 
-            } else {
-                data = data.save1
-            }
-            $.each(data, (k, v) => {
-                //console.log(v);
-                ele = this.cy.getElementById(k);
-                ele.position(v.position)
-            })
-            if (!shouldUnlock) {
-                this.cy.nodes().lock();
+                } else {
+                    data = data.save1
+                }
+                $.each(data, (k, v) => {
+                    //console.log(v);
+                    ele = this.cy.getElementById(k);
+                    ele.position(v.position)
+                })
+                if (!shouldUnlock) {
+                    this.cy.nodes().lock();
+                }
             }
         }
     });
@@ -390,9 +389,7 @@ $('#load-position').on('click', function () {
 
 $('#load-position-backup').on('click', function () {
     console.log("loadPositionackup []")
-    for (var x = 0; x < 30; x++) {
-        loadPosition(true, true);
-    }
+    loadPosition(true, true);
 });
 
 $('#play').on('click', function () {
