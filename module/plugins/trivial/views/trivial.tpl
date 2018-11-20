@@ -19,9 +19,12 @@ var username = '{{ user.get_name() }}';
 
 <div id="buttons">
   <button class="btn btn-primary btn-sx" id="load-position">Load Position</button>
+  <button class="btn btn-primary" id="load-position-backup">Load Position (Backup)</button>
   <button class="btn btn-primary" id="save-position">Save Position</button>
+  <button class="btn btn-primary" id="save-position-backup">Save Position (Backup)</button>
   <button class="btn btn-primary" id="work-mode">Work Mode</button>
   <button class="btn btn-primary" id="view-mode" style="display: none;">View Mode</button>
+  <button class="btn btn-primary" id="center">Center</button>
 </div>
 
 
