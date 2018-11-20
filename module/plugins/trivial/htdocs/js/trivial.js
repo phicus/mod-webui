@@ -192,7 +192,7 @@ function trivial_init(data) {
         },
         boxSelectionEnabled: true,
         maxZoom: 2,
-        minZoom: 0.125,
+        minZoom: 0.035,
         style: TRIVIAL_STYLE,
         elements: data,
         layout: LAYOUT1
@@ -234,8 +234,9 @@ function trivial_search(txt) {
         // });
 
         window.cy.on('tap', 'node', function (event) {
-            if (window.cy.workMode) { return }
             var node = event.target;
+            // TODO: handle locations
+            if (window.cy.workMode || node.isParent()) { return }
             var url = "/cpe/" + node.data('id');
             var win = window.open(url, '_blank');
             win.focus();
@@ -271,18 +272,18 @@ $(function () {
 })
 
 function savePosition(saveBackup) {
-
-    data = {}
-
     if (!confirm("really?")) {
         return;
     }
 
-    $.each(window.cy.nodes(), function (k, node) {
-        data[node.data().id] = {
-            'position': node.position()
-        };
-    });
+    data = {};
+    window.cy.nodes()
+        .forEach(n => data[n.data().id] = { 'position': n.position() });
+    // $.each(window.cy.nodes(), function (k, node) {
+    //     data[node.data().id] = {
+    //         'position': node.position()
+    //     };
+    // });
 
     if (saveBackup) { data = JSON.stringify({ backup: data }) }
     else { data = JSON.stringify({ save1: data }) }
@@ -307,21 +308,17 @@ function loadPosition(shouldUnlock, loadBackup) {
         dataType: 'json',
         url: '/trivial/settings/load',
         success: (data) => {
+            if (loadBackup) {data = data.backup}
+            else {data = data.save1}
             for (var x = 0; x < 30; x++) {
-                if (loadBackup) {
-                    data = data.backup
-
-                } else {
-                    data = data.save1
-                }
                 $.each(data, (k, v) => {
                     //console.log(v);
                     ele = this.cy.getElementById(k);
                     ele.position(v.position)
                 })
-                if (!shouldUnlock) {
-                    this.cy.nodes().lock();
-                }
+            }
+            if (!shouldUnlock) {
+                this.cy.nodes().lock();
             }
         }
     });
@@ -433,4 +430,33 @@ $("#nav-filters > form").submit(e => {
     console.log(`SEARCH: ${txt}`);
 });
 
+function getDFS(root, goal) {
+    var dfs = cy.elements().aStar({
+        root: root,
+        goal: goal,
+        directed: false
+    })
+    if (!dfs.path) {
+        // TODO: do something
+    }
+    return dfs;
+    //   dfs.path.select()
+}
 
+function deleteNodesNotPresentInDFSAndSelectPath(dfs) {
+    var ids = dfs.path.map(n => n.data().id);
+    console.log(ids);
+    var index;
+    var nodesToRemove = [];
+    // FIXME
+    cy.nodes().forEach(n => {
+        index = ids.indexOf(n.data().id);
+        if (index === -1 && !n.isParent()) {
+            nodesToRemove.push(n);
+        } else {
+            console.log(`I'm not going to delete ${index}, ${n.data().id}`);
+        }
+    });
+    nodesToRemove.forEach(n => n.remove())
+    dfs.path.select();
+}
