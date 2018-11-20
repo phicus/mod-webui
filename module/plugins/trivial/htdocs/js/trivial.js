@@ -201,7 +201,11 @@ function trivial_init(data) {
         layout: LAYOUT1
     });
     // ugly
-    setTimeout(() => { $('#loader').hide() }, 55);
+    setTimeout(() => {
+        $('#loader').hide();
+        $('#work-mode').show();
+        $('#center').show();
+    }, 55);
 }
 
 function trivial_search(txt) {
@@ -326,6 +330,8 @@ function loadPosition(shouldUnlock, loadBackup) {
 
 $('#load-position').hide();
 $('#save-position').hide();
+$('#work-mode').hide();
+$('#center').hide();
 $('#save-position-backup').hide();
 $('#load-position-backup').hide();
 
@@ -344,7 +350,9 @@ function workMode() {
 
 function viewMode() {
     $('#load-position').hide();
+    $('#load-position-backup').hide();
     $('#save-position').hide();
+    $('#save-position-backup').hide();
     $('#view-mode').hide();
     $('#work-mode').show();
     window.cy.nodes().lock();
@@ -411,6 +419,8 @@ $('#play').on('click', function () {
 });
 
 $(window).on('popstate', function (event) {
+    viewMode();
+    $('#loader').show();
     trivial_search($('#txtSearch').val());
 });
 
@@ -420,7 +430,9 @@ $("#nav-filters > form").submit(e => {
     var txt = $("#search").val();
     console.log(`SEARCH: ${txt}`);
     e.preventDefault();
-    trivial_search(txt);
+    viewMode();
+    $('#loader').show();
+    trivial_search(txt)
     console.log(`SEARCH: ${txt}`);
 });
 
