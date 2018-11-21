@@ -36,34 +36,25 @@
             %end
 
 
-            <div class="dropdown">
-              <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                Dropdown button
-              </button>
-              <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                <a class="dropdown-item" href="#">Action</a>
-                <a class="dropdown-item" href="#">Another action</a>
-                <a class="dropdown-item" href="#">Something else here</a>
-              </div>
-            </div>
+
+
+
+
+            <a href="/host/{{ cpe.host_name }}"><span  id="btn-web" type="button" class="btn btn-default" ><i class="fa fa-gears" aria-hidden="true"></i>&nbsp; More </span></a>
+            <a href="{{ cpe_proxy_url }}"><span  id="btn-web" type="button" class="btn btn-default" ><i class="fa fa-gears" aria-hidden="true"></i>&nbsp; Web</span></a>
 
 
             <div class="btn-group dropright">
-              <button type="button" class="btn btn-secondary">
-                Split dropright
-              </button>
+              <a href="/host/{{ cpe.host_name }}" class="btn btn-secondary">
+                More
+              </a>
               <button type="button" class="btn btn-secondary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 <span class="sr-only">Toggle Dropright</span>
               </button>
               <div class="dropdown-menu">
-                <a class="dropdown-item" href="#">Action</a>
-                <a class="dropdown-item" href="#">Another action</a>
-                <a class="dropdown-item" href="#">Something else here</a>
+                <a class="dropdown-item" href="/host/{{ cpe.host_name }}#graphs">Graphs</a>
               </div>
             </div>
-
-            <a href="/host/{{ cpe.host_name }}"><span  id="btn-web" type="button" class="btn btn-default" ><i class="fa fa-gears" aria-hidden="true"></i>&nbsp; More </span></a>
-            <a href="{{ cpe_proxy_url }}"><span  id="btn-web" type="button" class="btn btn-default" ><i class="fa fa-gears" aria-hidden="true"></i>&nbsp; Web</span></a>
 
         </div>
     </div>
