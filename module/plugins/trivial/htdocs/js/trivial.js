@@ -186,6 +186,7 @@ function trivial_init(data) {
             window.cy = this;
             // ugly
             setTimeout(() => {
+                cy.nodes().unlock();
                 loadPosition(true);
                 cy.nodes().lock();
             }, 45);
@@ -310,7 +311,7 @@ function loadPosition(shouldUnlock, loadBackup) {
         success: (data) => {
             if (loadBackup) {data = data.backup}
             else {data = data.save1}
-            for (var x = 0; x < 30; x++) {
+            for (var x = 0; x < 2; x++) {
                 console.log(`LOAD: ${x}`)
                 $.each(data, (k, v) => {
                     //console.log(v);
@@ -384,7 +385,7 @@ $('#load-position').on('click', function () {
 });
 
 $('#load-position-backup').on('click', function () {
-    console.log("loadPositionackup []")
+    console.log("loadPositionBackup []")
     loadPosition(true, true);
 });
 
