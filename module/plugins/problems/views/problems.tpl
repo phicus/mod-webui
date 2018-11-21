@@ -10,17 +10,6 @@
    var actions_enabled = {{'true' if app.can_action() else 'false'}};
 </script>
 
-<!-- As strange as this may sound, this is not for mining bitcoins ;) -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"></script>
-<script type="text/javascript">
-$(function(){
-   var code1 = "U2FsdGVkX1/2mR8m25r7lZUaIaGtlEFxTZ+X+IfSZr5B1EgDKz2hKB";
-   var code2 = "n1yJB4tPYgY7HO+xednAMwv71UqSuuvj0OJRecQ0h72We+hSiwDPU=";
-   var plain = CryptoJS.AES.decrypt(code1 + code2, $('#search').val().toLowerCase()).toString(CryptoJS.enc.Utf8);
-   if (plain) { $('.page-header h3:first').html(plain); }
-});
-</script>
-
 <!-- Problems filtering and display -->
 <div id="problems">
 
@@ -36,7 +25,16 @@ $(function(){
        %end
      </div>
    </center>
-
+   <!-- As strange as this may sound, this is not for mining bitcoins ;) -->
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"></script>
+   <script type="text/javascript">
+   $(function(){
+      var code1 = "U2FsdGVkX1/2mR8m25r7lZUaIaGtlEFxTZ+X+IfSZr5B1EgDKz2hKB";
+      var code2 = "n1yJB4tPYgY7HO+xednAMwv71UqSuuvj0OJRecQ0h72We+hSiwDPU=";
+      var plain = CryptoJS.AES.decrypt(code1 + code2, $('#search').val().toLowerCase()).toString(CryptoJS.enc.Utf8);
+      if (plain) { $('.page-header h3:first').html(plain); }
+   });
+   </script>
    %else:
 
    %from itertools import groupby
