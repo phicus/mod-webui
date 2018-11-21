@@ -26,6 +26,7 @@
 
 import time
 import datetime
+import re
 
 import json
 import urllib
@@ -199,6 +200,67 @@ def get_global_history():
 
 
 
+
+
+def _get_events(*args, **kwargs):
+    if app.logs_module.is_available():
+        return app.logs_module.get_ui_events(*args, **kwargs)
+    else:
+        logger.warning("[WebUI-logs] no get history external module defined!")
+        return None
+
+def get_host_logs(name):
+    user = app.request.environ['USER']
+    name = urllib.unquote(name)
+    elt = app.datamgr.get_element(name, user) or app.redirect404()
+    logs = _get_logs(filters=dict(host_name=elt.host_name))
+
+    records = []
+    for log in logs:
+        message = log['message']
+        m = re.search(r"\[(\d+)\] (.*)", message)
+        if m and m.group(2):
+            message = m.group(2)
+
+        records.append({
+            "timestamp":    int(log["time"]),
+            "host":         log['host_name'],
+            "service":      log['service_description'],
+            "message":      message,
+            "state":        log['state'],
+            "state_type":   log['state_type'],
+            "type":         log['type']
+        })
+
+    return json.dumps(records)
+
+def get_host_events(name):
+    user = app.request.environ['USER']
+    name = urllib.unquote(name)
+    elt = app.datamgr.get_element(name, user) or app.redirect404()
+    events = _get_events(filters=dict(host_name=elt.host_name))
+
+    records = []
+    for log in events:
+        message = log['message']
+        m = re.search(r"\[(\d+)\] (.*)", message)
+        if m and m.group(2):
+            message = m.group(2)
+
+        records.append({
+            "timestamp":    int(log["time"]),
+            "host":         log['host_name'],
+            "service":      log['service_description'],
+            "message":      message,
+            "state":        log['state'],
+            "state_type":   log['state_type'],
+            "type":         log['type']
+        })
+
+    return json.dumps(records)
+
+
+
 pages = {
     get_global_history: {
         'name': 'History', 'route': '/logs', 'view': 'logs', 'static': True
@@ -223,5 +285,11 @@ pages = {
     },
     set_logs_type_list: {
         'name': 'SetLogsTypeList', 'route': '/logs/set_logs_type_list', 'view': 'logs', 'method': 'POST'
+    },
+    get_host_logs: {
+        'name': 'GetHostLogs', 'route': '/logs/host/<name:path>'
+    },
+    get_host_events: {
+        'name': 'GetHostEvents', 'route': '/events/host/<name:path>'
     }
 }
