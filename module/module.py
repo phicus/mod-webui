@@ -103,7 +103,6 @@ from submodules.auth import AuthMetaModule
 from submodules.logs import LogsMetaModule
 from submodules.graphs import GraphsMetaModule
 from submodules.helpdesk import HelpdeskMetaModule
-from submodules.krillui import KrillUIMetaModule
 
 # Only for Alignak backend connection
 # todo: very old code that is no more compatible with most recent versions - to be cleaned!
@@ -440,11 +439,17 @@ class Webui_broker(BaseModule, Daemon):
         self.logs_module = LogsMetaModule(LogsMetaModule.find_modules(self.modules_manager.get_internal_instances()), self)
         self.graphs_module = GraphsMetaModule(GraphsMetaModule.find_modules(self.modules_manager.get_internal_instances()), self)
         self.helpdesk_module = HelpdeskMetaModule(HelpdeskMetaModule.find_modules(self.modules_manager.get_internal_instances()), self)
-        # KrillUI
-        self.krillui_module = KrillUIMetaModule(KrillUIMetaModule.find_modules(self.modules_manager.get_internal_instances()), self) # @jgomez
+    
+        # Data managery
+        try:
+            from krilldatamanager import KrillUIDataManager
+            self.datamgr = KrillUIDataManager(self.rg, self.frontend, self.alignak_backend_objects)
 
-        # Data manager
-        self.datamgr = WebUIDataManager(self.rg, self.frontend, self.alignak_backend_objects)
+            from submodules.krillui import KrillUIMetaModule
+            self.krillui_module = KrillUIMetaModule(KrillUIMetaModule.find_modules(self.modules_manager.get_internal_instances()), self)
+        except Exception as e:
+            self.datamgr = WebUIDataManager(self.rg, self.frontend, self.alignak_backend_objects)
+        
         self.helper = helper
 
         # Check directories
@@ -973,7 +978,7 @@ class Webui_broker(BaseModule, Daemon):
 
         try:
             retval = user and ((not self.manage_acl) or user.is_administrator() or user.can_submit_commands())
-        except:
+        except Exception as e:
             retval = False
         return retval
 
