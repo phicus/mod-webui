@@ -365,8 +365,8 @@ function poll_cpe() {
 </row>
 %else:
 <div class="row">
-  <div class="col-md-12"><div id="timeline"></div></div>
-  <div class="col-md-12" id="quickservices"> </div>
+  <div class="col-md-6">"><div id="timeline"></div></div>
+  <div class="col-md-6" id="quickservices"> </div>
 </row>
 %end
 
