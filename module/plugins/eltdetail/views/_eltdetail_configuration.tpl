@@ -14,10 +14,17 @@
         </thead>
         <tbody style="font-size:x-small;">
           %for var in sorted(elt.customs):
+          %if not 'pass' in var.lower():
           <tr>
             <td>{{var}}</td>
             <td>{{elt.customs[var]}}</td>
           </tr>
+          %else:
+          <tr>
+            <td>{{var}}</td>
+            <td>*********************</td>
+          </tr>
+          %end
           %end
         </tbody>
       </table>
