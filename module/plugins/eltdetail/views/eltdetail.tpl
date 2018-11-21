@@ -128,9 +128,11 @@ Invalid element name
       </div>
       %end
          <div class="pull-right">&nbsp;&nbsp;</div>
+      <!--
       <div class="btn-group pull-right">
          <a role="button" class="btn btn-primary btn-xs" href="/cpe/{{elt_host.host_name}}"/>Ficha</a>
       </div>
+        -->
    </div>
    %end
 
@@ -307,6 +309,9 @@ Invalid element name
                <li class="{{_go_active}} cv_pane" data-name="{{cvname}}" data-conf="{{cvconf}}" data-element='{{elt.get_full_name()}}' id='tab-cv-{{cvname}}-{{cvconf}}'><a href="#cv{{cvname}}_{{cvconf}}" data-toggle="tab">{{cvname.capitalize()}}{{'/'+cvconf.capitalize() if cvconf!='default' else ''}}</a></li>
                %_go_active = ''
             %end
+
+
+            <li><a role="button" class="btn btn-primary btn-xs" href="/cpe/{{elt_host.host_name}}"/>Monitor</a></li>
 
             <li class="{{_go_active}}"><a href="#information" data-toggle="tab">Information</a></li>
             <li><a href="#impacts" data-toggle="tab">{{'Services' if elt_type == 'host' else 'Impacts'}}</a></li>
