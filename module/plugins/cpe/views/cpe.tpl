@@ -74,10 +74,17 @@ Invalid element name
 <!--<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>-->
 
 %cpe_proxy_url  = "None"
+
+
+%proto  = ""
+%if hasattr(cpe, 'customs') and cpe.customs.get('_WEB_SECURE'):
+  %proto  = "https"
+%end
+
 %if cpe.customs.get('_WEB_PORT') and hasattr(cpe, 'address'):
-  %cpe_proxy_url  = "http://{}-{}.{}".format(cpe.address, cpe.customs.get('_WEB_PORT'), app.proxy_sufix)
+  %cpe_proxy_url  = "http://{}{}-{}.{}".format(proto,cpe.address, cpe.customs.get('_WEB_PORT'), app.proxy_sufix)
 %elif hasattr(cpe, 'address'):
-  %cpe_proxy_url  = "http://{}.{}".format(cpe.address, app.proxy_sufix)
+  %cpe_proxy_url  = "http://{}{}.{}".format(proto,cpe.address, app.proxy_sufix)
 %end
 
 <script src="/static/cpe/js/jquery.flot.js" charset="utf-8"></script>

@@ -133,7 +133,7 @@ Next check <strong>{{helper.print_duration(pb.next_chk)}}</strong>
                %end
                <td class="hidden-sm hidden-xs hidden-md">
                   %if pb.host_name != previous_pb_host_name:
-                     <a href="/all?search=host:{{ pb.host_name }}" title="{{!aka}}">
+                     <a href="/cpe/{{ pb.host_name }}" title="{{!aka}}" onclick="event.stopPropagation();">
                        {{ pb_host.get_name() if pb_host.display_name == '' else pb_host.display_name }}
                      </a>
                   %end
@@ -141,7 +141,7 @@ Next check <strong>{{helper.print_duration(pb.next_chk)}}</strong>
                <td class="hidden-sm hidden-xs">
                   %if pb.host_name != previous_pb_host_name:
                  <span class="hidden-lg">
-                   <a href="/all?search=host:{{ pb.host_name }}" title="{{!aka}}">
+                   <a href="/cpe/{{ pb.host_name }}" title="{{!aka}}" onclick="event.stopPropagation()">
                      {{ pb_host.get_name() if pb_host.display_name == '' else pb_host.display_name }}
                    </a>
 
