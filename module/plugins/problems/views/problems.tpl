@@ -25,7 +25,6 @@ $(function(){
 <div id="problems">
 
    %include("_problems_synthesis.tpl", pbs=pbs, search_string=app.get_search_string())
-
    %if not pbs:
    <center>
      <div class="page-header">
@@ -188,7 +187,7 @@ Next check <strong>{{helper.print_duration(pb.next_chk)}}</strong>
 
 
                      %if True:
-                     %if True:
+                     %if False:
                         <a style="text-decoration: none; color: #333;" role="button" tabindex="2"
                            href="{{ 'ok' }}">
                            <i class="fa fa-forward"></i>
