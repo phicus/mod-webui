@@ -97,7 +97,7 @@ Next check <strong>{{helper.print_duration(pb.next_chk)}}</strong>
                  data-container="body"
                  class="item-state font-{{pb.state.lower()}} text-center">
                    <div style="display: table-cell; vertical-align: middle; padding-right: 10px;">
-                     <input type="checkbox" class="input-sm item-checkbox" value="" id="selector-{{helper.get_html_id(pb)}}" data-type="problem" data-business-impact="{{business_impact}}" data-item="{{helper.get_uri_name(pb)}}">
+                     <input style="height: 20px; margin: 0 0 0 0;" type="checkbox" class="input-sm item-checkbox" value="" id="selector-{{helper.get_html_id(pb)}}" data-type="problem" data-business-impact="{{business_impact}}" data-item="{{helper.get_uri_name(pb)}}">
                      <div class="item-icon">
                        {{!helper.get_fa_icon_state(pb, useTitle=False)}}
                      </div>
@@ -160,7 +160,7 @@ Next check <strong>{{helper.print_duration(pb.next_chk)}}</strong>
                </td>
                <td class="row">
                   <div class="pull-right">
-                     {{!helper.get_perfdata_pies(pb)}}&nbsp;
+                     <span class="hidden-xs">{{!helper.get_perfdata_pies(pb)}}&nbsp;</span>
 
                      %if app.graphs_module.is_available():
                      %if pb.perf_data:
@@ -197,12 +197,15 @@ Next check <strong>{{helper.print_duration(pb.next_chk)}}</strong>
                   </div>
                   <div class="ellipsis output">
                   <!--<div class="ellipsis output" style='font-family: "Liberation Mono", "Lucida Console", Courier, monospace; color=#7f7f7f; font-size:0.917em;'>-->
+                    %print_host_name = pb_host.get_name() if pb_host.display_name == '' else pb_host.display_name
                     <div class="hidden-md hidden-lg">
-                      <a href="/all?search=host:{{ pb.host_name }}" title="{{!aka}}">
-                        {{ pb_host.get_name() if pb_host.display_name == '' else pb_host.display_name }}
-                      </a>
                       %if pb.__class__.my_type == 'service':
-                      / {{!helper.get_link(pb, short=True)}}
+                      <a href="/all?search=host:{{ pb.host_name }}" title="{{!aka}}">
+                        {{ print_host_name.split(" ")[0] }}</a>&nbsp;<i class="fa fa-chevron-right"></i> <span>{{!helper.get_link(pb, short=True)}}</span>
+                      %else:
+                      <a href="/all?search=host:{{ pb.host_name }}" title="{{!aka}}">
+                        {{ print_host_name }}
+                      </a>
                       %end
                       %if len(pb.impacts) > 0:
                       <span class="label label-danger" title="This service has impacts">+ {{ len(pb.impacts) }}</span>
