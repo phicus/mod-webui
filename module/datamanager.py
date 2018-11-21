@@ -434,6 +434,8 @@ class WebUIDataManager(DataManager):
 
             try:
                 h = i if i.__class__.my_type == 'host' else i.host
+                if "loc" in h.hostgroups:
+                    return False
                 if h.address and pat.search(h.address):
                     return True
                 if h.cpe_address and pat.search(h.cpe_address):
