@@ -519,6 +519,10 @@ class WebUIDataManager(DataManager):
                 patterns.append( (match.group('key'), match.group('value')) )
         logger.debug("[WebUI - datamanager] search patterns: %s", patterns)
 
+        # Delete locations
+        items = [i for i in items if 'loc' not in [h.get_name() for h in i.get_hostgroups()]]
+
+
         for t, s in patterns:
             t = t.lower()
             logger.debug("[WebUI - datamanager] searching for %s %s", t, s)
