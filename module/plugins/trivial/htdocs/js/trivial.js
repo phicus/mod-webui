@@ -179,6 +179,7 @@ function trivial_expand(txt) {
 }
 
 function trivial_init(data) {
+    $("#trivial").hide();
     var cy = cytoscape({
         container: document.getElementById('trivial'),
         ready: function () {
@@ -186,10 +187,11 @@ function trivial_init(data) {
             window.cy = this;
             // ugly
             setTimeout(() => {
-                cy.nodes().unlock();
-                loadPosition(true);
-                cy.nodes().lock();
-            }, 45);
+                $("#load-position").click();
+                // window.cy.nodes().unlock();
+                // loadPosition(true);
+                // window.cy.nodes().lock();
+            }, 25);
         },
         boxSelectionEnabled: true,
         maxZoom: 2,
@@ -200,9 +202,14 @@ function trivial_init(data) {
     });
     // ugly
     setTimeout(() => {
-        $('#loader').hide();
-        $('#work-mode').show();
-        $('#center').show();
+        cy.zoom(cy.maxZoom()/20);
+        setTimeout(_ => {
+            cy.center();
+            $('#loader').hide();
+            $('#work-mode').show();
+            $('#center').show();
+            $("#trivial").show();
+        }, 500)
     }, 55);
 }
 
@@ -304,7 +311,7 @@ function savePosition(saveBackup) {
 
 function loadPosition(shouldUnlock, loadBackup) {
     //var loadData = JSON.parse(localStorage.getItem('trivial'));
-    this.cy.nodes().unlock();
+    window.cy.nodes().unlock();
     $.ajax({
         dataType: 'json',
         url: '/trivial/settings/load',
@@ -320,7 +327,7 @@ function loadPosition(shouldUnlock, loadBackup) {
                 })
             }
             if (!shouldUnlock) {
-                this.cy.nodes().lock();
+                window.cy.nodes().lock();
             }
         }
     });
