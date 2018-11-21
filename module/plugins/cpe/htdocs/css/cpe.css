@@ -584,3 +584,27 @@ label.iOSCheckLabelOff {
   .table thead > tr > th, .table tbody > tr > th, .table tfoot > tr > th, .table thead > tr > td, .table tbody > tr > td, .table tfoot > tr > td {
     border-top: none;
 }
+
+
+
+
+.panel-default {
+    padding-left:  0px !important;
+    padding-right: 0px !important;
+}
+
+.content{
+    padding-top: 1em;
+}
+
+.vis-group {
+     /*height: 20px !important; */
+}
+
+.font-fixed {
+  font-family: "Courier New", Courier, "Lucida Sans Typewriter", "Lucida Typewriter", monospace;
+}
+
+.right {
+  text-align: right;
+}
