@@ -1,156 +1,86 @@
 // layout = window.cy.makeLayout({'name': 'cose'})
 // layout.options.eles = window.cy.elements();
 // layout.run()
-var tryPromise = fn => Promise.resolve().then(fn);
-var calculateCachedCentrality = () => {
-    var nodes = cy.nodes();
-    if (nodes.length > 0 && nodes[0].data('centrality') == null) {
-        var centrality = cy.elements().closenessCentralityNormalized();
-        nodes.forEach(n => n.data('centrality', centrality.closeness(n)));
-    }
-};
-var $layout = $('#layout');
-var maxLayoutDuration = 1500;
-var layoutPadding = 50;
-var concentric = function (node) {
-    calculateCachedCentrality();
-    return node.data('centrality');
-};
-var levelWidth = function (nodes) {
-    calculateCachedCentrality();
-    var min = nodes.min(n => n.data('centrality')).value;
-    var max = nodes.max(n => n.data('centrality')).value;
-    return (max - min) / 5;
-};
-var layouts = {
-    cola: {
-        name: 'cola',
-        padding: layoutPadding,
-        nodeSpacing: 12,
-        edgeLengthVal: 45,
-        animate: true,
-        randomize: true,
-        maxSimulationTime: maxLayoutDuration,
-        boundingBox: { // to give cola more space to resolve initial overlaps
-            x1: 0,
-            y1: 0,
-            x2: 10000,
-            y2: 10000
-        },
-        edgeLength: function (e) {
-            var w = e.data('weight');
-
-            if (w == null) {
-                w = 0.5;
-            }
-
-            return 45 / w;
-        }
-    },
-    concentricCentrality: {
-        name: 'concentric',
-        padding: layoutPadding,
-        animate: true,
-        animationDuration: maxLayoutDuration,
-        concentric: concentric,
-        levelWidth: levelWidth
-    },
-    concentricHierarchyCentrality: {
-        name: 'concentric',
-        padding: layoutPadding,
-        animate: true,
-        animationDuration: maxLayoutDuration,
-        concentric: concentric,
-        levelWidth: levelWidth,
-        sweep: Math.PI * 2 / 3,
-        clockwise: true,
-        startAngle: Math.PI * 1 / 6
-    },
-    custom: { // replace with your own layout parameters
-        name: 'preset',
-        padding: layoutPadding
-    }
-};
-var prevLayout;
-var getLayout = name => Promise.resolve(layouts[name]);
-var applyLayout = layout => {
-    if (prevLayout) {
-        prevLayout.stop();
-    }
-    var l = prevLayout = cy.makeLayout(layout);
-    return l.run().promiseOn('layoutstop');
-}
-var applyLayoutFromSelect = () => Promise.resolve($layout.value).then(getLayout).then(applyLayout);
-
-var ctxmenu_commands_all = [{
-    content: 'Search',
-    select: function () {
-        trivial_search(this.data('id'))
-    }
-}, {
-    content: 'Expand',
-    select: function () {
-        trivial_expand(this.data('id'))
-    }
-}, {
-    content: 'View',
-    select: function () {
-        var url = "/cpe/" + this.data('id');
-        var win = window.open(url, '_blank');
-        win.focus();
-    }
-}]
-var ctxmenu_commands_mikrotik = ctxmenu_commands_all.slice()
-ctxmenu_commands_mikrotik.push({
-    content: 'Winbox',
-    select: function () {
-        top.location.href = "winbox://" + username + "@" + this.data('address') + ':8291';
-    }
-});
-ctxmenu_commands_mikrotik.push({
-    content: 'SSH',
-    select: function () {
-        top.location.href = "krillssh://" + username + "@" + this.data('address') + ':22';
-    }
-});
-
-var ctxmenu_commands_access = ctxmenu_commands_all.slice()
-ctxmenu_commands_access.push({
-    content: 'Enter the Matrix',
-    select: function () {
-        var url = "/matrix/?search=reg:" + this.data('id');
-        var win = window.open(url, '_blank');
-        win.focus();
-    }
-});
-
-
-var ctxmenu_commands_wimax = ctxmenu_commands_all.slice()
-ctxmenu_commands_wimax.push({
-    content: 'Web',
-    select: function () {
-        var url = "http://" + this.data('address') + '.' + window.location.host.split('.')[0] + '.phicus.net';
-        var win = window.open(url, '_blank');
-        win.focus();
-    }
-});
-ctxmenu_commands_wimax.push({
-    content: 'Enter the Matrix',
-    select: function () {
-        var url = "/matrix?search=reg:" + this.data('id');
-        var win = window.open(url, '_blank');
-        win.focus();
-    }
-});
-
-var ctxmenu_commands_cpe = [{
-    content: 'View',
-    select: function () {
-        var url = "/cpe/" + this.data('id');
-        var win = window.open(url, '_blank');
-        win.focus();
-    }
-}]
+//var tryPromise = fn => Promise.resolve().then(fn);
+//var calculateCachedCentrality = () => {
+//    var nodes = cy.nodes();
+//    if (nodes.length > 0 && nodes[0].data('centrality') == null) {
+//        var centrality = cy.elements().closenessCentralityNormalized();
+//        nodes.forEach(n => n.data('centrality', centrality.closeness(n)));
+//    }
+//};
+//var $layout = $('#layout');
+//var maxLayoutDuration = 1500;
+//var layoutPadding = 50;
+//var concentric = function (node) {
+//    calculateCachedCentrality();
+//    return node.data('centrality');
+//};
+//var levelWidth = function (nodes) {
+//    calculateCachedCentrality();
+//    var min = nodes.min(n => n.data('centrality')).value;
+//    var max = nodes.max(n => n.data('centrality')).value;
+//    return (max - min) / 5;
+//};
+//var layouts = {
+//    cola: {
+//        name: 'cola',
+//        padding: layoutPadding,
+//        nodeSpacing: 12,
+//        edgeLengthVal: 45,
+//        animate: true,
+//        randomize: true,
+//        maxSimulationTime: maxLayoutDuration,
+//        boundingBox: { // to give cola more space to resolve initial overlaps
+//            x1: 0,
+//            y1: 0,
+//            x2: 10000,
+//            y2: 10000
+//        },
+//        edgeLength: function (e) {
+//            var w = e.data('weight');
+//
+//            if (w == null) {
+//                w = 0.5;
+//            }
+//
+//            return 45 / w;
+//        }
+//    },
+//    concentricCentrality: {
+//        name: 'concentric',
+//        padding: layoutPadding,
+//        animate: true,
+//        animationDuration: maxLayoutDuration,
+//        concentric: concentric,
+//        levelWidth: levelWidth
+//    },
+//    concentricHierarchyCentrality: {
+//        name: 'concentric',
+//        padding: layoutPadding,
+//        animate: true,
+//        animationDuration: maxLayoutDuration,
+//        concentric: concentric,
+//        levelWidth: levelWidth,
+//        sweep: Math.PI * 2 / 3,
+//        clockwise: true,
+//        startAngle: Math.PI * 1 / 6
+//    },
+//    custom: { // replace with your own layout parameters
+//        name: 'preset',
+//        padding: layoutPadding
+//    }
+//};
+//var prevLayout;
+//var getLayout = name => Promise.resolve(layouts[name]);
+//var applyLayout = layout => {
+//    if (prevLayout) {
+//        prevLayout.stop();
+//    }
+//    var l = prevLayout = cy.makeLayout(layout);
+//    return l.run().promiseOn('layoutstop');
+//}
+//var applyLayoutFromSelect = () => Promise.resolve($layout.value).then(getLayout).then(applyLayout);
 
 ///Layouts
 var LAYOUT1 = {
