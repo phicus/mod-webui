@@ -177,7 +177,7 @@ Next check <strong>{{helper.print_duration(pb.next_chk)}}</strong>
                      %if True:
                      %if True:
                         <a style="text-decoration: none; color: #333;" role="button" tabindex="1"
-                           href="/cpe/{{pb.host_name}}">
+                           href="/cpe/{{pb.host_name}}" onclick="event.stopPropagation();">
                            <i class="fa fa-eye"></i>
                         </a>
                      %end
