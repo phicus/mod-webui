@@ -200,6 +200,7 @@ function trivial_init(data) {
         elements: data,
         layout: LAYOUT1
     });
+    cy.panzoom();
 
     var defaults = {
         container: false // can be a HTML or jQuery element or jQuery selector
