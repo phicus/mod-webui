@@ -186,8 +186,6 @@ function trivial_search(txt) {
     });
 }
 
-
-
 function savePosition(saveBackup) {
     if (!confirm("really?")) {
         return;
@@ -242,7 +240,6 @@ function loadPosition(shouldUnlock, loadBackup) {
     });
 }
 
-
 function workMode() {
     $('#load-position').show();
     $('#save-position').show();
@@ -268,9 +265,6 @@ function viewMode() {
     $('#trivial').css('background-color', 'transparent');
     window.cy.workMode = false;
 }
-
-
-
 
 function getDFS(root, goal) {
     var dfs = cy.elements().aStar({
