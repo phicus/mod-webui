@@ -200,6 +200,20 @@ function trivial_init(data) {
         elements: data,
         layout: LAYOUT1
     });
+
+    var defaults = {
+        container: false // can be a HTML or jQuery element or jQuery selector
+      , viewLiveFramerate: 0 // set false to update graph pan only on drag end; set 0 to do it instantly; set a number (frames per second) to update not more than N times per second
+      , thumbnailEventFramerate: 30 // max thumbnail's updates per second triggered by graph updates
+      , thumbnailLiveFramerate: false // max thumbnail's updates per second. Set false to disable
+      , dblClickDelay: 200 // milliseconds
+      , removeCustomContainer: true // destroy the container specified by user on plugin destroy
+      , rerenderDelay: 100 // ms to throttle rerender updates to the panzoom for performance
+    };
+    
+    cy.navigator( defaults ); // get navigator instance, nav
+
+
     // ugly
     setTimeout(() => {
         cy.zoom(cy.maxZoom()/20);
@@ -394,6 +408,11 @@ $('#load-position').on('click', function () {
 $('#load-position-backup').on('click', function () {
     console.log("loadPositionBackup []")
     loadPosition(true, true);
+});
+
+$('#mini-map').on('click', function () {
+    console.log("mini map was clicked! :D");
+    $(".cytoscape-navigator").toggle();
 });
 
 $('#play').on('click', function () {

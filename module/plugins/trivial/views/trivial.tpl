@@ -2,7 +2,7 @@
 %helper = app.helper
 %search_string = app.get_search_string()
 
-%rebase("layout", title='Trivial for hosts/services', css=['trivial/css/trivial.css'], js=['trivial/js/trivial-style.js','trivial/js/trivial.js', 'trivial/js/cola.js', 'trivial/js/cytoscape-cola.js'], breadcrumb=[ ['Trivial All hosts', '/trivial'] ])
+%rebase("layout", title='Trivial for hosts/services', css=['trivial/css/trivial.css', 'trivial/css/cytoscape.js-navigator.css'], js=['trivial/js/cytoscape-navigator.js', 'trivial/js/trivial-style.js','trivial/js/trivial.js', 'trivial/js/cola.js', 'trivial/js/cytoscape-cola.js'], breadcrumb=[ ['Trivial All hosts', '/trivial'] ])
 
 <input  id="txtSearch" type="hidden" value="{{ search }}">
 
@@ -25,6 +25,7 @@ var username = '{{ user.get_name() }}';
   <button class="btn btn-primary" id="work-mode">Work Mode</button>
   <button class="btn btn-primary" id="view-mode" style="display: none;">View Mode</button>
   <button class="btn btn-primary" id="center">Center</button>
+  <button class="btn btn-primary" id="mini-map">Toggle mini-map</button>
 </div>
 
 
