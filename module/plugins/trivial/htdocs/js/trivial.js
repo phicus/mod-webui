@@ -242,12 +242,6 @@ function loadPosition(shouldUnlock, loadBackup) {
     });
 }
 
-$('#load-position').hide();
-$('#save-position').hide();
-$('#work-mode').hide();
-$('#center').hide();
-$('#save-position-backup').hide();
-$('#load-position-backup').hide();
 
 function workMode() {
     $('#load-position').show();
@@ -308,10 +302,3 @@ function deleteNodesNotPresentInDFSAndSelectPath(dfs) {
     nodesToRemove.forEach(n => n.remove())
     dfs.path.select();
 }
-
-
-$(function () {
-    $("#nav-filters > form").attr("action", "#")
-    trivial_search($('#txtSearch').val());
-})
-
