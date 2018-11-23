@@ -430,11 +430,13 @@ function selectPath(origin, hops=0) {
         // e.select();
         // Mmm... Nope xD
         // Object.keys(edge.css()).filter(e => e.includes("color")).forEach(e => edge.style(e, "red"));
+        edge.originalStyle = {};
+        Object.assign(edge.originalStyle, edge._private.style)
         edge.style("target-arrow-color", "red");
         edge.style("line-color", "red");
     });
     if (parent === undefined) {
-        if (hops === 0) alertify.warning(`There is not any parent. This node is God.`);
+        if (hops === 0) alertify.warning(`This node has not any parent, it is God.`);
         else alertify.success(`There is ${hops} hops`);
         return
     };
@@ -442,5 +444,15 @@ function selectPath(origin, hops=0) {
     selectPath(cy.$(`#${parent}`)[0].id(), hops);
 }
 
+$("#clearPaths").click(function() {
+    cy.edges().forEach(e => {
+        e._private.style = e.originalStyle || e._private.style;
+    });
+    cy.forceRender();
+});
 
-$(function() {if ($("#header_loading")[0].classList.value.includes("fa-refresh")) $("#header_loading").click();})
+$(function() {
+    if ($("#header_loading")[0].classList.value.includes("fa-refresh")) {
+        $("#header_loading").parent().click();
+    }
+})
