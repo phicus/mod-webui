@@ -205,11 +205,11 @@
         <li> <a href="#"><i class="fa fa-bar-chart sidebar-icon"></i>
         Tactical views<i class="fa arrow"></i></a>
           <ul class="nav nav-second-level">
-            <li> <a href="{{ app.get_url('Impacts') }}"> <span class="fa fa-bolt sidebar-icon"></span> Impacts </a> </li>
-            <li> <a href="{{ app.get_url('Minemap') }}"> <span class="fa fa-table sidebar-icon"></span> Minemap </a> </li>
-            <li> <a href="{{ app.get_url('Worldmap') }}"> <span class="fa fa-globe sidebar-icon"></span> World map </a> </li>
-            <li> <a href="{{ app.get_url('Wall') }}"> <span class="fa fa-th-large sidebar-icon"></span> Wall </a> </li>
-            <li> <a href="/matrix"> <span class="fa fa-th-large sidebar-icon"></span> Matrix </a> </li>
+            <li> <a onclick="window.top.location.href = '{{ app.get_url('Impacts') }}' + '?search=' + $('#search').val()"> <span class="fa fa-bolt sidebar-icon"></span> Impacts </a> </li>
+            <li> <a onclick="window.top.location.href = '{{ app.get_url('Minemap') }}' + '?search=' + $('#search').val()"> <span class="fa fa-table sidebar-icon"></span> Minemap </a> </li>
+            <li> <a onclick="window.top.location.href = '{{ app.get_url('Worldmap') }}' + '?search=' + $('#search').val()"> <span class="fa fa-globe sidebar-icon"></span> World map </a> </li>
+            <li> <a onclick="window.top.location.href = '{{ app.get_url('Wall') }}' + /?search=' + $('#search').val()"> <span class="fa fa-th-large sidebar-icon"></span> Wall </a> </li>
+            <li> <a onclick="window.top.location.href = '/matrix?search=' + $('#search').val()"> <span class="fa fa-th-large sidebar-icon"></span> Matrix </a> </li>
             <li> <a onclick="window.top.location.href = '/trivial?search=' + $('#search').val()"> <span class="fa fa-code-fork sidebar-icon"></span> Trivial </a> </li>
             %if app.logs_module.is_available():
             <li> <a href="{{ app.get_url('Availability') }}"> <span class="fa fa-bar-chart sidebar-icon"></span> Availability </a> </li>
