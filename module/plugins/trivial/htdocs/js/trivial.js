@@ -381,38 +381,6 @@ $("#nav-filters > form").submit(e => {
     console.log(`SEARCH: ${txt}`);
 });
 
-// function getDFS(root, goal) {
-//     var dfs = cy.elements().aStar({
-//         root: root,
-//         goal: goal,
-//         directed: false
-//     })
-//     if (!dfs.path) {
-//         // TODO: do something
-//     }
-//     return dfs;
-//     //   dfs.path.select()
-// }
-
-// function deleteNodesNotPresentInDFSAndSelectPath(dfs) {
-//     var ids = dfs.path.map(n => n.data().id);
-//     console.log(ids);
-//     var index;
-//     var nodesToRemove = [];
-//     // FIXME
-//     // cy.nodes().forEach(n => {
-//     //     index = ids.indexOf(n.data().id);
-//     //     if (index === -1 && !n.isParent()) {
-//     //         nodesToRemove.push(n);
-//     //     } else {
-//     //         console.log(`I'm not going to delete ${index}, ${n.data().id}`);
-//     //     }
-//     // });
-//     nodesToRemove.forEach(n => n.remove())
-//     dfs.path.select();
-// }
-
-
 function selectPath(origin, hops=0) {
     console.log(`origin: ${origin}`);
     let parent;
