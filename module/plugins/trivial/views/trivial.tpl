@@ -35,9 +35,8 @@ var username = '{{ user.get_name() }}';
 
 <script>
     // Hide leftmenu on trivial
-    $('.sidebar').hide();
+    $('.sidebar').hide()
     //$('#buttons').hide()
-    $('#loader').show()
 </script>
 
 

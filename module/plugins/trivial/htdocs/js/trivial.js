@@ -108,6 +108,17 @@ function trivial_init(data) {
             // ugly
             setTimeout(() => {
                 $("#load-position").click();
+                // ugly
+                setTimeout(() => {
+                    cy.zoom(cy.maxZoom() / 20);
+                    console.log("GOING TO CENTER GRAPH")
+                    setTimeout(() => {cy.center(); console.log("CENTER EXECUTED")}, 120);
+                    console.log("GRAPH (SHOULD BE) CENTERED")
+                    $('#loader').hide();
+                    $('#work-mode').show();
+                    $('#center').show();
+                    $("#trivial").show();
+                }, 55);
                 // window.cy.nodes().unlock();
                 // loadPosition(true);
                 // window.cy.nodes().lock();
@@ -124,28 +135,16 @@ function trivial_init(data) {
 
     var defaults = {
         container: false // can be a HTML or jQuery element or jQuery selector
-      , viewLiveFramerate: 0 // set false to update graph pan only on drag end; set 0 to do it instantly; set a number (frames per second) to update not more than N times per second
-      , thumbnailEventFramerate: 30 // max thumbnail's updates per second triggered by graph updates
-      , thumbnailLiveFramerate: false // max thumbnail's updates per second. Set false to disable
-      , dblClickDelay: 200 // milliseconds
-      , removeCustomContainer: true // destroy the container specified by user on plugin destroy
-      , rerenderDelay: 100 // ms to throttle rerender updates to the panzoom for performance
+        , viewLiveFramerate: 0 // set false to update graph pan only on drag end; set 0 to do it instantly; set a number (frames per second) to update not more than N times per second
+        , thumbnailEventFramerate: 30 // max thumbnail's updates per second triggered by graph updates
+        , thumbnailLiveFramerate: false // max thumbnail's updates per second. Set false to disable
+        , dblClickDelay: 200 // milliseconds
+        , removeCustomContainer: true // destroy the container specified by user on plugin destroy
+        , rerenderDelay: 100 // ms to throttle rerender updates to the panzoom for performance
     };
-    
-    cy.navigator( defaults ); // get navigator instance, nav
 
+    cy.navigator(defaults); // get navigator instance, nav
 
-    // ugly
-    setTimeout(() => {
-        cy.zoom(cy.maxZoom()/20);
-        setTimeout(_ => {
-            cy.center();
-            $('#loader').hide();
-            $('#work-mode').show();
-            $('#center').show();
-            $("#trivial").show();
-        }, 500)
-    }, 55);
 }
 
 function trivial_search(txt) {
@@ -251,8 +250,8 @@ function loadPosition(shouldUnlock, loadBackup) {
         dataType: 'json',
         url: '/trivial/settings/load',
         success: (data) => {
-            if (loadBackup) {data = data.backup}
-            else {data = data.save1}
+            if (loadBackup) { data = data.backup }
+            else { data = data.save1 }
             for (var x = 0; x < 2; x++) {
                 console.log(`LOAD: ${x}`)
                 $.each(data, (k, v) => {
