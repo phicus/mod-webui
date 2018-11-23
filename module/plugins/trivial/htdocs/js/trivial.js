@@ -19,6 +19,11 @@ var ctxmenu_commands_all = [{
         var win = window.open(url, '_blank');
         win.focus();
     }
+}, {
+    content: 'Path to parent',
+    select: function () {
+        selectPath(this.data("id"))
+    }
 }]
 var ctxmenu_commands_mikrotik = ctxmenu_commands_all.slice()
 ctxmenu_commands_mikrotik.push({
@@ -376,33 +381,66 @@ $("#nav-filters > form").submit(e => {
     console.log(`SEARCH: ${txt}`);
 });
 
-function getDFS(root, goal) {
-    var dfs = cy.elements().aStar({
-        root: root,
-        goal: goal,
-        directed: false
-    })
-    if (!dfs.path) {
-        // TODO: do something
-    }
-    return dfs;
-    //   dfs.path.select()
+// function getDFS(root, goal) {
+//     var dfs = cy.elements().aStar({
+//         root: root,
+//         goal: goal,
+//         directed: false
+//     })
+//     if (!dfs.path) {
+//         // TODO: do something
+//     }
+//     return dfs;
+//     //   dfs.path.select()
+// }
+
+// function deleteNodesNotPresentInDFSAndSelectPath(dfs) {
+//     var ids = dfs.path.map(n => n.data().id);
+//     console.log(ids);
+//     var index;
+//     var nodesToRemove = [];
+//     // FIXME
+//     // cy.nodes().forEach(n => {
+//     //     index = ids.indexOf(n.data().id);
+//     //     if (index === -1 && !n.isParent()) {
+//     //         nodesToRemove.push(n);
+//     //     } else {
+//     //         console.log(`I'm not going to delete ${index}, ${n.data().id}`);
+//     //     }
+//     // });
+//     nodesToRemove.forEach(n => n.remove())
+//     dfs.path.select();
+// }
+
+
+function selectPath(origin, hops=0) {
+    console.log(`origin: ${origin}`);
+    let parent;
+    // for any reason .edges() returns none
+    cy.$(`#${origin}`)[0]._private.edges.forEach((edge) => {
+        console.log("Processing edge:");
+        console.log(edge);
+        if (edge.data().source !== origin) return
+        parent = edge.data().target;
+        console.log(`We got a parent! It is: ${parent}`);
+        // Select is like cliking in the edge:
+        // it selects the edge and changes its color
+        // but if you click somewhere, its color
+        // gets back to default
+        // e.select();
+        // Mmm... Nope xD
+        // Object.keys(edge.css()).filter(e => e.includes("color")).forEach(e => edge.style(e, "red"));
+        edge.style("target-arrow-color", "red");
+        edge.style("line-color", "red");
+    });
+    if (parent === undefined) {
+        if (hops === 0) alertify.warning(`There is not any parent. This node is God.`);
+        else alertify.success(`There is ${hops} hops`);
+        return
+    };
+    hops += 1;
+    selectPath(cy.$(`#${parent}`)[0].id(), hops);
 }
 
-function deleteNodesNotPresentInDFSAndSelectPath(dfs) {
-    var ids = dfs.path.map(n => n.data().id);
-    console.log(ids);
-    var index;
-    var nodesToRemove = [];
-    // FIXME
-    cy.nodes().forEach(n => {
-        index = ids.indexOf(n.data().id);
-        if (index === -1 && !n.isParent()) {
-            nodesToRemove.push(n);
-        } else {
-            console.log(`I'm not going to delete ${index}, ${n.data().id}`);
-        }
-    });
-    nodesToRemove.forEach(n => n.remove())
-    dfs.path.select();
-}
+
+$(function() {if ($("#header_loading")[0].classList.value.includes("fa-refresh")) $("#header_loading").click();})

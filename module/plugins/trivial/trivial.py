@@ -211,6 +211,19 @@ def get_trivial_setting():
     return json.loads(app.prefs_module.get_ui_common_preference('trivial') or '{}')
 
 
+def get_parents():
+    user = app.request.environ.get('USER')
+    host = app.request.query.get('host', None)
+    if not host:
+        search = ""
+
+    host = app.datamgr.get_host(host, user)
+
+
+
+
+    return {'search': search, 'user': user }
+
 pages = {
     set_trivial_setting: {
         'name': 'SetTrivialSetting', 'route': '/trivial/settings/save', 'method': 'POST'

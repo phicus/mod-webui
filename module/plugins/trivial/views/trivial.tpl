@@ -17,7 +17,7 @@ var username = '{{ user.get_name() }}';
 
 <div id="trivial" ></div>
 
-<div id="buttons">
+<div id="buttons" class="buttons">
   <button class="btn btn-primary btn-sx" id="load-position">Load Position</button>
   <button class="btn btn-primary" id="load-position-backup">Load Position (Backup)</button>
   <button class="btn btn-primary" id="save-position">Save Position</button>
@@ -28,6 +28,9 @@ var username = '{{ user.get_name() }}';
   <button class="btn btn-primary" id="mini-map">Toggle mini-map</button>
 </div>
 
+<div id="buttons2" class="buttons">
+  <button class="btn btn-primary" id="clearPaths">Clear paths</button>
+</div>
 
 <script src="/static/trivial/js/cytoscape.min.js"></script>
 <script src="/static/trivial/js/cytoscape-cose-bilkent.js"></script>
@@ -39,6 +42,12 @@ var username = '{{ user.get_name() }}';
     //$('#buttons').hide()
 </script>
 
+
+<script src="//cdn.jsdelivr.net/npm/alertifyjs@1.11.2/build/alertify.min.js"></script>
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.11.2/build/css/alertify.min.css"/>
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.11.2/build/css/themes/default.min.css"/>
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.11.2/build/css/themes/semantic.min.css"/>
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.11.2/build/css/themes/bootstrap.min.css"/>
 
 <style>
 #loader {
