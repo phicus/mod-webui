@@ -10,7 +10,7 @@ var ctxmenu_commands_all = [{
 }, {
     content: 'Expand',
     select: function () {
-        trivial_expand(this.data('id'))
+        trivial_expand(this)
     }
 }, {
     content: 'View',
@@ -96,11 +96,18 @@ var LAYOUT1 = {
 //     name: 'preset'
 // }
 
-function trivial_expand(txt) {
-    $.getJSON("trivial.json?search=" + txt, function (data) {
-        console.log(data);
-        window.cy.add(data);
-    });
+// TODO: Use this in selectPath function
+const getParent = node => node._private.edges.filter(edge => node.data().id === edge.data().source)[0];
+
+// FIXME
+function trivial_expand(node) {
+    let nodesThatShouldNotBeRemoved = [];
+
+    while (node) {
+        nodesThatShouldNotBeRemoved.push(node.data().id);
+        node = getParent(node);
+    }
+    cy.nodes().filter(e => !nodesThatShouldNotBeRemoved.includes(e.data().id)).remove();
 }
 
 function trivial_init(data) {
@@ -117,7 +124,7 @@ function trivial_init(data) {
                 setTimeout(() => {
                     cy.zoom(cy.maxZoom() / 20);
                     console.log("GOING TO CENTER GRAPH")
-                    setTimeout(() => {cy.center(); console.log("CENTER EXECUTED")}, 120);
+                    setTimeout(() => { cy.center(); console.log("CENTER EXECUTED") }, 120);
                     console.log("GRAPH (SHOULD BE) CENTERED")
                     $('#loader').hide();
                     $('#work-mode').show();
@@ -381,7 +388,7 @@ $("#nav-filters > form").submit(e => {
     console.log(`SEARCH: ${txt}`);
 });
 
-function selectPath(origin, hops=0) {
+function selectPath(origin, hops = 0) {
     console.log(`origin: ${origin}`);
     let parent;
     // for any reason .edges() returns none
@@ -412,14 +419,14 @@ function selectPath(origin, hops=0) {
     selectPath(cy.$(`#${parent}`)[0].id(), hops);
 }
 
-$("#clearPaths").click(function() {
+$("#clearPaths").click(function () {
     cy.edges().forEach(e => {
         e._private.style = e.originalStyle || e._private.style;
     });
     cy.forceRender();
 });
 
-$(function() {
+$(function () {
     if ($("#header_loading")[0].classList.value.includes("fa-refresh")) {
         $("#header_loading").parent().click();
     }
