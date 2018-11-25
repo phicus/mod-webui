@@ -68,14 +68,6 @@ ctxmenu_commands_wimax.push({
     }
 });
 
-var ctxmenu_commands_cpe = [{
-    content: 'View',
-    select: function () {
-        var url = "/cpe/" + this.data('id');
-        var win = window.open(url, '_blank');
-        win.focus();
-    }
-}]
 
 ///Layouts
 var LAYOUT1 = {
@@ -97,15 +89,16 @@ var LAYOUT1 = {
 // }
 
 // TODO: Use this in selectPath function
+// Hmm... Is it buggy? 🤔
 const getParent = node => node._private.edges.filter(edge => node.data().id === edge.data().source)[0];
 
 // FIXME
 function trivial_expand(node) {
     let nodesThatShouldNotBeRemoved = [];
-
-    while (node) {
-        nodesThatShouldNotBeRemoved.push(node.data().id);
+    while (n) {
+        nodesThatShouldNotBeRemoved.push(n.data().id);
         node = getParent(node);
+        console.log(node && node.data().id);
     }
     cy.nodes().filter(e => !nodesThatShouldNotBeRemoved.includes(e.data().id)).remove();
 }
