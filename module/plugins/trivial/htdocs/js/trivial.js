@@ -15,9 +15,10 @@ var LAYOUT1 = {
 }
 
 // TODO: Use this in selectPath function
-// Hmm... Is it buggy? 🤔 (not seems)
-// TODO: test this properly
-const getParent = node => node._private.edges.filter(edge => node.data().id === edge.data().source)[0];
+const getParent = node => {
+    let edge = node._private.edges.filter(edge => node.data().id === edge.data().source)[0];
+    return cy.$("#" + edge.data().target)[0];
+}
 
 // FIXME
 function trivial_expand(node) {
