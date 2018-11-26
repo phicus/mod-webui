@@ -3,12 +3,14 @@ var ctxmenu_commands_all = [{
     select: function () {
         trivial_search(this.data('id'))
     }
-}, {
-    content: 'Expand',
-    select: function () {
-        trivial_expand(this)
-    }
-}, {
+},
+// {
+//     content: 'Expand',
+//     select: function () {
+//         trivial_expand(this)
+//     }
+// }, 
+{
     content: 'View',
     select: function () {
         var url = "/cpe/" + this.data('id');

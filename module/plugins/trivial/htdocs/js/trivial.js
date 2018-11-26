@@ -1,4 +1,4 @@
-// TODO: import trivial-commands
+// See trivial-commands.
 
 ///Layouts
 var LAYOUT1 = {
@@ -14,22 +14,29 @@ var LAYOUT1 = {
     tile: true
 }
 
+// Utils
+const obEach = (object, func) => Object.entries(object).forEach(([k, v]) => func(k, v));
+const getEdgeToParent = node => node._private.edges.filter(edge => node.data().id === edge.data().source)[0];
+const setupZoom = _ => cy.zoom(cy.maxZoom() / 20) && cy.center();
+const sleep = async (ms) => new Promise(resolve => setTimeout(resolve, ms))
 // TODO: Use this in selectPath function
-const getParent = node => {
-    let edge = node._private.edges.filter(edge => node.data().id === edge.data().source)[0];
-    return cy.$("#" + edge.data().target)[0];
-}
+const getParent = node => getEdgeToParent(node) && cy.$(`#${getEdgeToParent(node).data().target}`)[0];
+const initButtons = _ => $('#loader').hide() && $('#work-mode, #center, #trivial').show();
 
 // FIXME
-function trivial_expand(node) {
-    let nodesThatShouldNotBeRemoved = [];
-    while (n) {
-        nodesThatShouldNotBeRemoved.push(n.data().id);
-        node = getParent(node);
-        console.log(node && node.data().id);
-    }
-    cy.nodes().filter(e => !nodesThatShouldNotBeRemoved.includes(e.data().id)).remove();
-}
+// function trivial_expand(node) {
+//     let nodesThatShouldNotBeRemoved = [];
+//     while (node) {
+//         nodesThatShouldNotBeRemoved.push(node.data().id);
+//         node = getParent(node);
+//         console.log(node && node.data().id);
+//     }
+//     console.log(`nodesThatShouldNotBeRemoved: ${nodesThatShouldNotBeRemoved}`);
+//     cy.nodes()
+//         .filter(e => !nodesThatShouldNotBeRemoved.includes(e.data().id))
+//         .forEach(n => console.log(`deleting node: ${n}`) && n.remove());
+//     // .remove();
+// }
 
 function trivial_init(data) {
     $("#trivial").hide();
@@ -38,30 +45,9 @@ function trivial_init(data) {
         ready: function () {
             console.log("cy::ready []");
             window.cy = this;
-            // ugly and TRICKY
-            // 25 después de que el grafo emita el evento
-            // ready, acermos click en el botón de load position
-            // (no, ejecutar loadPosition(true) justo como lo hace el
-            // event handler de load-position no sirve)
-            setTimeout(() => {
-                $("#load-position").click();
-                // ugly and TRICKY
-                // 55 milisegundos después de que se carguen las posiciones
-                // se configura el zoom, se centra, se oculta el loader etc...
-                setTimeout(() => {
-                    cy.zoom(cy.maxZoom() / 20);
-                    console.log("GOING TO CENTER GRAPH")
-                    setTimeout(() => { cy.center(); console.log("CENTER EXECUTED") }, 120);
-                    console.log("GRAPH (SHOULD BE) CENTERED")
-                    $('#loader').hide();
-                    $('#work-mode').show();
-                    $('#center').show();
-                    $("#trivial").show();
-                }, 55);
-                // window.cy.nodes().unlock();
-                // loadPosition(true);
-                // window.cy.nodes().lock();
-            }, 25);
+            loadPosition()
+                .then(setupZoom)
+                .then(initButtons);
         },
         boxSelectionEnabled: true,
         maxZoom: 2,
@@ -73,54 +59,43 @@ function trivial_init(data) {
     cy.panzoom();
 
     var defaults = {
-        container: false // can be a HTML or jQuery element or jQuery selector
-        , viewLiveFramerate: 0 // set false to update graph pan only on drag end; set 0 to do it instantly; set a number (frames per second) to update not more than N times per second
-        , thumbnailEventFramerate: 30 // max thumbnail's updates per second triggered by graph updates
-        , thumbnailLiveFramerate: false // max thumbnail's updates per second. Set false to disable
-        , dblClickDelay: 200 // milliseconds
-        , removeCustomContainer: true // destroy the container specified by user on plugin destroy
-        , rerenderDelay: 100 // ms to throttle rerender updates to the panzoom for performance
+        container: false, // can be a HTML or jQuery element or jQuery selector
+        viewLiveFramerate: 0, // set false to update graph pan only on drag end; set 0 to do it instantly; set a number (frames per second) to update not more than N times per second
+        thumbnailEventFramerate: 30, // max thumbnail's updates per second triggered by graph updates
+        thumbnailLiveFramerate: false, // max thumbnail's updates per second. Set false to disable
+        dblClickDelay: 200, // milliseconds
+        removeCustomContainer: true, // destroy the container specified by user on plugin destroy
+        rerenderDelay: 100, // ms to throttle rerender updates to the panzoom for performance
     };
-
     cy.navigator(defaults); // get navigator instance, nav
-
 }
 
 function trivial_search(txt) {
     $('#search').val(txt);
     // side-effect
-    history.pushState('trivial:' + txt, 'Trivial: ' + txt, '/trivial?search=' + txt);
+    history.pushState(`trivial: ${txt}`, `Trivial: ${txt}`, `/trivial?search=${txt}`);
     $.getJSON("trivial.json?search=" + txt, function (data) {
         trivial_init(data);
-
         window.cy.cxtmenu({
             selector: 'node',
             commands: function (e) {
                 console.log(this)
-
-                if (e.data()['tech'] == "wimax") {
-                    return ctxmenu_commands_wimax;
-                }
-
-                if (e.data()['model'].search('Mikrotik') == 0) {
-                    return ctxmenu_commands_mikrotik;
-                }
-
+                if (e.data()['tech'] == "wimax") return ctxmenu_commands_wimax;
+                if (e.data()['model'].search('Mikrotik') == 0) return ctxmenu_commands_mikrotik;
                 return ctxmenu_commands_all;
             }
         });
 
         window.cy.on('tap', 'node', function (event) {
-            var node = event.target;
+            const node = event.target;
             // TODO: handle locations
             // If we are in work mode, we do not want to open
             // anything when clicking a node.
             // And if the node is a parent, it is a box, no do not
             // want to open a box (that is a location)
-            if (window.cy.workMode || node.isParent()) { return }
-            var url = "/cpe/" + node.data('id');
-            var win = window.open(url, '_blank');
-            win.focus();
+            if (window.cy.workMode || node.isParent()) return
+            const url = `/cpe/${node.data('id')}`;
+            window.open(url, '_blank').focus();
         });
 
 
@@ -129,15 +104,16 @@ function trivial_search(txt) {
             if (window.cy.workMode) { return }
             var node = event.target;
 
-            console.log(event.renderedPosition.x + '/' + event.renderedPosition.y);
+            console.log(`${event.renderedPosition.x}/${event.renderedPosition.y}`);
             console.log(node.data().id);
-            $.get('/cpe/quickservices/' + node.data().id, function (data) {
+            $.get(`/cpe/quickservices/${node.data().id}`, function (data) {
                 console.log(`DATA: ${data}
-              ${typeof data}`)
+                            ${typeof data}`)
                 $('#info').show();
                 $('#info').html(data);
-                $('#info').css('left', event.renderedPosition.x + 30 + 'px');
-                $('#info').css('top', event.renderedPosition.y + 30 + 'px');
+                // TODO: use rem instead of pixels.
+                $('#info').css('left', `${event.renderedPosition.x + 30}px`);
+                $('#info').css('top', `${event.renderedPosition.y + 30}px`);
             });
         });
 
@@ -147,11 +123,7 @@ function trivial_search(txt) {
     });
 }
 
-$(function () {
-    trivial_search($('#txtSearch').val());
-})
-
-function savePosition(saveBackup) {
+async function savePosition() {
     // TODO: this only works with a specific search
     // Generally, you view "type:host bp:>2", you edit it
     // and you save THAT graph
@@ -160,61 +132,31 @@ function savePosition(saveBackup) {
     // or maybe you ahve only some positions
     // and this results in an non-beauty graph
 
-    // TODO: use alertify (it is more beatiful :D)
-    if (!confirm("really?")) {
-        return;
+    // Execute this only if user says that wants to save.
+    function save() {
+        data = {};
+        cy.nodes().forEach(n => data[n.data().id] = { 'position': n.position() });
+        const data = JSON.stringify(data);
+        localStorage.setItem('trivial', data);
     }
+    alertify.confirm("Do you want to save?", save);
 
-    data = {};
-    window.cy.nodes()
-        .forEach(n => data[n.data().id] = { 'position': n.position() });
-    // $.each(window.cy.nodes(), function (k, node) {
-    //     data[node.data().id] = {
-    //         'position': node.position()
-    //     };
-    // });
-
-    if (saveBackup) { data = JSON.stringify({ backup: data }) }
-    else { data = JSON.stringify({ save1: data }) }
-
-    //localStorage.setItem('trivial', JSON.stringify(data));
-    $.ajax({
-        type: "POST",
-        url: '/trivial/settings/save',
-        dataType: 'json',
-        data: data,
-        success: function (data) {
-            console.log(data);
-            alert("Save result:" + data.status);
-        }
-    });
 }
 
-function loadPosition(shouldUnlock, loadBackup) {
-    //var loadData = JSON.parse(localStorage.getItem('trivial'));
-    window.cy.nodes().unlock();
-    $.ajax({
-        dataType: 'json',
-        url: '/trivial/settings/load',
-        success: (data) => {
-            if (loadBackup) { data = data.backup }
-            else { data = data.save1 }
-            // TRICKY
-            // Al parecer para que se cargen bien las positiones
-            // hay que establecer las posiciones 2 veces
-            for (var x = 0; x < 2; x++) {
-                console.log(`LOAD: ${x}`)
-                $.each(data, (k, v) => {
-                    //console.log(v);
-                    ele = this.cy.getElementById(k);
-                    ele.position(v.position)
-                })
-            }
-            if (!shouldUnlock) {
-                window.cy.nodes().lock();
-            }
-        }
-    });
+async function loadPosition(shouldUnlock) {
+    cy.nodes().unlock();
+    let graph = JSON.parse(localStorage.getItem("graph"));
+    if (graph === null) return;
+    // TRICK
+    // Al parecer para que se cargen bien las positiones
+    // hay que establecer las posiciones 2 veces
+    console.log("LOAD: 0");
+    obEach(graph, (k, v) => this.cy.getElementById(k).position(v.position));
+    console.log("LOAD: 1");
+    obEach(graph, (k, v) => this.cy.getElementById(k).position(v.position));
+    cy.forceRender();
+    // await sleep(800);
+    if (!shouldUnlock) cy.nodes().lock();
 }
 
 function workMode() {
@@ -243,83 +185,6 @@ function viewMode() {
     // 
     window.cy.workMode = false;
 }
-
-// Esto debería hacerse con CSS
-$('#load-position').hide();
-$('#save-position').hide();
-$('#work-mode').hide();
-$('#center').hide();
-$('#save-position-backup').hide();
-$('#load-position-backup').hide();
-
-$('#work-mode').on('click', function () {
-    workMode();
-});
-
-$('#view-mode').on('click', function () {
-    viewMode();
-});
-
-$("#center").on("click", () => { cy.center() });
-
-$('#save-position').on('click', function () {
-    console.log("savePosition []");
-    savePosition();
-});
-
-$('#save-position-backup').on('click', function () {
-    console.log("savePositionBackup []")
-    savePosition(true);
-});
-
-$('#load-position').on('click', function () {
-    console.log("loadPosition []")
-    loadPosition(true);
-});
-
-$('#load-position-backup').on('click', function () {
-    console.log("loadPositionBackup []")
-    loadPosition(true, true);
-});
-
-$('#mini-map').on('click', function () {
-    console.log("mini map button was clicked! :D");
-    $(".cytoscape-navigator").toggle();
-});
-
-$(window).on('popstate', function (event) {
-    // Al pulsar el botón atrás se activa el modo view,
-    // y se muestra el loader.
-    viewMode();
-    $('#loader').show();
-    // Como "side-effect" trivial_search oculta el
-    // loader y también cambia la URL del navegador.
-    trivial_search($('#txtSearch').val());
-});
-
-// TRICKY
-// Esto hace que el formulario se envíe al propio
-// documento, haciendo así que no se recarge la página
-// Idealmente esto se haría con un preventDefault
-// pero parece que no funciona.
-$("#nav-filters > form").attr("action", "#")
-
-$("#nav-filters > form").submit(e => {
-    // TRICKY (?)
-    // Al hacer una búsqueda se captura el evento
-    // y se hace una nueva búsqueda de trivial sin
-    // recargar la página
-    var txt = $("#search").val();
-    console.log(`SEARCH: ${txt}`);
-    viewMode();
-    $('#loader').show();
-    // trivial_search tiene el "side-effect" de ocultar el
-    // loader cuando el grafo carga (técnicamente esto es de herejes
-    // y debe evitarse y blah blah).
-    trivial_search(txt)
-    console.log(`SEARCH: ${txt}`);
-});
-
 function selectPath(origin, hops = 0) {
     // Esta función busca el padre de un nodo
     // y pinta el edge, entonces incrementa el
@@ -368,37 +233,4 @@ function selectPath(origin, hops = 0) {
     selectPath(cy.$(`#${parent}`)[0].id(), hops);
 }
 
-$("#clearPaths").click(function () {
-    // TRICKY
-    // En algún sitio muy, muy lejano se cambia el estilo de
-    // algunos edges, y para guardar su estilo original, se
-    // guarda en el propio objeto, en un nuevo atributo llamado
-    // originalStyle.
-    // Esta función limpia los estilos de los edges, poniendo su
-    // estilo por defecto.
-    cy.edges().forEach(e => {
-        // Explicación:
-        // true || false se evalúa a true
-        // false || true se evalúa a true
-        // false || "some text" se evalúa a "some text", NO a true
-        // así que e.prop || e.prop2 devuelve e.prop si e.prop no es false
-        // (si accedes a un atributo inexistente te devuelve undefined)
-        // y si e.prop es false (o undefined, etc...) entonces se devuelve e.prop2
-        // Básicamente al nodo se le pone el estilo original si existe el atributo
-        // y sino, se le pone el estilo actual xD
-        e._private.style = e.originalStyle || e._private.style;
-    });
-    cy.forceRender();
-});
-
-$(function () {
-    // TRICKY
-    // Esto es para desactivar el auto-refresco.
-    // Cuando el refresco está activo, el botón se pinta sin la raya,
-    // la clase de ese icono es "fa-refresh", así que se comprueba si
-    // #header_loading tiene esa clase; de ser así se hace click en el
-    // botón.
-    if ($("#header_loading")[0].classList.value.includes("fa-refresh")) {
-        $("#header_loading").parent().click();
-    }
-})
+// See init.js
