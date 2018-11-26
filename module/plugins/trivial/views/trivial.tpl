@@ -2,7 +2,7 @@
 %helper = app.helper
 %search_string = app.get_search_string()
 
-%rebase("layout", title='Trivial for hosts/services', css=['trivial/css/trivial.css', 'trivial/css/cytoscape.js-panzoom.css', 'trivial/css/cytoscape.js-navigator.css'], js=['trivial/js/cytoscape-navigator.js', 'trivial/js/cytoscape-panzoom.js', 'trivial/js/trivial-style.js','trivial/js/trivial.js'], breadcrumb=[ ['Trivial All hosts', '/trivial'] ])
+%rebase("layout", title='Trivial for hosts/services', css=['trivial/css/trivial.css', 'trivial/css/cytoscape.js-panzoom.css', 'trivial/css/cytoscape.js-navigator.css'], js=['trivial/js/trivial-commands.js', 'trivial/js/cytoscape-navigator.js', 'trivial/js/cytoscape-panzoom.js', 'trivial/js/trivial-style.js','trivial/js/trivial.js'], breadcrumb=[ ['Trivial All hosts', '/trivial'] ])
 
 <input  id="txtSearch" type="hidden" value="{{ search }}">
 
