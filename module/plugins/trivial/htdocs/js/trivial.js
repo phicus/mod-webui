@@ -60,6 +60,50 @@ function trivial_init(data) {
     });
     cy.panzoom();
     initNavigator();
+
+    cy.cxtmenu({
+        selector: 'node',
+        commands: function (e) {
+            console.log(this)
+            if (e.data()['tech'] == "wimax") return ctxmenu_commands_wimax;
+            if (e.data()['model'].search('Mikrotik') == 0) return ctxmenu_commands_mikrotik;
+            return ctxmenu_commands_all;
+        }
+    });
+
+    cy.on('tap', 'node', function (event) {
+        const node = event.target;
+        // TODO: handle locations
+        // If we are in work mode, we do not want to open
+        // anything when clicking a node.
+        // And if the node is a parent, it is a box, no do not
+        // want to open a box (that is a location)
+        if (window.cy.workMode || node.isParent()) return
+        const url = `/cpe/${node.data('id')}`;
+        window.open(url, '_blank').focus();
+    });
+
+    cy.on('mouseover', 'node', function (event) {
+        // Very ugly. Maybe also buggy
+        if (window.cy.workMode) { return }
+        var node = event.target;
+
+        console.log(`${event.renderedPosition.x}/${event.renderedPosition.y}`);
+        console.log(node.data().id);
+        $.get(`/cpe/quickservices/${node.data().id}`, function (data) {
+            console.log(`DATA: ${data}
+                        ${typeof data}`)
+            $('#info').show();
+            $('#info').html(data);
+            // TODO: use rem instead of pixels.
+            $('#info').css('left', `${event.renderedPosition.x + 50}px`);
+            $('#info').css('top', `${event.renderedPosition.y + 50}px`);
+        });
+    });
+
+    cy.on('mouseout', 'node', function () {
+        $('#info').hide();
+    });
 }
 
 function trivial_search(txt) {
@@ -68,49 +112,6 @@ function trivial_search(txt) {
     history.pushState(`trivial: ${txt}`, `Trivial: ${txt}`, `/trivial?search=${txt}`);
     $.getJSON("trivial.json?search=" + txt, function (data) {
         trivial_init(data);
-        cy.cxtmenu({
-            selector: 'node',
-            commands: function (e) {
-                console.log(this)
-                if (e.data()['tech'] == "wimax") return ctxmenu_commands_wimax;
-                if (e.data()['model'].search('Mikrotik') == 0) return ctxmenu_commands_mikrotik;
-                return ctxmenu_commands_all;
-            }
-        });
-
-        cy.on('tap', 'node', function (event) {
-            const node = event.target;
-            // TODO: handle locations
-            // If we are in work mode, we do not want to open
-            // anything when clicking a node.
-            // And if the node is a parent, it is a box, no do not
-            // want to open a box (that is a location)
-            if (window.cy.workMode || node.isParent()) return
-            const url = `/cpe/${node.data('id')}`;
-            window.open(url, '_blank').focus();
-        });
-
-        cy.on('mouseover', 'node', function (event) {
-            // Very ugly. Maybe also buggy
-            if (window.cy.workMode) { return }
-            var node = event.target;
-
-            console.log(`${event.renderedPosition.x}/${event.renderedPosition.y}`);
-            console.log(node.data().id);
-            $.get(`/cpe/quickservices/${node.data().id}`, function (data) {
-                console.log(`DATA: ${data}
-                            ${typeof data}`)
-                $('#info').show();
-                $('#info').html(data);
-                // TODO: use rem instead of pixels.
-                $('#info').css('left', `${event.renderedPosition.x + 50}px`);
-                $('#info').css('top', `${event.renderedPosition.y + 50}px`);
-            });
-        });
-
-        cy.on('mouseout', 'node', function () {
-            $('#info').hide();
-        });
     });
 }
 
