@@ -14,14 +14,16 @@ var LAYOUT1 = {
     tile: true
 }
 
-// Utils
 const obEach = (object, func) => Object.entries(object).forEach(([k, v]) => func(k, v));
 const getEdgeToParent = node => node._private.edges.filter(edge => node.data().id === edge.data().source)[0];
-const setupZoom = _ => cy.zoom(cy.maxZoom() / 20) && cy.center();
-const sleep = async (ms) => new Promise(resolve => setTimeout(resolve, ms))
+const setupZoom = async _ => await sleep(300) && cy.zoom(cy.maxZoom() / 20) && cy.center();
+const sleep = async (ms) => new Promise(resolve => setTimeout(resolve, ms));
 // TODO: Use this in selectPath function
 const getParent = node => getEdgeToParent(node) && cy.$(`#${getEdgeToParent(node).data().target}`)[0];
 const initButtons = _ => $('#loader').hide() && $('#work-mode, #center, #trivial').show();
+const initNavigator = (options = undefined) => cy.navigator(options);
+const savePosition = async () => alertify.confirm("Do you want to save?", saveToLocalStorage);
+const elementById = id => cy.getElementById(id.startsWith("#") ? id : `#${id}`);
 
 // FIXME
 // function trivial_expand(node) {
@@ -57,17 +59,7 @@ function trivial_init(data) {
         layout: LAYOUT1
     });
     cy.panzoom();
-
-    var defaults = {
-        container: false, // can be a HTML or jQuery element or jQuery selector
-        viewLiveFramerate: 0, // set false to update graph pan only on drag end; set 0 to do it instantly; set a number (frames per second) to update not more than N times per second
-        thumbnailEventFramerate: 30, // max thumbnail's updates per second triggered by graph updates
-        thumbnailLiveFramerate: false, // max thumbnail's updates per second. Set false to disable
-        dblClickDelay: 200, // milliseconds
-        removeCustomContainer: true, // destroy the container specified by user on plugin destroy
-        rerenderDelay: 100, // ms to throttle rerender updates to the panzoom for performance
-    };
-    cy.navigator(defaults); // get navigator instance, nav
+    initNavigator();
 }
 
 function trivial_search(txt) {
@@ -76,7 +68,7 @@ function trivial_search(txt) {
     history.pushState(`trivial: ${txt}`, `Trivial: ${txt}`, `/trivial?search=${txt}`);
     $.getJSON("trivial.json?search=" + txt, function (data) {
         trivial_init(data);
-        window.cy.cxtmenu({
+        cy.cxtmenu({
             selector: 'node',
             commands: function (e) {
                 console.log(this)
@@ -86,7 +78,7 @@ function trivial_search(txt) {
             }
         });
 
-        window.cy.on('tap', 'node', function (event) {
+        cy.on('tap', 'node', function (event) {
             const node = event.target;
             // TODO: handle locations
             // If we are in work mode, we do not want to open
@@ -98,8 +90,7 @@ function trivial_search(txt) {
             window.open(url, '_blank').focus();
         });
 
-
-        window.cy.on('mouseover', 'node', function (event) {
+        cy.on('mouseover', 'node', function (event) {
             // Very ugly. Maybe also buggy
             if (window.cy.workMode) { return }
             var node = event.target;
@@ -117,30 +108,26 @@ function trivial_search(txt) {
             });
         });
 
-        window.cy.on('mouseout', 'node', function () {
+        cy.on('mouseout', 'node', function () {
             $('#info').hide();
         });
     });
 }
 
-async function savePosition() {
-    // TODO: this only works with a specific search
-    // Generally, you view "type:host bp:>2", you edit it
-    // and you save THAT graph
-    // So, if you search " (insert some awsome filter here)"
-    // then you do not have the positions of that search
-    // or maybe you ahve only some positions
-    // and this results in an non-beauty graph
+// TODO: this only works with a specific search
+// Generally, you view "type:host bp:>2", you edit it
+// and you save THAT graph
+// So, if you search " (insert some awsome filter here)"
+// then you do not have the positions of that search
+// or maybe you ahve only some positions
+// and this results in an non-beauty graph
 
-    // Execute this only if user says that wants to save.
-    function save() {
-        data = {};
-        cy.nodes().forEach(n => data[n.data().id] = { 'position': n.position() });
-        const data = JSON.stringify(data);
-        localStorage.setItem('trivial', data);
-    }
-    alertify.confirm("Do you want to save?", save);
-
+// Execute this only if user says that wants to save.
+function saveToLocalStorage() {
+    const data = {};
+    cy.nodes().forEach(n => data[n.data().id] = { 'position': n.position() });
+    const data = JSON.stringify(data);
+    localStorage.setItem('trivial', data);
 }
 
 async function loadPosition(shouldUnlock) {
@@ -151,9 +138,9 @@ async function loadPosition(shouldUnlock) {
     // Al parecer para que se cargen bien las positiones
     // hay que establecer las posiciones 2 veces
     console.log("LOAD: 0");
-    obEach(graph, (k, v) => this.cy.getElementById(k).position(v.position));
+    obEach(graph, (k, v) => elementById(k).position(v.position));
     console.log("LOAD: 1");
-    obEach(graph, (k, v) => this.cy.getElementById(k).position(v.position));
+    obEach(graph, (k, v) => elementById(k).position(v.position));
     cy.forceRender();
     // await sleep(800);
     if (!shouldUnlock) cy.nodes().lock();

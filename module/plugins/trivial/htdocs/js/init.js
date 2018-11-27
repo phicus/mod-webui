@@ -1,73 +1,73 @@
-// Esto debería hacerse con CSS
-$('#load-position').hide();
-$('#save-position').hide();
-$('#work-mode').hide();
-$('#center').hide();
-$('#save-position-backup').hide();
-$('#load-position-backup').hide();
-
-$('#work-mode').on('click', function () {
-    workMode();
+$(function () {
+    trivial_search(txtSearch.val());
 });
 
-$('#view-mode').on('click', function () {
-    viewMode();
-});
+const navButton = $(".cytoscape-navigator");
+const loadPositionButton = $('#load-position');
+const savePositionButton = $('#save-position');
+const workModeButton = $('#work-mode');
+const viewModeButton = $('#view-mode');
+const centerButton = $('#center');
+const miniMap = $('#mini-map');
+const form = $("#nav-filters > form");
+const txtSearch = $('#txtSearch');
+const crearPathsButton = $("#clearPaths");
 
-$("#center").on("click", () => { cy.center() });
+const searchs = [];
 
-$('#save-position').on('click', function () {
-    console.log("savePosition []");
-    savePosition();
-});
+// TODO: Esto debería hacerse con CSS.
+loadPositionButton.hide();
+savePositionButton.hide();
+workModeButton.hide();
+centerButton.hide();
 
-$('#load-position').on('click', function () {
-    console.log("loadPosition []")
-    loadPosition(true);
-});
+workModeButton.on('click', workMode);
 
-$('#mini-map').on('click', function () {
-    console.log("mini map button was clicked! :D");
-    $(".cytoscape-navigator").toggle();
-});
+viewModeButton.on('click', viewMode);
+
+centerButton.on("click", () => cy.center());
+
+savePositionButton.on('click', () => console.log("savePosition []") && savePosition());
+
+loadPositionButton.on('click', () => console.log("loadPosition []") && loadPosition(true));
+
+miniMap.on('click', () => console.log("mini map button was clicked! :D") && navButton.toggle());
 
 $(window).on('popstate', function (event) {
+    searchs.pop();
+    if (searchs.length === 0) return;
     // Al pulsar el botón atrás se activa el modo view,
     // y se muestra el loader.
     viewMode();
     $('#loader').show();
+    const search = searchs[-1];
+    if (search === undefined) return;
+    $('#txtSearch').val(search);
     // Como "side-effect" trivial_search oculta el
     // loader y también cambia la URL del navegador.
-    trivial_search($('#txtSearch').val());
+    trivial_search(search);
 });
 
-// TRICK
-// Esto hace que el formulario se envíe al propio
-// documento, haciendo así que no se recarge la página
-// Idealmente esto se haría con un preventDefault
-// pero parece que no funciona.
-$("#nav-filters > form").attr("action", "#")
-
 // FIXME
-$("#nav-filters > form").submit(e => {
+form.submit(e => {
     // TRICK (?)
     // Al hacer una búsqueda se captura el evento
     // y se hace una nueva búsqueda de trivial sin
-    // recargar la página
-    var txt = $("#search").val();
+    // recargar la página.
+    e.stopPropagation();
+    const txt = $("#search").val();
+    if (txt !== searchs[-1]) searchs.push(txt);
     console.log(`SEARCH: ${txt}`);
     viewMode();
     $('#loader').show();
     // trivial_search tiene el "side-effect" de ocultar el
     // loader cuando el grafo carga (técnicamente esto es de herejes
     // y debe evitarse y blah blah).
-    trivial_search(txt)
+    trivial_search(txt);
     console.log(`SEARCH: ${txt}`);
 });
 
-
-
-$("#clearPaths").click(function () {
+crearPathsButton.click(function () {
     // TRICK
     // En algún sitio muy, muy lejano se cambia el estilo de
     // algunos edges, y para guardar su estilo original, se
@@ -75,7 +75,6 @@ $("#clearPaths").click(function () {
     // originalStyle.
     // Esta función limpia los estilos de los edges, poniendo su
     // estilo por defecto.
-
 
     // Explicación:
     // true || false se evalúa a true
@@ -92,9 +91,4 @@ $("#clearPaths").click(function () {
 
 $(function () {
     disable_refresh();
-});
-
-// This should be the lastest being executed.
-$(function () {
-    trivial_search($('#txtSearch').val());
 });
