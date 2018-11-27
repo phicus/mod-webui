@@ -101,18 +101,14 @@ function trivial_init(data) {
         });
     });
 
-    cy.on('mouseout', 'node', function () {
-        $('#info').hide();
-    });
+    cy.on('mouseout', 'node', () => $('#info').hide());
 }
 
 function trivial_search(txt) {
     $('#search').val(txt);
     // side-effect
     history.pushState(`trivial: ${txt}`, `Trivial: ${txt}`, `/trivial?search=${txt}`);
-    $.getJSON("trivial.json?search=" + txt, function (data) {
-        trivial_init(data);
-    });
+    $.getJSON("trivial.json?search=" + txt, trivial_init);
 }
 
 // TODO: this only works with a specific search
