@@ -124,9 +124,9 @@ function trivial_search(txt) {
 
 // Execute this only if user says that wants to save.
 function saveToLocalStorage() {
-    const data = {};
+    let data = {};
     cy.nodes().forEach(n => data[n.data().id] = { 'position': n.position() });
-    const data = JSON.stringify(data);
+    data = JSON.stringify(data);
     localStorage.setItem('trivial', data);
 }
 
