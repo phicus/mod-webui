@@ -14,6 +14,7 @@ const txtSearch = $('#txtSearch');
 const crearPathsButton = $("#clearPaths");
 
 const searchs = [];
+$(() => searchs.push(txtSearch.val()))
 
 // TODO: Esto debería hacerse con CSS.
 loadPositionButton.hide();
@@ -34,29 +35,31 @@ loadPositionButton.on('click', () => console.log("loadPosition []") && loadPosit
 miniMap.on('click', () => console.log("mini map button was clicked! :D") && navButton.toggle());
 
 $(window).on('popstate', function (event) {
+    console.log("poping");
     searchs.pop();
     if (searchs.length === 0) return;
-    // Al pulsar el botón atrás se activa el modo view,
-    // y se muestra el loader.
-    viewMode();
+    console.log("after searchs");
+    event.preventDefault();
+    event.stopPropagation();
     $('#loader').show();
-    const search = searchs[-1];
-    if (search === undefined) return;
+    const search = searchs[searchs.length - 1];
+    console.log(`search: ${search}`);
     $('#txtSearch').val(search);
+    history.pushState("", "trivial", "/trivial?search=" + search)
     // Como "side-effect" trivial_search oculta el
     // loader y también cambia la URL del navegador.
     trivial_search(search);
+    // Al pulsar el botón atrás se activa el modo view,
+    // y se muestra el loader.
+    viewMode();
 });
 
 // FIXME
 form.submit(e => {
-    // TRICK (?)
-    // Al hacer una búsqueda se captura el evento
-    // y se hace una nueva búsqueda de trivial sin
-    // recargar la página.
+    e.preventDefault();
     e.stopPropagation();
     const txt = $("#search").val();
-    if (txt !== searchs[-1]) searchs.push(txt);
+    if (txt !== searchs[searchs.length - 1]) searchs.push(txt);
     console.log(`SEARCH: ${txt}`);
     viewMode();
     $('#loader').show();
