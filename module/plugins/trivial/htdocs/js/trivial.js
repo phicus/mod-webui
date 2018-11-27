@@ -103,8 +103,8 @@ function trivial_search(txt) {
                 $('#info').show();
                 $('#info').html(data);
                 // TODO: use rem instead of pixels.
-                $('#info').css('left', `${event.renderedPosition.x + 30}px`);
-                $('#info').css('top', `${event.renderedPosition.y + 30}px`);
+                $('#info').css('left', `${event.renderedPosition.x + 50}px`);
+                $('#info').css('top', `${event.renderedPosition.y + 50}px`);
             });
         });
 
