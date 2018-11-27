@@ -16,14 +16,16 @@ var LAYOUT1 = {
 
 const obEach = (object, func) => Object.entries(object).forEach(([k, v]) => func(k, v));
 const getEdgeToParent = node => node._private.edges.filter(edge => node.data().id === edge.data().source)[0];
-const setupZoom = async _ => await sleep(300) && cy.zoom(cy.maxZoom() / 20) && cy.center();
-const sleep = async (ms) => new Promise(resolve => setTimeout(resolve, ms));
 // TODO: Use this in selectPath function
 const getParent = node => getEdgeToParent(node) && cy.$(`#${getEdgeToParent(node).data().target}`)[0];
+const setupZoom = async _ => await sleep(300) && cy.zoom(cy.maxZoom() / 20) && cy.center();
+const sleep = async (ms) => new Promise(resolve => setTimeout(resolve, ms));
 const initButtons = _ => $('#loader').hide() && $('#work-mode, #center, #trivial').show();
 const initNavigator = (options = undefined) => cy.navigator(options);
-const savePosition = async () => alertify.confirm("Do you want to save?", saveToLocalStorage);
+const savePosition = async () => alertify.confirm("Do you want to save?", _ => saveToLocalStorage() && saveToServer());
+const loadPosition = async (shouldUnlock) => loadPositionFromLocalStorage(shouldUnlock) && loadPositionFromServer(shouldUnlock);
 const elementById = id => cy.getElementById(id.startsWith("#") ? id : `#${id}`);
+const setPositions = data => obEach(data, (k, v) => ele = this.cy.getElementById(k).position(v.position));
 
 // FIXME
 // function trivial_expand(node) {
@@ -127,27 +129,58 @@ function saveToLocalStorage() {
     localStorage.setItem('trivial', data);
 }
 
-async function loadPosition(shouldUnlock) {
+function saveToServer() {
+    let data = {};
+    cy.nodes().forEach(n => data[n.data().id] = { 'position': n.position() });
+    data = JSON.stringify(data);
+    $.ajax({
+        type: "POST",
+        url: '/trivial/settings/save',
+        dataType: 'json',
+        data: data,
+        success: function (data) {
+            console.log(data);
+            alertify.success("Save result:" + data.status);
+        }
+    });
+}
+
+async function loadPositionFromLocalStorage(shouldUnlock) {
     cy.nodes().unlock();
     let graph = JSON.parse(localStorage.getItem("graph"));
     if (graph === null) return;
     // TRICK
     // Al parecer para que se cargen bien las positiones
     // hay que establecer las posiciones 2 veces
-    console.log("LOAD: 0");
-    obEach(graph, (k, v) => elementById(k).position(v.position));
-    console.log("LOAD: 1");
-    obEach(graph, (k, v) => elementById(k).position(v.position));
+    console.log("LOAD");
+    setPositions(graph);
+    setPositions(graph);
     cy.forceRender();
     // await sleep(800);
     if (!shouldUnlock) cy.nodes().lock();
 }
 
+
+function loadPositionFromServer(shouldUnlock) {
+    //var loadData = JSON.parse(localStorage.getItem('trivial'));
+    window.cy.nodes().unlock();
+    $.ajax({
+        dataType: 'json',
+        url: '/trivial/settings/load',
+        success: data => {
+            console.log("LOAD");
+            setPositions(data);
+            setPositions(data);
+            if (!shouldUnlock) {
+                cy.nodes().lock();
+            }
+        }
+    });
+}
+
 function workMode() {
     $('#load-position').show();
     $('#save-position').show();
-    $('#save-position-backup').show();
-    $('#load-position-backup').show();
     $('#view-mode').show();
     $('#work-mode').hide();
     window.cy.nodes().unlock();
@@ -158,15 +191,13 @@ function workMode() {
 
 function viewMode() {
     $('#load-position').hide();
-    $('#load-position-backup').hide();
     $('#save-position').hide();
-    $('#save-position-backup').hide();
     $('#view-mode').hide();
     $('#work-mode').show();
     window.cy.nodes().lock();
 
     $('#trivial').css('background-color', 'transparent');
-    // 
+
     window.cy.workMode = false;
 }
 function selectPath(origin, hops = 0) {
@@ -177,32 +208,11 @@ function selectPath(origin, hops = 0) {
     console.log(`origin: ${origin}`);
     let parent;
     // for any reason .edges() returns none
-    cy.$(`#${origin}`)[0]._private.edges.forEach((edge) => {
-        console.log("Processing edge:");
-        console.log(edge);
-        // En este grafo, el edge que enlaza un hijo
-        // a su padre, no tiene la dirección padre -> hijo
-        // como normalmente sino que es hijo -> padre
-        // Entonces, cuando el origen del edge es el propio
-        // nodo, es un enlace hacia un padre.
-        // En cambio, si el origen del edge es otro nodo,
-        // es un enlace con un hijo.
-        if (edge.data().source !== origin) return
-        parent = edge.data().target;
-        console.log(`We got a parent! It is: ${parent}`);
-        // Select is like cliking in the edge:
-        // it selects the edge and changes its color
-        // but if you click somewhere, its color
-        // gets back to default
-        // e.select();
-        // Mmm... Nope xD
-        // Object.keys(edge.css()).filter(e => e.includes("color")).forEach(e => edge.style(e, "red"));
-        // Se guarda el estilo actual para restaurarlo más tarde
-        edge.originalStyle = {};
-        Object.assign(edge.originalStyle, edge._private.style)
-        edge.style("target-arrow-color", "red");
-        edge.style("line-color", "red");
-    });
+    let edge = getEdgeToParent(origin);
+    edge.originalStyle = {};
+    Object.assign(edge.originalStyle, edge._private.style)
+    edge.style("target-arrow-color", "red");
+    edge.style("line-color", "red");
     // Si no se ha encontrado ningún padre y los saltos son 0,
     // el nodo no tiene ningún padre, así que él es el creador
     // de todo es decir: Dios
@@ -214,7 +224,34 @@ function selectPath(origin, hops = 0) {
         return
     };
     hops += 1;
-    selectPath(cy.$(`#${parent}`)[0].id(), hops);
+    selectPath(cy.$(`#${parent}`)[0], hops);
+
+
+
+
+
+
+
+    while (true) {
+        console.log(`origin: ${origin}`);
+        let parent;
+        let edge = getEdgeToParent(origin);
+        edge.originalStyle = {};
+        Object.assign(edge.originalStyle, edge._private.style)
+        edge.style("target-arrow-color", "red");
+        edge.style("line-color", "red");
+
+        if (parent === undefined) {
+            if (hops === 0) alertify.warning(`This node has not any parent, it is God.`);
+            else alertify.success(`There is ${hops} hops`);
+            return
+        };
+        hops += 1;
+    }
+
+
+
+
 }
 
 // See init.js

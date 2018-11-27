@@ -20,7 +20,7 @@ var ctxmenu_commands_all = [{
 }, {
     content: 'Path to parent',
     select: function () {
-        selectPath(this.data("id"))
+        selectPath(this)
     }
 }]
 var ctxmenu_commands_mikrotik = ctxmenu_commands_all.slice()

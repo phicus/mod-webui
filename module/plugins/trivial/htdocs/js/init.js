@@ -28,11 +28,17 @@ viewModeButton.on('click', viewMode);
 
 centerButton.on("click", () => cy.center());
 
-savePositionButton.on('click', () => console.log("savePosition []") && savePosition());
+savePositionButton.on('click', () => {
+    console.log("savePosition []");
+    savePosition();
+});
 
-loadPositionButton.on('click', () => console.log("loadPosition []") && loadPosition(true));
+loadPositionButton.on('click', () => {
+    console.log("loadPosition []");
+    loadPosition(true);
+});
 
-miniMap.on('click', () => console.log("mini map button was clicked! :D") && navButton.toggle());
+miniMap.on('click', () => {console.log("mini map button was clicked! :D"); navButton.toggle()});
 
 $(window).on('popstate', function (event) {
     console.log("poping");
