@@ -23,7 +23,7 @@ const sleep = async (ms) => new Promise(resolve => setTimeout(resolve, ms));
 const initButtons = _ => $('#loader').hide() && $('#work-mode, #center, #trivial').show();
 const initNavigator = (options = undefined) => cy.navigator(options);
 const savePosition = async () => alertify.confirm("Do you want to save?", _ => saveToLocalStorage() && saveToServer());
-const loadPosition = async (shouldUnlock) => loadPositionFromLocalStorage(shouldUnlock) && loadPositionFromServer(shouldUnlock);
+const loadPosition = async (shouldUnlock) => {await loadPositionFromLocalStorage(shouldUnlock); loadPositionFromServer(shouldUnlock)};
 const elementById = id => cy.getElementById(id.startsWith("#") ? id : `#${id}`);
 const setPositions = data => obEach(data, (k, v) => ele = this.cy.getElementById(k).position(v.position));
 
@@ -58,7 +58,7 @@ function trivial_init(data) {
         minZoom: 0.035,
         style: TRIVIAL_STYLE,
         elements: data,
-        layout: LAYOUT1
+        layout: LAYOUT1,
     });
     cy.panzoom();
     initNavigator();
