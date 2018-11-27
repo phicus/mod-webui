@@ -4,6 +4,7 @@
 
 import time
 import urllib
+from urlparse import urlparse
 
 from shinken.log import logger
 
@@ -38,6 +39,7 @@ class GraphsMetaModule(MetaModule):
             logger.debug("[WebUI] Got graphs: %s", uris)
 
         for uri in uris:
-            uri['img_src'] = '/graph?url=' + urllib.quote(uri['img_src'])
+            # uri['img_src'] = '/graph?url=' + urllib.quote(uri['img_src'])
+            uri['img_src'] = '/graph?' + urlparse(uri['img_src']).query
 
         return uris
