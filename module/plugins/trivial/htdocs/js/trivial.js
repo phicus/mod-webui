@@ -201,57 +201,22 @@ function viewMode() {
     window.cy.workMode = false;
 }
 function selectPath(origin, hops = 0) {
-    // Esta función busca el padre de un nodo
-    // y pinta el edge, entonces incrementa el
-    // contador de hops y se ejecuta a sí misma,
-    // es una función recursiva.
-    console.log(`origin: ${origin}`);
-    let parent;
-    // for any reason .edges() returns none
-    let edge = getEdgeToParent(origin);
-    edge.originalStyle = {};
-    Object.assign(edge.originalStyle, edge._private.style)
-    edge.style("target-arrow-color", "red");
-    edge.style("line-color", "red");
-    // Si no se ha encontrado ningún padre y los saltos son 0,
-    // el nodo no tiene ningún padre, así que él es el creador
-    // de todo es decir: Dios
-    // Si tiene algún padre, los enlaces ya están pintados, sólo resta
-    // notificar el número de saltos
-    if (parent === undefined) {
-        if (hops === 0) alertify.warning(`This node has not any parent, it is God.`);
-        else alertify.success(`There is ${hops} hops`);
-        return
-    };
-    hops += 1;
-    selectPath(cy.$(`#${parent}`)[0], hops);
-
-
-
-
-
-
-
     while (true) {
         console.log(`origin: ${origin}`);
-        let parent;
+        let parent = getParent(origin);
+        if (parent === undefined || parseFloat === null) {
+            if (hops === 0) alertify.warning(`This node has not any parent, it is God`);
+            else alertify.success(`There is ${hops} hops`);
+            break
+        };
         let edge = getEdgeToParent(origin);
         edge.originalStyle = {};
         Object.assign(edge.originalStyle, edge._private.style)
         edge.style("target-arrow-color", "red");
         edge.style("line-color", "red");
-
-        if (parent === undefined) {
-            if (hops === 0) alertify.warning(`This node has not any parent, it is God.`);
-            else alertify.success(`There is ${hops} hops`);
-            return
-        };
         hops += 1;
+        origin = parent;
     }
-
-
-
-
 }
 
 // See init.js
