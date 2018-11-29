@@ -69,7 +69,7 @@ if ALIGNAK:
 
     # Shinken logger configuration
     from shinken.log import logger
-    logger.register_local_log('/tmp/var/log/alignak/shinken.log', 'WARNING')
+    #logger.register_local_log('/tmp/var/log/alignak/shinken.log', 'WARNING')
     import logging
     logger.setLevel(logging.INFO)
 else:

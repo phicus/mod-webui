@@ -88,6 +88,7 @@
    <body>
       <div id="wrapper">
          %include("header_element")
+
          <div id="page-wrapper">
 
             <!-- Do not remove the next comment!
@@ -97,12 +98,15 @@
             -->
             <!--begin-page-content-->
             <div id="page-content">
+              <div class="row">
+              %if navi:
+              %include("pagination_element", navi=navi, page=page)
+              %end
+              </div>
                <div class="row">
                   <!-- Page header -->
                   <section class="content-header">
-                     %if navi:
-                     %include("pagination_element", navi=navi, page=page)
-                     %end
+
                      <!--
                      <h3 class="page-header" style="margin-top: 10px">
                        <ol class="breadcrumb" style="margin:0px">
@@ -122,7 +126,7 @@
                          %end
                        </ol>
                      </h3>
-                    -->
+
                   </section>
 
                   <!-- Page content -->
