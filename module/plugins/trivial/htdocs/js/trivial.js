@@ -100,21 +100,44 @@ function trivial_search(txt) {
     $.getJSON("trivial.json?search=" + txt, trivial_init);
 }
 
-// TODO: this only works with a specific search
-// Generally, you view "type:host bp:>2", you edit it
-// and you save THAT graph
-// So, if you search " (insert some awsome filter here)"
-// then you do not have the positions of that search
-// or maybe you ahve only some positions
-// and this results in an non-beauty graph
-
-// Execute this only if user says that wants to save.
-function saveToLocalStorage() {
+async function saveToLocalStorage() {
     let data = {};
     cy.nodes().forEach(n => data[n.data().id] = { 'position': n.position() });
     data = JSON.stringify(data);
-    localStorage.setItem('trivial', data);
+    localStorage.setItem('graph', data);
 }
+
+async function saveToServer() {
+    let data = {};
+    cy.nodes().forEach(n => data[n.data().id] = { 'position': n.position() });
+    data = JSON.stringify({ save1: data });
+    $.ajax({
+        type: "POST",
+        url: '/trivial/settings/save',
+        dataType: 'json',
+        data: data,
+        success: function (data) {
+            console.log(data);
+            alertify.success("Save result:" + data.status);
+        }
+    });
+}
+async function savePosition() {
+    // TODO: this only works with a specific search
+    // Generally, you view "type:host bp:>2", you edit it
+    // and you save THAT graph
+    // So, if you search " (insert some awsome filter here)"
+    // then you do not have the positions of that search
+    // or maybe you ahve only some positions
+    // and this results in an non-beauty graph
+
+    // Execute this only if user says that wants to save.
+    function save() {
+        saveToLocalStorage();
+        saveToServer();
+    }
+    alertify.confirm("Do you want to save?", save);
+
 
 function saveToServer() {
     let data = {};
