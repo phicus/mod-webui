@@ -22,10 +22,14 @@
 #
 # You should have received a copy of the GNU Affero General Public License
 # along with Shinken.  If not, see <http://www.gnu.org/licenses/>.
+import os
 import time
+import re
 import json
 import requests
 import random
+import urllib2
+
 from shinken.log import logger
 
 
@@ -39,16 +43,24 @@ def proxy_graph():
         encoded with urlencode. The graphs metamodule takes care of that. This
         route should not be usefull anywhere else.
     '''
-    url = app.request.GET.get('url', '')
-
+    # Example: ?lineMode=connected&from=08%3A25_20181126&title=Response Time on cmtsC4c&height=308&width=586&fontSize=8&yMin=0&until=08%3A25_20181127&target=legendValue(alias(cmtsC4c.__HOST__.rta%2C"Response Time")%2C"last")&target=cpe0005.upstream.uprate
+    # Complete URL http://some-site:4288/render/?lineMode=connected&from=08%3A25_20181126&title=Response%20Time%20on%20cmtsC4c&height=308&width=586&fontSize=8&yMin=0&until=08%3A25_20181127&target=legendValue(alias(cmtsC4c.__HOST__.rta%2C%22Response%20Time%22)%2C%22last%22)&target=cpe0005.upstream.uprate
+    options = app.request.query.decode()
+    graphite_url = os.getenv("GRAPHITE_URL", "127.0.0.1:4288")
+    schema_regex = "^(http:\/\/|https:\/\/)"
+    if not re.match(schema_regex, graphite_url): graphite_url = "http://" + graphite_url
+    graphite_url = "{}/render/?".format(graphite_url)
+    for k, v in options.items():
+        graphite_url += "{}={}&".format(k, v)
+    
     try:
-        r = requests.get(url)
+        r = requests.get(graphite_url)
         if r.status_code != 200:
-            logger.error("[WebUI-graph] Image URL not found: %d - %s", r.status_code, url)
+            logger.error("[WebUI-graph] Image URL not found: %d - %s", r.status_code, graphite_url)
             app.bottle.response.status = r.status_code
             app.bottle.response.content_type = 'application/json'
             return json.dumps(
-                {'status': 'ko', 'message': r.content}
+                {'status': 'ko', 'message': r.content, "url": graphite_url}
             )
 
     except Exception as e:
@@ -56,7 +68,7 @@ def proxy_graph():
         app.bottle.response.status = 409
         app.bottle.response.content_type = 'application/json'
         return json.dumps(
-            {'status': 'ko', 'message': str(e)}
+            {'status': 'ko', 'message': str(e), "url": graphite_url}
         )
 
     app.response.content_type = str(r.headers['content-type'])
