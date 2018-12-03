@@ -167,6 +167,7 @@ function loadPositionFromServer(shouldUnlock) {
 
 function workMode() {
     $('#load-position').show();
+    $('#load-position-server').show();
     $('#save-position').show();
     $('#view-mode').show();
     $('#work-mode').hide();
@@ -178,6 +179,7 @@ function workMode() {
 
 function viewMode() {
     $('#load-position').hide();
+    $('#load-position-server').hide();
     $('#save-position').hide();
     $('#view-mode').hide();
     $('#work-mode').show();
