@@ -1,3 +1,6 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 from datamanager import WebUIDataManager
 from shinken.log import logger
 import re
@@ -130,11 +133,11 @@ class KrillUIDataManager(WebUIDataManager):
 
         for t, s in patterns:
             t = t.lower()
-            logger.debug("[WebUI - datamanager] searching for %s %s", t, s)
+            logger.debug(u"[WebUI - datamanager] searching for %s %s", t, s.decode('utf-8'))
 
             if t == 'name':
                 # Case insensitive
-                pat = re.compile(s, re.IGNORECASE)
+                pat = re.compile(unicode(s.decode('utf-8')), re.IGNORECASE | re.UNICODE)
                 new_items = []
                 for i in items:
                     if _filter_item(i):
