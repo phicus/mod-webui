@@ -26,7 +26,7 @@ centerButton.hide();
 
 workModeButton.on('click', _ => workMode());
 
-viewModeButton.on('click', _ => viewMod());
+viewModeButton.on('click', _ => viewMode());
 
 centerButton.on("click", () => cy.center());
 
