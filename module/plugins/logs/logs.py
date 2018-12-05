@@ -202,9 +202,9 @@ def get_global_history():
 
 
 
-def _get_events(*args, **kwargs):
+def _get_events(elt):
     if app.logs_module.is_available():
-        return app.logs_module.get_ui_events(*args, **kwargs)
+        return app.logs_module.get_ui_events(elt)
     else:
         logger.warning("[WebUI-logs] no get history external module defined!")
         return None
@@ -238,7 +238,7 @@ def get_host_events(name):
     user = app.request.environ['USER']
     name = urllib.unquote(name)
     elt = app.datamgr.get_element(name, user) or app.redirect404()
-    events = _get_events(filters=dict(host_name=elt.host_name))
+    events = _get_events(elt)
 
     records = []
     for log in events:
