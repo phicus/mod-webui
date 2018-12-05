@@ -24,9 +24,9 @@ savePositionButton.hide();
 workModeButton.hide();
 centerButton.hide();
 
-workModeButton.on('click', workMode);
+workModeButton.on('click', _ => workMode());
 
-viewModeButton.on('click', viewMode);
+viewModeButton.on('click', _ => viewMod());
 
 centerButton.on("click", () => cy.center());
 
