@@ -1,4 +1,16 @@
-// See trivial-commands.
+const obEach = (object, func) => Object.entries(object).forEach(([k, v]) => func(k, v));
+const getEdgeToParent = node => node._private.edges.filter(edge => node.data().id === edge.data().source)[0];
+// TODO: Use this in selectPath function
+const getParent = node => getEdgeToParent(node) && cy.$(`#${getEdgeToParent(node).data().target}`)[0];
+// TODO: this does not work
+const setupZoom = async _ => await sleep(300) && cy.zoom(cy.maxZoom() / 20) && cy.center();
+const sleep = async (ms) => new Promise(resolve => setTimeout(resolve, ms));
+const initButtons = _ => $('#loader').hide() && $('#work-mode, #center, #trivial').show();
+const initNavigator = (options = undefined) => cy.navigator(options);
+const savePosition = async () => alertify.confirm("Do you want to save?", _ => {saveToLocalStorage(); saveToServer()});
+const loadPosition = async (shouldUnlock) => {await loadPositionFromLocalStorage(shouldUnlock); loadPositionFromServer(shouldUnlock)};
+const elementById = id => cy.getElementById(id.startsWith("#") ? id : `#${id}`);
+const setPositions = data => obEach(data, (k, v) => ele = this.cy.getElementById(k).position(v.position));
 
 ///Layouts
 var LAYOUT1 = {
@@ -100,26 +112,17 @@ function trivial_search(txt) {
     $.getJSON("trivial.json?search=" + txt, trivial_init);
 }
 
-// TODO: this only works with a specific search
-// Generally, you view "type:host bp:>2", you edit it
-// and you save THAT graph
-// So, if you search " (insert some awsome filter here)"
-// then you do not have the positions of that search
-// or maybe you ahve only some positions
-// and this results in an non-beauty graph
-
-// Execute this only if user says that wants to save.
-function saveToLocalStorage() {
+async function saveToLocalStorage() {
     let data = {};
     cy.nodes().forEach(n => data[n.data().id] = { 'position': n.position() });
-    data = JSON.stringify(data);
-    localStorage.setItem('trivial', data);
+    data = JSON.stringify({save1: data});
+    localStorage.setItem('graph', data);
 }
 
-function saveToServer() {
+async function saveToServer() {
     let data = {};
     cy.nodes().forEach(n => data[n.data().id] = { 'position': n.position() });
-    data = JSON.stringify(data);
+    data = JSON.stringify({ save1: data });
     $.ajax({
         type: "POST",
         url: '/trivial/settings/save',
@@ -140,8 +143,8 @@ async function loadPositionFromLocalStorage(shouldUnlock) {
     // Al parecer para que se cargen bien las positiones
     // hay que establecer las posiciones 2 veces
     console.log("LOAD");
-    setPositions(graph);
-    setPositions(graph);
+    setPositions(graph.save1);
+    setPositions(graph.save1);
     cy.forceRender();
     // await sleep(800);
     if (!shouldUnlock) cy.nodes().lock();
@@ -156,8 +159,8 @@ function loadPositionFromServer(shouldUnlock) {
         url: '/trivial/settings/load',
         success: data => {
             console.log("LOAD");
-            setPositions(data);
-            setPositions(data);
+            setPositions(data.save1);
+            setPositions(data.save1);
             if (!shouldUnlock) {
                 cy.nodes().lock();
             }
@@ -167,6 +170,7 @@ function loadPositionFromServer(shouldUnlock) {
 
 function workMode() {
     $('#load-position').show();
+    $('#load-position-server').show();
     $('#save-position').show();
     $('#view-mode').show();
     $('#work-mode').hide();
@@ -178,6 +182,7 @@ function workMode() {
 
 function viewMode() {
     $('#load-position').hide();
+    $('#load-position-server').hide();
     $('#save-position').hide();
     $('#view-mode').hide();
     $('#work-mode').show();
@@ -187,6 +192,7 @@ function viewMode() {
 
     window.cy.workMode = false;
 }
+
 function selectPath(origin, hops = 0) {
     while (true) {
         console.log(`origin: ${origin}`);

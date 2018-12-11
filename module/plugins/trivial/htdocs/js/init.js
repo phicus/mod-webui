@@ -4,6 +4,7 @@ $(function () {
 
 const navButton = $(".cytoscape-navigator");
 const loadPositionButton = $('#load-position');
+const loadPositionServerButton = $("#load-position-server")
 const savePositionButton = $('#save-position');
 const workModeButton = $('#work-mode');
 const viewModeButton = $('#view-mode');
@@ -18,13 +19,14 @@ $(() => searchs.push(txtSearch.val()))
 
 // TODO: Esto debería hacerse con CSS.
 loadPositionButton.hide();
+loadPositionServerButton.hide();
 savePositionButton.hide();
 workModeButton.hide();
 centerButton.hide();
 
-workModeButton.on('click', workMode);
+workModeButton.on('click', _ => workMode());
 
-viewModeButton.on('click', viewMode);
+viewModeButton.on('click', _ => viewMode());
 
 centerButton.on("click", () => cy.center());
 
@@ -36,6 +38,11 @@ savePositionButton.on('click', () => {
 loadPositionButton.on('click', () => {
     console.log("loadPosition []");
     loadPosition(true);
+});
+
+loadPositionServerButton.on('click', () => {
+    console.log("loadPosition []");
+    loadPositionFromServer(true);
 });
 
 miniMap.on('click', () => {console.log("mini map button was clicked! :D"); navButton.toggle()});

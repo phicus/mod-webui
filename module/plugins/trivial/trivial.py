@@ -208,21 +208,30 @@ def set_trivial_setting():
     return {'status': 'ok'}
 
 def get_trivial_setting():
+    # Do not work
+    # app.response.content_type = 'application/octet-stream'
+    # Do not work
+    # app.bottle.response.content_type = 'application/octet-stream'
+    # Do not work
+    # app.response.set_header("Content-Type", 'application/octet-stream')
+    # It works
+    # app.response.set_header("Test-Header", 'Some awesome value')
     return json.loads(app.prefs_module.get_ui_common_preference('trivial') or '{}')
 
 
 def get_parents():
-    user = app.request.environ.get('USER')
-    host = app.request.query.get('host', None)
+    query_user = app.request.environ.get('USER')
+    query_host = app.request.query.get('host', None)
+    if not query_host:
+        app.response.status = 400
+        return "Error: 400 Bad Request"
+
+    host = app.datamgr.get_host(query_host, query_user)
     if not host:
-        search = ""
-
-    host = app.datamgr.get_host(host, user)
-
-
-
-
-    return {'search': search, 'user': user }
+        app.response.status = 404
+        return "Error: 404 Not Found\n\tCould not find host: " + query_host
+    parents = host.parents
+    return {'parents': parents}
 
 pages = {
     set_trivial_setting: {
@@ -240,9 +249,7 @@ pages = {
     show_trivial_json: {
         'name': 'trivial', 'route': '/trivial.json', 'search_engine': True
     },
-
-
-
-
-
+    get_parents: {
+        'name': 'parents', 'route': '/trivial/parents', 'method': 'GET', 'search_engine': True
+    },
 }

@@ -2,7 +2,7 @@
 %helper = app.helper
 %search_string = app.get_search_string()
 
-%rebase("layout", title='Trivial for hosts/services', css=['trivial/css/trivial.css', 'trivial/css/cytoscape.js-panzoom.css', 'trivial/css/cytoscape.js-navigator.css'], js=['trivial/js/trivial-commands.js', 'trivial/js/cytoscape-navigator.js', 'trivial/js/cytoscape-panzoom.js', 'trivial/js/trivial-style.js', 'trivial/js/utils.js', 'trivial/js/trivial.js', 'trivial/js/init.js'], breadcrumb=[ ['Trivial All hosts', '/trivial'] ])
+%rebase("layout", title='Trivial for hosts/services', css=['trivial/css/trivial.css', 'trivial/css/cytoscape.js-panzoom.css', 'trivial/css/cytoscape.js-navigator.css'], js=['trivial/js/trivial-commands.js', 'trivial/js/cytoscape-navigator.js', 'trivial/js/cytoscape-panzoom.js', 'trivial/js/trivial-style.js', 'trivial/js/trivial.js', 'trivial/js/init.js'], breadcrumb=[ ['Trivial All hosts', '/trivial'] ])
 
 <input  id="txtSearch" type="hidden" value="{{ search }}">
 
@@ -19,6 +19,7 @@ var username = '{{ user.get_name() }}';
 
 <div id="buttons" class="buttons">
   <button class="btn btn-primary btn-sx" id="load-position">Load Position</button>
+  <button class="btn btn-primary btn-sx" id="load-position-server">Load Position From Server</button>
   <button class="btn btn-primary" id="save-position">Save Position</button>
   <button class="btn btn-primary" id="work-mode">Work Mode</button>
   <button class="btn btn-primary" id="view-mode" style="display: none;">View Mode</button>
