@@ -3,12 +3,12 @@ const getEdgeToParent = node => node._private.edges.filter(edge => node.data().i
 // TODO: Use this in selectPath function
 const getParent = node => getEdgeToParent(node) && cy.$(`#${getEdgeToParent(node).data().target}`)[0];
 // TODO: this does not work
-const setupZoom = async _ => await sleep(300) && cy.zoom(cy.maxZoom() / 20) && cy.center();
+const setupZoom = async _ => {await sleep(500); cy.zoom(0.06936194370526784); (async _ => {await sleep(100); cy.center()})()};
 const sleep = async (ms) => new Promise(resolve => setTimeout(resolve, ms));
 const initButtons = _ => $('#loader').hide() && $('#work-mode, #center, #trivial').show();
 const initNavigator = (options = undefined) => cy.navigator(options);
 const savePosition = async () => alertify.confirm("Do you want to save?", _ => {saveToLocalStorage(); saveToServer()});
-const loadPosition = async (shouldUnlock) => {await loadPositionFromLocalStorage(shouldUnlock); loadPositionFromServer(shouldUnlock)};
+const loadPosition = async (shouldUnlock) => {await sleep(500); await loadPositionFromLocalStorage(shouldUnlock); loadPositionFromServer(shouldUnlock)};
 const elementById = id => cy.getElementById(id.startsWith("#") ? id : `#${id}`);
 const setPositions = data => obEach(data, (k, v) => ele = this.cy.getElementById(k).position(v.position));
 
@@ -49,8 +49,11 @@ function trivial_init(data) {
             console.log("cy::ready []");
             window.cy = this;
             loadPosition()
-                .then(setupZoom)
-                .then(initButtons);
+            .then(initButtons).then(async _ => {
+                await sleep(10);
+                cy.panzoom();
+                initNavigator();
+            }).then(setupZoom);
         },
         boxSelectionEnabled: true,
         maxZoom: 2,
@@ -59,8 +62,7 @@ function trivial_init(data) {
         elements: data,
         layout: LAYOUT1,
     });
-    cy.panzoom();
-    initNavigator();
+    
 
     cy.cxtmenu({
         selector: 'node',
