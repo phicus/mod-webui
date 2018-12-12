@@ -2,7 +2,6 @@ $(function () {
     trivial_search(txtSearch.val());
 });
 
-const navButton = $(".cytoscape-navigator");
 const loadPositionButton = $('#load-position');
 const loadPositionServerButton = $("#load-position-server")
 const savePositionButton = $('#save-position');
@@ -45,12 +44,15 @@ loadPositionServerButton.on('click', () => {
     loadPositionFromServer(true);
 });
 
-miniMap.on('click', () => {console.log("mini map button was clicked! :D"); navButton.toggle()});
+miniMap.on('click', () => {console.log("mini map button was clicked! :D"); $("div.cytoscape-navigator").toggle()});
 
 $(window).on('popstate', function (event) {
     console.log("poping");
     searchs.pop();
-    if (searchs.length === 0) return;
+    if (searchs.length === 0) {
+        history.back();
+        return;
+    };
     console.log("after searchs");
     event.preventDefault();
     event.stopPropagation();
@@ -83,6 +85,7 @@ form.submit(e => {
     console.log(`SEARCH: ${txt}`);
 });
 
+// TODO: rename to clearPathsButton
 crearPathsButton.click(function () {
     // TRICK
     // En algún sitio muy, muy lejano se cambia el estilo de
