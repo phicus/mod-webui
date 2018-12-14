@@ -169,7 +169,7 @@ class MongoDBLogs():
             query.append({'time': {'$lte': range_end}})
 
         query = {'$and': query} if query else None
-        logger.debug("[mongo-logs] Fetching %limit records from database with query: '%s' and offset %s", (limit, query, offset))
+        logger.debug("[mongo-logs] Fetching %s records from database with query: '%s' and offset %s", limit, query, offset)
 
         records = []
         try:
