@@ -492,11 +492,11 @@ class WebUIDataManager(DataManager):
                 contacts = [c for c in self.get_contacts(user=user) if c in group.members]
                 items = list(set(itertools.chain(*[self._only_related_to(items, self.rg.contacts.find_by_name(c)) for c in contacts])))
 
-            if t == 'realm':
-                r = self.get_realm(s)
-                if not r:
-                    return []  # :TODO:maethor:150716: raise an error
-                items = [i for i in items if i.get_realm() == r]
+            # if t == 'realm':
+            #     r = self.get_realm(s)
+            #     if not r:
+            #         return []  # :TODO:maethor:150716: raise an error
+            #     items = [i for i in items if i.get_realm() == r]
 
             if t == 'htag' and s.lower() != 'all':
                 items = [i for i in items if s in i.get_host_tags()]
@@ -1050,43 +1050,43 @@ class WebUIDataManager(DataManager):
     ##
     # Realms
     ##
-    def get_realms(self):
-        items = []
-        if self.alignak:
-            # Request objects from the backend ...
-            # Get only registered (real ...) objects ...
-            parameters = {
-            }
-            if name:
-                parameters = {
-                    'where': json.dumps({
-                        'realm_name': name
-                    })
-                }
-
-            logger.info("[WebUI - datamanager] get_realms, backend parameters: %s", parameters)
-            resp = self.fe.get_objects('contactgroup', parameters=parameters)
-            total = 0
-            if '_meta' in resp:
-                total = int(resp['_meta']['total'])
-                page_number = int(resp['_meta']['page'])
-                logger.info("[WebUI - datamanager] get_realms, total %d realms", total)
-
-            if '_items' in resp:
-                for item in resp['_items']:
-                    logger.info("[WebUI - datamanager] get_realms, found realm: %s", item['name'])
-                    items.append(Realm(item))
-                return self._only_related_to(items, user)
-
-        return self._only_related_to(self.rg.realms, user)
-
-    def get_realm(self, name):
-        try:
-            name = name.decode('utf8', 'ignore')
-        except UnicodeEncodeError:
-            pass
-
-        return self._is_related_to(self.get_realms(user=user, name=name), user)
+    # def get_realms(self):
+    #     items = []
+    #     if self.alignak:
+    #         # Request objects from the backend ...
+    #         # Get only registered (real ...) objects ...
+    #         parameters = {
+    #         }
+    #         if name:
+    #             parameters = {
+    #                 'where': json.dumps({
+    #                     'realm_name': name
+    #                 })
+    #             }
+    #
+    #         logger.info("[WebUI - datamanager] get_realms, backend parameters: %s", parameters)
+    #         resp = self.fe.get_objects('contactgroup', parameters=parameters)
+    #         total = 0
+    #         if '_meta' in resp:
+    #             total = int(resp['_meta']['total'])
+    #             page_number = int(resp['_meta']['page'])
+    #             logger.info("[WebUI - datamanager] get_realms, total %d realms", total)
+    #
+    #         if '_items' in resp:
+    #             for item in resp['_items']:
+    #                 logger.info("[WebUI - datamanager] get_realms, found realm: %s", item['name'])
+    #                 items.append(Realm(item))
+    #             return self._only_related_to(items, user)
+    #
+    #     return self._only_related_to(self.rg.realms, user)
+    #
+    # def get_realm(self, name):
+    #     try:
+    #         name = name.decode('utf8', 'ignore')
+    #     except UnicodeEncodeError:
+    #         pass
+    #
+    #     return self._is_related_to(self.get_realms(user=user, name=name), user)
 
     ##
     # Shinken program and daemons
