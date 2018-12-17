@@ -1,14 +1,11 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-from shinken.log import logger
-from shinken.misc.perfdata import PerfDatas
-from shinken.objects.service import Service
-from shinken.objects.host import Host
-
+import re
 from collections import OrderedDict
 
-import re
+from shinken.misc.perfdata import PerfDatas
+from shinken.objects.host import Host
 
 app = None
 

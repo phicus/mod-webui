@@ -158,7 +158,6 @@ class AuthMetaModule(MetaModule):
         if not c:
             logger.error("[WebUI-auth-cfg-password] You need to have a contact having the same name as your user: %s", username)
             return False
-        p = None
         if isinstance(c, dict):
             p = c.get('password', None)
         else:

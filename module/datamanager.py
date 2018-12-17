@@ -25,26 +25,16 @@
 # along with Shinken.  If not, see <http://www.gnu.org/licenses/>.
 
 
-import re
-import json
 import itertools
+import json
+import re
 import time
+
 from shinken.log import logger
-
 from shinken.misc.datamanager import DataManager
-from shinken.objects.contact import Contact
-
+from shinken.misc.sorter import worse_first
 # Import all objects we will need
-from shinken.objects.host import Host, Hosts
-from shinken.objects.hostgroup import Hostgroup, Hostgroups
-from shinken.objects.service import Service, Services
-from shinken.objects.servicegroup import Servicegroup, Servicegroups
-from shinken.objects.contact import Contact, Contacts
-from shinken.objects.contactgroup import Contactgroup, Contactgroups
-from shinken.objects.notificationway import NotificationWay, NotificationWays
-from shinken.objects.timeperiod import Timeperiod, Timeperiods
-from shinken.objects.command import Command, Commands
-from shinken.misc.sorter import worse_first, last_state_change_earlier
+from shinken.objects.contact import Contact
 
 
 class WebUIDataManager(DataManager):

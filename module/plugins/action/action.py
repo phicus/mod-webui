@@ -90,11 +90,6 @@ def get_page(cmd=None):
         logger.error("[WebUI-actions] unknown command: %s", cmd_name)
         return forge_response(callback, 404, 'Unknown command %s' % cmd_name)
 
-    try:
-        extcmd = u"[%s] %s" % (now, ';'.join(elts))
-    except UnicodeDecodeError as e:
-        extcmd = "[%s] %s" % (now, ';'.join(elts))
-
     logger.info("[JUAN-DEBUG] %s.", extcmd)
     # Expand macros
     extcmd = expand_macros(extcmd)

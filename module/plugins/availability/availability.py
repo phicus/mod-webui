@@ -50,7 +50,6 @@ def get_element(name):
     name = urllib.unquote(name)
     elt = app.datamgr.get_element(name, user) or app.redirect404()
 
-    records = []
     today = arrow.now().replace(hour=0,minute=0,second=0)
     records = OrderedDict()
     records['Today'] = _get_availability(elt=elt, range_start=today.timestamp)

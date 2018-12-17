@@ -4,11 +4,11 @@
 
 import time
 import urllib
-from urlparse import urlparse
 
 from shinken.log import logger
 
 from .metamodule import MetaModule
+
 
 class GraphsMetaModule(MetaModule):
 

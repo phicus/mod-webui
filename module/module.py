@@ -64,7 +64,6 @@ except ImportError as err:
 # Alignak
 if ALIGNAK:
     from alignak.basemodule import BaseModule
-    from alignak.message import Message
     from regenerator import Regenerator
 
     # Shinken logger configuration
@@ -75,7 +74,6 @@ if ALIGNAK:
 else:
     # Shinken import
     from shinken.basemodule import BaseModule
-    from shinken.message import Message
     from shinken.misc.regenerator import Regenerator
 
     # Shinken logger configuration
@@ -87,7 +85,7 @@ from shinken.daemon import Daemon
 from shinken.util import to_bool
 
 # Bottle import
-from bottle import route, request, response, template
+from bottle import request, response
 import bottle
 
 # Local import

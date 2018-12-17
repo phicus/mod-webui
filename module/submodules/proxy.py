@@ -2,11 +2,10 @@
 # -*- coding: utf-8 -*-
 # vim: ai ts=4 sts=4 et sw=4 nu
 
-import traceback
-
 from shinken.log import logger
 
 from .metamodule import MetaModule
+
 
 class ProxyMetaModule(MetaModule):
 

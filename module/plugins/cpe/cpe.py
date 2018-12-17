@@ -25,13 +25,10 @@
 # along with Shinken.  If not, see <http://www.gnu.org/licenses/>.
 
 import time
+
 import yaml
-
-from shinken.log import logger
-from shinken.external_command import ExternalCommand, ExternalCommandManager
-
-from libkrill.kws.datamanager import KwsDataManager
 from libkrill.config import Config as KrillConfig
+from libkrill.kws.datamanager import KwsDataManager
 
 # Will be populated by the UI with it's own value
 app = None
@@ -39,7 +36,6 @@ app = None
 
 # Our page
 def show_cpe(cpe_name):
-
     kc = KrillConfig('/etc/krill')
     datamanager = KwsDataManager(kc.kws_list or [])
 
@@ -51,9 +47,9 @@ def show_cpe(cpe_name):
     user = app.bottle.request.environ['USER']
 
     # if not cpe_name.startswith('cpe'):
-        # app.redirect404()
+    # app.redirect404()
 
-    cpe = app.datamgr.get_host(cpe_name, user) #or app.redirect404()
+    cpe = app.datamgr.get_host(cpe_name, user)  # or app.redirect404()
 
     try:
         if not cpe:
@@ -71,7 +67,6 @@ def show_cpe(cpe_name):
     maxtime = int(time.time())
     mintime = maxtime - 7 * 24 * 3600
 
-
     try:
         with open("/etc/krill/cpe_models.yml", 'r') as stream:
             models = yaml.load(stream)
@@ -88,9 +83,7 @@ def show_cpe(cpe_name):
     return {'cpe': cpe, 'parent': parent, 'mintime': mintime, 'maxtime': maxtime, 'model': model}
 
 
-
 def show_quick_services(cpe_name):
-
     cpe = None
     parent = None
 
@@ -99,7 +92,7 @@ def show_quick_services(cpe_name):
     user = app.bottle.request.environ['USER']
 
     # if not cpe_name.startswith('cpe'):
-        # app.redirect404()
+    # app.redirect404()
 
     cpe = app.datamgr.get_host(cpe_name, user) or app.redirect404()
 
@@ -115,15 +108,12 @@ def show_quick_services(cpe_name):
 
     return {'cpe': cpe, 'parent': parent, 'mintime': mintime, 'maxtime': maxtime}
 
+
 def show_quick(cpe_name):
-
-    cpe = None
-    parent = None
-
     ''' Mostrar la ficha del CPE con nombre cpe_name.'''
     # Ok, we can lookup it
     user = app.bottle.request.environ['USER']
-    host = app.datamgr.get_host(host_name, user) or app.redirect404()
+    host = app.datamgr.get_host(cpe_name, user) or app.redirect404()
 
     return {'host': host}
 
@@ -134,7 +124,7 @@ pages = {
     },
 
     show_quick: {
-    'name': 'Quick', 'route': '/cpe/quick/:host_name', 'view': 'quick', 'static': True,
+        'name': 'Quick', 'route': '/cpe/quick/:host_name', 'view': 'quick', 'static': True,
     },
 
     show_quick_services: {

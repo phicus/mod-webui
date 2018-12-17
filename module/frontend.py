@@ -23,38 +23,25 @@
     Interface to the Alignak backend
 """
 
-import os
+import json
 import time
 import traceback
-import logging
-
-import json
-
-
-# Import all objects we will need
-from shinken.objects.host import Host, Hosts
-from shinken.objects.hostgroup import Hostgroup, Hostgroups
-from shinken.objects.service import Service, Services
-from shinken.objects.servicegroup import Servicegroup, Servicegroups
-from shinken.objects.contact import Contact, Contacts
-from shinken.objects.contactgroup import Contactgroup, Contactgroups
-from shinken.objects.notificationway import NotificationWay, NotificationWays
-from shinken.objects.timeperiod import Timeperiod, Timeperiods
-from shinken.objects.command import Command, Commands
-from shinken.objects.config import Config
-from shinken.objects.schedulerlink import SchedulerLink, SchedulerLinks
-from shinken.objects.reactionnerlink import ReactionnerLink, ReactionnerLinks
-from shinken.objects.pollerlink import PollerLink, PollerLinks
-from shinken.objects.brokerlink import BrokerLink, BrokerLinks
-from shinken.objects.receiverlink import ReceiverLink, ReceiverLinks
 
 # Import specific modules
 import requests
-
 # import alignak_backend_client.client
 from alignak_backend_client.client import Backend, BackendException
-
 from shinken.log import logger
+from shinken.objects.command import Command, Commands
+from shinken.objects.contact import Contact, Contacts
+from shinken.objects.contactgroup import Contactgroup, Contactgroups
+# Import all objects we will need
+from shinken.objects.host import Host, Hosts
+from shinken.objects.hostgroup import Hostgroup, Hostgroups
+from shinken.objects.notificationway import NotificationWays
+from shinken.objects.service import Service, Services
+from shinken.objects.servicegroup import Servicegroup, Servicegroups
+from shinken.objects.timeperiod import Timeperiod, Timeperiods
 
 
 class FrontEnd(object):

@@ -24,10 +24,14 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with Shinken.  If not, see <http://www.gnu.org/licenses/>.
 
-import os,sys,re
-from shinken.misc.perfdata import PerfDatas
+import os
+import re
+
 from shinken.log import logger
+from shinken.misc.perfdata import PerfDatas
+
 from webui2.config_parser import config_parser
+
 plugin_name = os.path.splitext(os.path.basename(__file__))[0]
 
 ### Will be populated by the UI with it's own value

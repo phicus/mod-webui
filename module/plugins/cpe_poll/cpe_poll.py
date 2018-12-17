@@ -5,9 +5,6 @@
 
 import time
 
-from shinken.log import logger
-from shinken.external_command import ExternalCommand, ExternalCommandManager
-
 from shinken.brok import Brok
 
 # Will be populated by the UI with it's own value
