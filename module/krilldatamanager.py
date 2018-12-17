@@ -4,6 +4,9 @@
 from datamanager import WebUIDataManager
 from shinken.log import logger
 import re
+import operator
+from shinken.misc.perfdata import PerfDatas
+
 
 class KrillUIDataManager(WebUIDataManager):
 
