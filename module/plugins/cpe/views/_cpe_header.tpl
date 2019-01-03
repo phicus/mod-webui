@@ -50,6 +50,14 @@
             <span style="color: #E65100" alt="Disabled Internet access" title="CPE disabled"><i class="fa fa-thumbs-down text-danger"></i><!--Disabled Internet access--></span>
             %end
 
+            %tv_profile = str(cpe.customs.get('_TV_PROFILE') if hasattr(cpe,'customs') else "")
+            %if 'catv' in tv_profile:
+            <span style="color: green" alt="Enabled CATV" title="Enabled CATV"><i class="fa fa-tv"></i><!--Internet access--></span>
+            %end
+            %if 'iptv' in tv_profile:
+            <span style="color: blue" alt="Enabled IPTV" title="Enabled IPTV"><i class="fa fa-tv"></i><!--Internet access--></span>
+            %end
+
             <span style="color: #9E9E9E"><i class="fa fa-arrow-circle-o-down"></i>{{cpe.customs.get('_DOWNSTREAM')}}</span>
             <span style="color: #9E9E9E"><i class="fa fa-arrow-circle-o-up"></i>{{cpe.customs.get('_UPSTREAM')}}</span>
 
