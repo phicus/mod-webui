@@ -216,8 +216,11 @@ function updateGraphs(data) {
   }
 
   if (typeof data.catvrx != 'undefined') {
+    if (typeof plotData.rx[2] === 'undefined') {
+      plotData.rx[2] = {data: [], color: "green"}
+    }
     plotData.rx[2].data.push([ Date.now() , data.catvrx ])
-    plotData.rx[2].label = "TvRx: " + Math.roundTo(data.catvrx, -2) + " dbm"
+    plotData.rx[2].label = "CATV: " + Math.roundTo(data.catvrx, -2) + " dbm"
   }
 
   if (typeof data.ccq != 'undefined') {
