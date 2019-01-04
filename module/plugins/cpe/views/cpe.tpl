@@ -190,6 +190,10 @@ function poll_cpe() {
               $('#ccq').html(data.ccq + "%").show()
             }
 
+            if (typeof data.catvrx !== 'undefined') {
+              $('#ccq').html("CATV:" + data.catvrx + "").show()
+            }
+
             if (typeof data.uptime === 'string') {
               d1 = Date.parse(data.uptime);
               console.log(d1)

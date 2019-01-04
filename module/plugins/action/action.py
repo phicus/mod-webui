@@ -89,9 +89,13 @@ def get_page(cmd=None):
     if cmd_name not in ExternalCommandManager.commands:
         logger.error("[WebUI-actions] unknown command: %s", cmd_name)
         return forge_response(callback, 404, 'Unknown command %s' % cmd_name)
-
-    logger.info("[JUAN-DEBUG] %s.", extcmd)
     # Expand macros
+
+    try:
+        extcmd = u"[%s] %s" % (now, ';'.join(elts))
+    except UnicodeDecodeError as e:
+        extcmd = "[%s] %s" % (now, ';'.join(elts))
+
     extcmd = expand_macros(extcmd)
     e = ExternalCommand(extcmd)
     app.push_external_command(e)

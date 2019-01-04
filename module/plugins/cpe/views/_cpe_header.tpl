@@ -114,7 +114,7 @@
             <button id="btn-reboot" type="button" class="btn btn-default" {{'disabled' if not reboot_available else ''}} ><i class="fa fa-refresh" aria-hidden="true"></i>&nbsp; Reboot</button>
             %end
             %if hasattr(cpe, 'cpe_connection_request_url'):
-            <button id="btn-tr069"       type="button" class="btn btn-default" {{'disabled' if not tr069_available else  ''}} ><i class="fa fa-gears" aria-hidden="true"></i>&nbsp; Reconfig</button>
+            <button id="btn-tr069" type="button" class="btn btn-default" {{'disabled' if not tr069_available else  ''}} ><i class="fa fa-gears" aria-hidden="true"></i>&nbsp; Reconfig</button>
             %end
 
 

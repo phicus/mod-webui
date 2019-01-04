@@ -215,6 +215,11 @@ function updateGraphs(data) {
     plotData.rx[1].label = "UpRx (AP): " + Math.roundTo(data.uprx, -2) + " dbm"
   }
 
+  if (typeof data.catvrx != 'undefined') {
+    plotData.rx[2].data.push([ Date.now() , data.catvrx ])
+    plotData.rx[2].label = "TvRx: " + Math.roundTo(data.catvrx, -2) + " dbm"
+  }
+
   if (typeof data.ccq != 'undefined') {
     plotData.ccq[0].data.push([ Date.now(), data.ccq ])
     plotData.ccq[0].label = "CCQ: " + data.ccq + "%"
