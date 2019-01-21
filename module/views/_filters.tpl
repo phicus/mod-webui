@@ -69,7 +69,7 @@
                 <span class="btn fa fa-table"></span>Minemap</a></li>
               <li><a role="menuitem" href="/wall?search={{ app.get_search_string() }}">
                 <span class="btn fa fa-th-large"></span>Wall</a></li>
-              <li><a role="menuitem" href="/technical?search={{ app.get_search_string() }}">
+              <li><a role="menuitem" href="/matrix?search={{ app.get_search_string() }}">
                 <span class="btn fa fa-th"></span>Matrix</a></li>
               <li><a role="menuitem" href="/trivial?search={{ app.get_search_string() }}">
                 <span class="btn fa fa-code-fork"></span>Trivial</a></li>

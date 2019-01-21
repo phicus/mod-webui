@@ -233,7 +233,7 @@ function enable_refresh() {
 
 $(document).ready(function(){
    // Start refresh periodical check ...
-   setInterval("check_refresh();", app_refresh_period * 1000);
+   window.auto_refresh = setInterval("check_refresh();", app_refresh_period * 1000);
 
    // Toggle refresh ...
    $('body').on("click", '.js-toggle-page-refresh', function (e, data) {

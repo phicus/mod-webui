@@ -2,6 +2,21 @@
 
 }
 
+.hoststate0 {background-color: #5bb75b; color: #fff;}
+.hoststate1 {background-color: #da4f49; color: #fff;}
+.hoststate2 {background-color: #faa732; color: #fff;}
+.hoststate3 {background-color: #49afcd; color: #fff;}
+.hoststate0 a { color: #fff; }
+.hoststate1 a { color: #fff; }
+.hoststate2 a { color: #fff; }
+.hoststate3 a { color: #fff; }
+td.highlight { background-color: whitesmoke !important; }
+
+.blue   { background-color:#0051BA !important; }
+.green  { background-color:#008751 !important; }
+.gray   { background-color:#919693 !important; }
+.yellow { background-color:#FFC61E !important; }
+
 
 .host_name {
   overflow: hidden;
@@ -13,4 +28,49 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+
+#loader.loading {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 1;
+  width: 150px;
+  height: 150px;
+  margin: -75px 0 0 -75px;
+  border: 16px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 16px solid #005A4E;
+  -webkit-animation: spin 2s linear infinite;
+  animation: spin 2s linear infinite;
+}
+
+#loader.loading * {
+  display: none;
+}
+
+#loader.error {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 1;
+  width: 350px;
+  height: 150px;
+  margin: -175px 0 0 -175px;
+  font-size:100px;
+  color: #faa732;
+  text-align: center;
+}
+
+#loader.error h1 {
+  border: 8px solid #faa732;
+  padding: 5px;
+}
+
+
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
