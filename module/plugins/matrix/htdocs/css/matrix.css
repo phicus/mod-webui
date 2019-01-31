@@ -10,12 +10,20 @@
 .hoststate1 a { color: #fff; }
 .hoststate2 a { color: #fff; }
 .hoststate3 a { color: #fff; }
+
 td.highlight { background-color: whitesmoke !important; }
 
 .blue   { background-color:#0051BA !important; }
 .green  { background-color:#008751 !important; }
 .gray   { background-color:#919693 !important; }
 .yellow { background-color:#FFC61E !important; }
+
+td.servicestate0 {border-bottom: 2px solid #C5E1A5 !important;}
+td.servicestate1 {border-bottom: 2px solid #FFE082 !important;}
+td.servicestate2 {border-bottom: 2px solid #ef9a9a !important;}
+td.servicestate3 {border-bottom: 2px solid #80DEEA !important;}
+td.servicestateU {border-bottom: 2px solid #ececec !important; /* background-color: #ececec !important;*/}
+
 
 
 .host_name {

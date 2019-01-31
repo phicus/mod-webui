@@ -103,9 +103,10 @@ function processMetric(m) {
 
 
 var draw_matrix_table = function( data, parent, options ) {
-  _cache = data;
-  _options = {};
-  _defaults = {simple: false};
+  var _cache = data;
+  var _options = {};
+  var _defaults = {simple: false};
+  var _defs = [ { "visible": false, "targets": [] } ];
 
   if(options) {
     _options = $.extend(_defaults, options);
@@ -130,9 +131,10 @@ var draw_matrix_table = function( data, parent, options ) {
   row = row + '</tr><tr>';
   row = row + '<th>Host</th>';
 
-
+  n = 0;
   $.each(data.groups, function(k,v){
      $.each(v, function(kk,vv){
+       n++;
        _headers.push(vv)
        _sort = vv.substr(0,3);
        _sort2 = vv.substr(0,2);
@@ -146,6 +148,10 @@ var draw_matrix_table = function( data, parent, options ) {
            _sort = vv.replace(c,'');
          }
        });
+
+       if(vv == "version" || vv == "runmodel") {
+          _defs[0].targets.push(n);
+       }
 
        if(vv == "reg" || vv == "uptime" || vv == "ruptime" || vv == "luptime" ) {
          row = row + '<th class="'+_class+'" style="width: 40px; override: hidden"><span title="'+vv+'" alt="'+vv+'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' + vv + '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></th>';
@@ -163,7 +169,19 @@ var draw_matrix_table = function( data, parent, options ) {
   $.each(data.data, function(k,v){
       row = "<tr>";
       $.each(_headers, function(kk,i){
-        cell = v[i]
+        cell = v[i];
+        klass="";
+
+        $.each(data.groups, function(_service,_values){
+          if(_values.includes(i)) {
+            if( _service != "host" && typeof v.services === "object" && v.services.hasOwnProperty(_service)) {
+              klass="servicestate"+v.services[_service].state_id;
+            }
+          }
+        });
+
+
+
         if ( i == "host" ) {
           row = row + '<td class="hoststate' + v.state_id +'"">'
           + '<a href="/cpe/' + cell +'">'
@@ -177,11 +195,11 @@ var draw_matrix_table = function( data, parent, options ) {
           + '<span>' + v.reg + '</span>'
           + '</a></td>';
         } else if ( cell instanceof Object ) {
-          row = row + '<td data-order="' + Math.round(cell.value) + '" onmouseover="g(\''+host+'\',\''+cell.name+'\')">' + processMetric(cell) +'</td>';
+          row = row + '<td class="'+klass+'" data-order="' + Math.round(cell.value) + '" onmouseover="g(\''+host+'\',\''+cell.name+'\')">' + processMetric(cell) +'</td>';
         } else if ( typeof cell === "undefined"){
-          row = row + '<td data-order="0">-</td>';
+          row = row + '<td class="'+klass+'" data-order="0">&nbsp;</td>';
         } else {
-          row = row + '<td data-order="0">' + cell + '</td>';
+          row = row + '<td class="'+klass+'" data-order="'+cell+'">' + cell + '</td>';
         }
       });
 
@@ -194,6 +212,7 @@ var draw_matrix_table = function( data, parent, options ) {
 
   $(parent).append(_table);
 
+  console.log(_defs);
 
   if(_options.simple) {
     _table.DataTable( {
@@ -208,6 +227,7 @@ var draw_matrix_table = function( data, parent, options ) {
   } else {
     _table.DataTable( {
       autoFill: true,
+      columnDefs: _defs,
       lengthMenu: [[25, 50, 100, -1], [25, 50, 100, "All"]],
       searching: true,
       pageLength: 25,
@@ -217,21 +237,72 @@ var draw_matrix_table = function( data, parent, options ) {
       "<'row'<'col-sm-12'tr>>" +
       "<'row'<'col-sm-5'i><'col-sm-7'p>>",
 
-
       buttons: [
-          'copy', 'csv', 'excel', 'pdf',
+        {
+          extend: 'pageLength',
+          className: 'btn btn-xs'
+        }, {
+           extend: 'csv',
+           header: true,
+           footer: false,
+           fieldBoundary: '"',
+           fieldSeparator: ";",
+           extension: ".csv",
+           exportOptions: {
+              columns: ':visible',
+              modifier: {
+                 search: 'none'
+              }
+           },
+           className: 'btn btn-xs'
+        },{
+          extend: 'excel',
+          header: true,
+          footer: false,
+          extension: ".xlsx",
+          exportOptions: {
+             columns: ':visible',
+             modifier: {
+                search: 'none'
+             }
+          },
+          className: 'btn btn-xs'
+       },{
+          extend: 'pdf',
+          header: true,
+          footer: false,
+          extension: ".pdf",
+          orientation: 'landscape',
+          pageSize: 'A4',
+          exportOptions: {
+             columns: ':visible',
+             modifier: {
+                search: 'none'
+             }
+          },
+          className: 'btn btn-xs'
+       }, {
+        text: 'Toggle Display Name',
+        action: function ( e, dt, button, config ) {
+          $('.display_name').toggleClass('hidden');
+          $('.host_name').toggleClass('hidden');
+        },
+        className: 'btn btn-xs'
+       }, {
+        text: 'Expand Info',
+        action: function ( e, dt, button, config ) {
+          e.preventDefault();
+          var column = dt.column( 1 );
+          column.visible( ! column.visible() );
+          },
+        className: 'btn btn-xs'
+        }
       ],
 
 
     });
 
-    _table.button().add( 0, {
-      action: function ( e, dt, button, config ) {
-        $('.display_name').toggleClass('hidden');
-        $('.host_name').toggleClass('hidden');
-      },
-      text: 'Toggle Display Name'
-    } );
+
   }
 
 

@@ -9,7 +9,7 @@ from shinken.objects.host import Host
 
 app = None
 
-def _metric_to_json(m):
+def _metric_to_dict(m):
     return dict(name=m.name, value=m.value, uom=m.uom, warning=m.warning, critical=m.critical, min=m.min, max=m.max)
 
 
@@ -75,12 +75,13 @@ def show_matrix_json():
 
             hosts[_host]['state_id'] = h.state_id
             hosts[_host]['display_name'] = h.display_name
+            hosts[_host]['services'] = {}
 
 
         if hasattr(h,'perf_data'):
             perfdatas = PerfDatas(h.perf_data)
             for m in perfdatas:
-                _metric = _metric_to_json(m)
+                _metric = _metric_to_dict(m)
                 _name  = _metric.get('name')
                 p = re.compile(r"\w+\d+")
                 if p.search(_name):
@@ -99,13 +100,35 @@ def show_matrix_json():
             hosts[_host]['reg'] = h.address
 
         for s in h.services:
+
             _group = s.get_name()
+            hosts[_host]['services'][_group]=dict(state_id=s.state_id)
             if not _groups.get(_group):
                 _groups[_group] = list()
+            
+            if _group == 'info' and s.state_id == 0:
+                info_metrics = re.split("\s*(\w+):", s.output)
+                if len(info_metrics) < 2:
+                    continue
+
+                if len(info_metrics) % 2 == 1:
+                    info_metrics = info_metrics[1:]
+
+                _ = iter(info_metrics)
+                _metrics = dict([ (i, next(_)) for i in _ ])
+
+                for _name,_value in _metrics.iteritems():
+                    hosts[_host][_name] = _value
+                    if not _name in _headers:
+                        _headers.add(_name)
+                        _groups[_group].append(_name)
 
             perfdatas = PerfDatas(s.perf_data)
             for m in perfdatas:
-                _metric = _metric_to_json(m)
+                _metric = _metric_to_dict(m)
+                _metric.update(service_state_id=s.state_id)
+                _metric.update(service=_group)
+                
                 _name  = _metric.get('name')
                 p = re.compile(r"\w+\d+")
                 if p.search(_name):
