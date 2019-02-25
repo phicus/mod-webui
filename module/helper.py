@@ -622,7 +622,10 @@ class Helper(object):
                 s += """ is <span class="font-%s"><strong>%s</strong></span>""" % (svc.state.lower(), svc.state)
                 s += " since %s" % self.print_duration(svc.last_state_change, just_duration=True, x_elts=2)
                 if show_output:
-                    s += ": %s" % (svc.output)
+                    regex = r"(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})"
+                    subst = "<a href=\"http://\\1\">\\1</a>"
+                    output = re.sub(regex, subst, svc.output, 0, re.MULTILINE)
+                    s += ": %s" % (output)
                 s += "</li>"
             s += "</ul></li>"
         else:
