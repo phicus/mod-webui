@@ -102,9 +102,9 @@
 
             %tech = str(cpe.customs.get('_TECH') if hasattr(cpe,'customs') else cpe.tech)
 
-            %if False and tech in ('wifi'):
+            %if True and tech in ('wifi'):
             <button id="btn-update" type="button" class="btn btn-default"><i class="fa fa-arrow-up" aria-hidden="true"></i>&nbsp; Update</button>
-            <button id="btn-backup" type="button" class="btn btn-default"><i class="fa fa-save" aria-hidden="true"></i>&nbsp; Backup</button>
+            <a href="/cpe/{{ cpe.host_name }}/backup" id="btn-backup" type="button" class="btn btn-default"><i class="fa fa-save" aria-hidden="true"></i>&nbsp; Backup</a>
             %end
             %if tech in ('gpon'):
             <button id="btn-unprovision" type="button" class="btn btn-default" {{'disabled' if not reboot_available else ''}} ><i class="fa fa-reply" aria-hidden="true"></i>&nbsp; Unprovision</button>

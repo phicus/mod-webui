@@ -117,6 +117,14 @@ def show_quick(cpe_name):
 
     return {'host': host}
 
+def backup(cpe_name):
+    ''' Mostrar la ficha del CPE con nombre cpe_name.'''
+    # Ok, we can lookup it
+    user = app.bottle.request.environ['USER']
+    host = app.datamgr.get_host(cpe_name, user) or app.redirect404()
+
+    return "toma caracola"
+
 
 pages = {
     show_cpe: {
@@ -129,6 +137,10 @@ pages = {
 
     show_quick_services: {
         'name': 'QuickServices', 'route': '/cpe/quickservices/:cpe_name', 'view': 'quickservices', 'static': True,
+    },
+
+    backup: {
+        'name': 'Backup', 'route': '/cpe/:cpe_name/backup',
     }
 
 }
