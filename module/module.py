@@ -438,6 +438,11 @@ class Webui_broker(BaseModule, Daemon):
         self.graphs_module = GraphsMetaModule(GraphsMetaModule.find_modules(self.modules_manager.get_internal_instances()), self)
         self.helpdesk_module = HelpdeskMetaModule(HelpdeskMetaModule.find_modules(self.modules_manager.get_internal_instances()), self)
     
+        logger.info("[WebUI-module] auth_module {}".format(type(self.auth_module)))
+        logger.info("[WebUI-module] logs_module {}".format(type(self.logs_module)))
+        
+
+
         # Data managery
         try:
             from krilldatamanager import KrillUIDataManager

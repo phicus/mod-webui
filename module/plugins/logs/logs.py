@@ -239,25 +239,7 @@ def get_host_events(name):
     name = urllib.unquote(name)
     elt = app.datamgr.get_element(name, user) or app.redirect404()
     events = _get_events(elt)
-
-    records = []
-    for log in events:
-        message = log['message']
-        m = re.search(r"\[(\d+)\] (.*)", message)
-        if m and m.group(2):
-            message = m.group(2)
-
-        records.append({
-            "timestamp":    int(log["time"]),
-            "host":         log['host_name'],
-            "service":      log['service_description'],
-            "message":      message,
-            "state":        log['state'],
-            "state_type":   log['state_type'],
-            "type":         log['type']
-        })
-
-    return json.dumps(records)
+    return json.dumps(events)
 
 
 
