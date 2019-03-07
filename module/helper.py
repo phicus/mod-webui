@@ -623,7 +623,7 @@ class Helper(object):
                 s += " since %s" % self.print_duration(svc.last_state_change, just_duration=True, x_elts=2)
                 if show_output:
                     regex = r"(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})"
-                    subst = "<a href=\"http://\\1\">\\1</a>"
+                    subst = "<a href=\"http://$PROXY_PREFIX\\1.$PROXY_SUFIX\">\\1</a>"
                     output = re.sub(regex, subst, svc.output, 0, re.MULTILINE)
                     s += ": %s" % (output)
                 s += "</li>"

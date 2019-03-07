@@ -417,7 +417,10 @@ $("[data-type='host']").each(function(key, value){
 
          $('#search').val( _txt  );
       });
-      $('#quickservices').html( html );
+      $('#quickservices').html( $(html).html()
+            .replace(/\$PROXY_SUFIX/g,proxy_sufix)
+            .replace(/\$PROXY_PREFIX/g,proxy_prefix)
+       );
 
 
       // $('#quickservices li').on('click', function(){
