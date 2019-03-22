@@ -115,7 +115,19 @@ def show_quick(cpe_name):
     user = app.bottle.request.environ['USER']
     host = app.datamgr.get_host(cpe_name, user) or app.redirect404()
 
-    return {'host': host}
+    #worst service
+    worst_service_id = 0
+
+    data = {
+        'state': host.state,
+        'state_id': host.state_id,
+        'worst_state_id': max(s.state_id for s in host.services if s.state_id < 3)
+    }
+
+    return data
+
+
+    { 'status': host.state, 'status_id': host.state_id }
 
 def backup(cpe_name):
     ''' Mostrar la ficha del CPE con nombre cpe_name.'''
@@ -132,7 +144,7 @@ pages = {
     },
 
     show_quick: {
-        'name': 'Quick', 'route': '/cpe/quick/:host_name', 'view': 'quick', 'static': True,
+        'name': 'Quick', 'route': '/cpe/quick/:cpe_name',
     },
 
     show_quick_services: {

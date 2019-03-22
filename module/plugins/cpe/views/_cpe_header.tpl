@@ -36,7 +36,7 @@
         %if cpe.customs.get('_CPE_ID'):
         <div style="font-size: 22px">{{ cpe.customs.get('_CUSTOMER_NAME')}} {{cpe.customs.get('_CUSTOMER_SURNAME')}}</div>
         <div style="font-size: 18px; color: #666; white-space:normal;">
-            <a href="/cpe/{{ cpe.cpe_registration_host }}" data-type="registration-host">{{ cpe.cpe_registration_host }}</a><span>/</span><a href="/all?search=type:host {{cpe.cpe_registration_id}}" data-type="registration-id">{{ cpe.cpe_registration_id }}</a><span>:</span><span id="registration_state"><i class="fa fa-spinner fa-spin"></i> <!--{{cpe.cpe_registration_state}}--></span>
+            <a href="/cpe/{{ cpe.cpe_registration_host }}" data-type="registration-host">{{ cpe.cpe_registration_host }}</a><span><span data-type="registration-host-state"></span><span>/</span><a href="/all?search=type:host {{cpe.cpe_registration_id}}" data-type="registration-id">{{ cpe.cpe_registration_id }}</a><span>:</span><span id="registration_state"><i class="fa fa-spinner fa-spin"></i> <!--{{cpe.cpe_registration_state}}--></span>
         </div>
         <div style="font-size: 18px; color: #999;">
             %if cpe.customs.get('_ACTIVE') == '1':

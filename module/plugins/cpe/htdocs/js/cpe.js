@@ -108,8 +108,21 @@ var Krill = {
   	} else if ( val == 3 ) {
   		return COLOR_UNKONWN;
   	}
-
   },
+
+
+  getColorHostState: function(val) {
+    if(val == 0) {
+        return COLOR_OK;
+    } else if ( val == 1 ) {
+        return COLOR_WARNING;
+    } else if ( val == 2 ) {
+        return COLOR_CRITICAL;
+    } else if ( val == 3 ) {
+        return COLOR_UNKONWN;
+    }
+   },
+
 
   parsePerfdata: function(perfdata) {
     var parsed = [];
@@ -228,6 +241,13 @@ var COLOR_WARNING   = '#FAA732';
 var COLOR_CRITICAL  = '#FF7043';
 var COLOR_UNKONWN   = '#49AFCD';
 
+
+var COLOR_UP           = '#8BC34A';
+var COLOR_DOWN         = '#FF7043';
+var COLOR_UNREACHABLE  = '#FAA732';
+var COLOR_UNKONWN      = '#49AFCD';
+
+
 function getHTMLState(val) {
 	if(val == 0) {
 		return ICON_OK;
@@ -264,6 +284,19 @@ function getColorState(val) {
 		return COLOR_UNKONWN;
 	}
 
+}
+
+
+function getHostColorState(val) {
+	if(val == 0) {
+		return COLOR_UP;
+	} else if ( val == 1 ) {
+		return COLOR_DOWN;
+	} else if ( val == 2 ) {
+		return COLOR_UNREACHABLE;
+	} else if ( val == 3 ) {
+		return COLOR_UNKONWN;
+	}
 }
 
 
