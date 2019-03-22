@@ -143,11 +143,12 @@ function check_cpe_registration_host(){
     if( data.worst_state_id == 1) {
       $('[data-type="registration-host-state"]').html('<i class="fa fa-exclamation-triangle"></i>')
       $('[data-type="registration-host-state"]').css('color', getColorState(data.worst_state_id) );
-    }
-
-    if( data.worst_state_id == 2) {
+    } else if( data.worst_state_id == 2) {
       $('[data-type="registration-host-state"]').html('<i class="fa fa-exclamation-triangle"></i>')
       $('[data-type="registration-host-state"]').css('color', getColorState(data.worst_state_id) );
+    } else {
+      $('[data-type="registration-host-state"]').html('')
+      
     }
 
     console.log(data);
