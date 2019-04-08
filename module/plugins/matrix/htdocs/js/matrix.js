@@ -106,7 +106,7 @@ var draw_matrix_table = function( data, parent, options ) {
   var _cache = data;
   var _options = {};
   var _defaults = {simple: false};
-  var _defs = [ { "visible": false, "targets": [] } ];
+  var _defs = [ { "visible": false, "targets": [1] } ];
 
   if(options) {
     _options = $.extend(_defaults, options);
@@ -122,14 +122,14 @@ var draw_matrix_table = function( data, parent, options ) {
     data.groups['host'].push('reg');
   }
 
-  row = '<thead><tr><th></th>';
+  row = '<thead><tr><th colspan="2"></th>';
   $.each(data.groups, function(k,v){
      if (v.length > 0) {
        row = row + '<th colspan="'+v.length+'">' + k + "</th>";
      }
   });
   row = row + '</tr><tr>';
-  row = row + '<th>Host</th>';
+  row = row + '<th>Host</th><th>Long</th>';
 
   n = 0;
   $.each(data.groups, function(k,v){
@@ -186,8 +186,9 @@ var draw_matrix_table = function( data, parent, options ) {
           row = row + '<td class="hoststate' + v.state_id +'"">'
           + '<a href="/cpe/' + cell +'">'
           + '<span class="host_name">' + cell + '</span>'
-          + '<span class="display_name hidden">' + v.display_name + '</span>'
-          + '</a></td>';
+          + '</a></td><td class="log_name">'
+          + '<span class="display_name">' + v.display_name + '</span>'
+          + '</td>';
           host = cell;
         } else if ( i == "reg" ) {
           row = row + '<td>'
@@ -284,8 +285,7 @@ var draw_matrix_table = function( data, parent, options ) {
        }, {
         text: 'Toggle Display Name',
         action: function ( e, dt, button, config ) {
-          $('.display_name').toggleClass('hidden');
-          $('.host_name').toggleClass('hidden');
+          dt.column(1).visible(true);
         },
         className: 'btn btn-xs'
        }, {
@@ -296,7 +296,10 @@ var draw_matrix_table = function( data, parent, options ) {
           column.visible( ! column.visible() );
           },
         className: 'btn btn-xs'
-        }
+       },{
+          extend: 'colvis',
+          className: 'btn btn-xs'
+       }
       ],
 
 
