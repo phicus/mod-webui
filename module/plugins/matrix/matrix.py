@@ -79,7 +79,11 @@ def show_matrix_json():
 
             hosts[_host]['sn']    =  h.customs.get('_SN',"")
             hosts[_host]['mac']    =  h.customs.get('_MAC',"")
-            hosts[_host]['customer_name']    =  h.customs.get('_CUSTOMER_NAME',"")
+            try:
+                hosts[_host]['customer_name']    =  "{} {}".format(h.customs.get('_CUSTOMER_NAME',""), h.customs.get('_CUSTOMER_SURNAME',""))
+            except:
+                hosts[_host]['customer_name']    =  ""
+                
             hosts[_host]['customer_address'] =  h.customs.get('_CUSTOMER_ADDRESS',"")
             hosts[_host]['customer_city']    =  h.customs.get('_CUSTOMER_CITY',"")
             

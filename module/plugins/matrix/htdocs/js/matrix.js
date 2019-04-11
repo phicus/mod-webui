@@ -122,7 +122,7 @@ var draw_matrix_table = function( data, parent, options ) {
     data.groups['host'].push('reg');
   }
 
-  row = '<thead><tr><th colspan=""></th><th colspan="3"></th>';
+  row = '<thead><tr><th colspan="6"></th>';
   $.each(data.groups, function(k,v){
      if (v.length > 0) {
        row = row + '<th colspan="'+v.length+'">' + k + "</th>";
@@ -292,20 +292,18 @@ var draw_matrix_table = function( data, parent, options ) {
           },
           className: 'btn btn-xs'
        }, {
-        text: 'Toggle Display Name',
-        action: function ( e, dt, button, config ) {
-          dt.column(1).visible(true);
-          dt.column(2).visible(true);
-          dt.column(3).visible(true);
-          dt.column(4).visible(true);
-          dt.column(5).visible(true);
-        },
-        className: 'btn btn-xs'
-       }, {
-        text: 'Expand Info',
+        text: 'Toggle Administrative Info',
         action: function ( e, dt, button, config ) {
           e.preventDefault();
           var column = dt.column( 1 );
+          column.visible( ! column.visible() );
+          var column = dt.column( 2 );
+          column.visible( ! column.visible() );
+          var column = dt.column( 3 );
+          column.visible( ! column.visible() );
+          var column = dt.column( 4 );
+          column.visible( ! column.visible() );
+          var column = dt.column( 5 );
           column.visible( ! column.visible() );
           },
         className: 'btn btn-xs'
