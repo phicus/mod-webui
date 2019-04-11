@@ -106,7 +106,7 @@ var draw_matrix_table = function( data, parent, options ) {
   var _cache = data;
   var _options = {};
   var _defaults = {simple: false};
-  var _defs = [ { "visible": false, "targets": [1] } ];
+  var _defs = [ { "visible": false, "targets": [1,2,3,4,5] } ];
 
   if(options) {
     _options = $.extend(_defaults, options);
@@ -122,14 +122,19 @@ var draw_matrix_table = function( data, parent, options ) {
     data.groups['host'].push('reg');
   }
 
-  row = '<thead><tr><th colspan="2"></th>';
+  row = '<thead><tr><th colspan=""></th><th colspan="3"></th>';
   $.each(data.groups, function(k,v){
      if (v.length > 0) {
        row = row + '<th colspan="'+v.length+'">' + k + "</th>";
      }
   });
   row = row + '</tr><tr>';
-  row = row + '<th>Host</th><th>Long</th>';
+  row = row + '<th>Host</th>'
+            + '<th>SN</th>'
+            + '<th>MAC</th>'
+            + '<th>Name</th>'
+            + '<th>Address</th>'
+            + '<th>City</th>';
 
   n = 0;
   $.each(data.groups, function(k,v){
@@ -186,9 +191,13 @@ var draw_matrix_table = function( data, parent, options ) {
           row = row + '<td class="hoststate' + v.state_id +'"">'
           + '<a href="/cpe/' + cell +'">'
           + '<span class="host_name">' + cell + '</span>'
-          + '</a></td><td class="log_name">'
-          + '<span class="display_name">' + v.display_name + '</span>'
-          + '</td>';
+          + '</a></td>'
+          + '<td class="sn">' + v.sn + '</td>'
+          + '<td class="mac">' + v.mac + '</td>'
+          + '<td class="customer_name">' + v.customer_name + '</td>'
+          + '<td class="customer_address">' + v.customer_address + '</td>'
+          + '<td class="customer_city">' + v.customer_city + '</td>'
+          + '';
           host = cell;
         } else if ( i == "reg" ) {
           row = row + '<td>'
@@ -286,6 +295,10 @@ var draw_matrix_table = function( data, parent, options ) {
         text: 'Toggle Display Name',
         action: function ( e, dt, button, config ) {
           dt.column(1).visible(true);
+          dt.column(2).visible(true);
+          dt.column(3).visible(true);
+          dt.column(4).visible(true);
+          dt.column(5).visible(true);
         },
         className: 'btn btn-xs'
        }, {

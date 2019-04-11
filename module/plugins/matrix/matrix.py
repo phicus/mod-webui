@@ -75,6 +75,14 @@ def show_matrix_json():
 
             hosts[_host]['state_id'] = h.state_id
             hosts[_host]['display_name'] = h.display_name
+            
+
+            hosts[_host]['sn']    =  h.customs.get('_SN',"")
+            hosts[_host]['mac']    =  h.customs.get('_MAC',"")
+            hosts[_host]['customer_name']    =  h.customs.get('_CUSTOMER_NAME',"")
+            hosts[_host]['customer_address'] =  h.customs.get('_CUSTOMER_ADDRESS',"")
+            hosts[_host]['customer_city']    =  h.customs.get('_CUSTOMER_CITY',"")
+            
             hosts[_host]['services'] = {}
 
 
@@ -94,7 +102,9 @@ def show_matrix_json():
                     _groups['host'].append(_name)
 
 
-        if hasattr(h,'cpe_registration_host') and h.cpe_registration_host:
+        if hasattr(h,'cpe_registration_tags') and h.cpe_registration_tags:
+            hosts[_host]['reg'] =  h.cpe_registration_host.split(',')
+        elif hasattr(h,'cpe_registration_host') and h.cpe_registration_host:
             hosts[_host]['reg'] =  h.cpe_registration_host
         elif hasattr(h,'address') and h.address:
             hosts[_host]['reg'] = h.address
