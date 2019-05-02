@@ -619,13 +619,13 @@ class Helper(object):
                 s += self.get_link(svc, short=True)
                 if svc.business_impact > 2:
                     s += "(" + self.get_business_impact_text(svc.business_impact) + ")"
-                s += """ is <span class="font-%s"><strong>%s</strong></span>""" % (svc.state.lower(), svc.state)
-                s += " since %s" % self.print_duration(svc.last_state_change, just_duration=True, x_elts=2)
+                # s += """ is <span class="font-%s"><strong>%s</strong></span>""" % (svc.state.lower(), svc.state)
+                s += """<span class="badge"> since %s</span>""" % self.print_duration(svc.last_state_change, just_duration=True, x_elts=2)
                 if show_output:
                     regex = r"(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})"
                     subst = "<a href=\"http://$PROXY_PREFIX\\1.$PROXY_SUFIX\">\\1</a>"
                     output = re.sub(regex, subst, svc.output, 0, re.MULTILINE)
-                    s += ": %s" % (output)
+                    s += "<samp>%s</samp>" % (output)
                 s += "</li>"
             s += "</ul></li>"
         else:

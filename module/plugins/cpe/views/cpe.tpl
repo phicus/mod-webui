@@ -235,7 +235,7 @@ function poll_cpe() {
 
             if (typeof data.uptime === 'number') {
               start = Date.parse(new Date()) - data.uptime;
-              delta = data.uptime / 1000
+              delta = data.uptime  /* / 1000 */
               if(delta > window.cpe_uptime) {
                 window.cpe_uptime = delta;
               }
@@ -428,7 +428,7 @@ $("[data-type='host']").each(function(key, value){
 });
 
 // Actualizador servicios
-(function worker() {
+function update_cpe_services() {
   $.ajax({
     url: '/cpe/quickservices/{{cpe_host.host_name}}',
     success: function(data) {
@@ -455,11 +455,11 @@ $("[data-type='host']").each(function(key, value){
 
 
     },
-    complete: function() {
-      setTimeout(worker, CPE_QUICKSERVICES_UPDATE_FREQUENCY);
-    }
+    //complete: function() {
+    //  setTimeout(worker, CPE_QUICKSERVICES_UPDATE_FREQUENCY);
+    //}
   });
-})();
+}
 
 // Poller
 // var realtimeTimer = window.setInterval(function(){
@@ -467,34 +467,34 @@ $("[data-type='host']").each(function(key, value){
 //}, CPE_POOL_UPDATE_FREQUENCY);
 
 
-function poll_cpe_timeout() {
-  if ( CPE_POOL_UPDATE_FREQUENCY > 0) {
-
-    poll_cpe();
-
-    window.setTimeout(function(){
-          poll_cpe_timeout();
-    }, CPE_POOL_UPDATE_FREQUENCY);
-
-  }
-}
-
 // lazy start
 $(function(){
-  window.setTimeout(function(){
-        poll_cpe_timeout();
-  }, 1000);
-
-  window.cpe_uptime = null;
-
-  window.cpe_uptime_interval = setInterval(function(){
-    if(window.cpe_uptime != null) {
-      window.cpe_uptime += 1;
-      $('#uptime').html(toHHMMSS(window.cpe_uptime));
-    }
-  }, 1000);
 
 
+  if( typeof window.cpe_poll_interval === 'undefined' ){
+    window.cpe_poll_interval = setInterval(function(){
+      poll_cpe();
+    }, CPE_POOL_UPDATE_FREQUENCY);
+  }
+
+  if( typeof window.cpe_update_services_interval === 'undefined' ){
+    window.cpe_update_services_interval = setInterval(function(){
+      update_cpe_services();
+    }, CPE_QUICKSERVICES_UPDATE_FREQUENCY);
+  }
+
+  if( typeof window.cpe_uptime === 'undefined' ){
+    window.cpe_uptime = null;
+  }
+
+  if( typeof window.cpe_uptime_interval === 'undefined' ){
+    window.cpe_uptime_interval = setInterval(function(){
+      if(window.cpe_uptime != null) {
+        window.cpe_uptime += 1;
+        $('#uptime').html(toHHMMSS(window.cpe_uptime));
+      }
+    }, 1000);
+  }
 
   var cpeSRN = document.getElementById("cpe-sn");
   var cpeMAC = document.getElementById("cpe-mac");

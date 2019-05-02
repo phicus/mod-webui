@@ -120,8 +120,8 @@ def show_matrix_json():
             if not _groups.get(_group):
                 _groups[_group] = list()
             
-            if _group == 'info' and s.state_id == 0:
-                info_metrics = re.split("\s*(\w+):", s.output)
+            if _group in ('info','pppoe') and s.state_id == 0:
+                info_metrics = re.split("\s+([a-z]\w+)[:=]", s.output)
                 if len(info_metrics) < 2:
                     continue
 

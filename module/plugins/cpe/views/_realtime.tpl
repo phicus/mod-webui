@@ -52,6 +52,9 @@
             <dt>MTA MAC</dt><dd>{{cpe.customs.get('_MTAMAC')}}</dd>
             %end
             <dt>CPE IP Address</dt><dd>{{cpe.cpe_address if hasattr(cpe, 'cpe_address') else '' }}</dd>
+            <dt>CPE Router Address</dt><dd>{{cpe.cpe_router_address if hasattr(cpe, 'cpe_router_address') else '' }}</dd>
+            <dt>CPE ATA Address</dt><dd>{{cpe.cpe_ata_address if hasattr(cpe, 'cpe_ata_address') else '' }}</dd>
+
 
             <dt>Registration host</dt><dd>{{ cpe.cpe_registration_host if hasattr(cpe, 'cpe_registration_host') else '' }}
                 <a href="/all?search=type:host {{ cpe.cpe_registration_host if hasattr(cpe, 'cpe_registration_host') else '' }}"><i class="fa fa-search"></i></a></dd>

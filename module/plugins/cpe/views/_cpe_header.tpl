@@ -106,6 +106,18 @@
             <button id="btn-update" type="button" class="btn btn-default"><i class="fa fa-arrow-up" aria-hidden="true"></i>&nbsp; Update</button>
             <a href="/cpe/{{ cpe.host_name }}/backup" id="btn-backup" type="button" class="btn btn-default"><i class="fa fa-save" aria-hidden="true"></i>&nbsp; Backup</a>
             %end
+
+            %if cpe.customs.get('_CPE_MODEL') in ('UBNTM5','TL-WR841ND'):
+            %cpe_webport = cpe.customs.get('_CPE_WEBPORT',7125)
+            %cpe_router_webport = cpe.customs.get('_CPE_ROUTER_WEBPORT',1025)
+            
+            %cpe_address        = cpe.cpe_address if hasattr(cpe, 'cpe_address') else ''
+            %cpe_router_address = cpe.cpe_router_address if hasattr(cpe, 'cpe_router_address') else cpe_address
+
+            <a href="http://{{ '' + cpe_address + '-' + str(cpe_webport) + '.' + app.proxy_sufix }}" target="_blank" id="btn-web1" type="button" class="btn btn-default {{'disabled' if not cpe_address else '' }}"><i class="fa fa-globe" aria-hidden="true"></i>&nbsp; CPE</a>
+            <a href="http://{{ '' + cpe_router_address + '-' + str(cpe_router_webport) + '.' + app.proxy_sufix }}" target="_blank" id="btn-web2" type="button" class="btn btn-default {{'disabled' if not cpe_router_address else '' }}"><i class="fa fa-globe" aria-hidden="true"></i>&nbsp; Router</a>
+            %end
+
             %if tech in ('gpon'):
             <button id="btn-unprovision" type="button" class="btn btn-default" {{'disabled' if not reboot_available else ''}} ><i class="fa fa-reply" aria-hidden="true"></i>&nbsp; Unprovision</button>
             <button id="btn-factrestore" type="button" class="btn btn-default" {{'disabled' if not reboot_available else ''}} ><i class="fa fa-fast-backward" aria-hidden="true"></i>&nbsp; Factory</button>
