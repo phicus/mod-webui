@@ -472,15 +472,18 @@ $(function(){
 
 
   if( typeof window.cpe_poll_interval === 'undefined' ){
+    poll_cpe();
     window.cpe_poll_interval = setInterval(function(){
       poll_cpe();
     }, CPE_POOL_UPDATE_FREQUENCY);
   }
 
   if( typeof window.cpe_update_services_interval === 'undefined' ){
+    update_cpe_services();
     window.cpe_update_services_interval = setInterval(function(){
       update_cpe_services();
     }, CPE_QUICKSERVICES_UPDATE_FREQUENCY);
+
   }
 
   if( typeof window.cpe_uptime === 'undefined' ){
