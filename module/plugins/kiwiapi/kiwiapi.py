@@ -12,9 +12,9 @@ def kiwi_api_proxy(filepath):
 
     url = app.request.url
     
-    path = "/".join(url.split('/')[3:0])
+    path = "/".join(url.split('/')[3:])
             
-    url = "http://localhost:4280/api/{}".format(path)
+    url = "http://localhost:4280/{}".format(path)
 
     try:
         r = requests.get(url)

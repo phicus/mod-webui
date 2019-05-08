@@ -1,0 +1,273 @@
+%breadcrumb = []
+
+%title = 'cpe'
+
+%js=['js/shinken-actions.js', 'cpe/js/bootstrap-switch.min.js', 'cpe/js/datatables.min.js']
+%css=['cpe/css/bootstrap-switch.min.css', 'cpe/css/datatables.min.css', 'cpe/css/vis.min.css', 'cpe/css/cpe.css']
+%rebase("layout", js=js, css=css, breadcrumb=breadcrumb, title=title)
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.1.2/handlebars.min.js"></script>
+<script>
+function humanBytes(fileSizeInBytes) {
+
+    var i = -1;
+    var byteUnits = ['kb', 'Mb', 'Gb', 'Tb', 'Pb', 'Eb', 'Zb', 'Yb'];
+    do {
+        fileSizeInBytes = fileSizeInBytes / 1024;
+        i++;
+    } while (fileSizeInBytes > 1024);
+
+    return Math.max(fileSizeInBytes, 0.1).toFixed(1) + byteUnits[i];
+};
+
+function humanHertz(frequency) {
+
+    var i = 0;
+    var byteUnits = ['Hz', 'kHz', 'MHz', 'GHz'];
+    do {
+        frequency = frequency / 1000;
+        i++;
+    } while (frequency > 1000);
+
+    return Math.max(frequency, 0).toFixed(0) + byteUnits[i];
+};
+
+function toHHMMSS(num) {
+    var sec_num = parseInt(num, 10); // don't forget the second param
+    var days    = Math.floor(sec_num / (3600 * 24));
+    var hours   = Math.floor((sec_num / 3600) % 24);
+    var minutes = Math.floor((sec_num / 60) % 60);
+    var seconds = sec_num % 60;
+
+    if (days    >  0) {days    = days + "d " } else { days = ""}
+    if (hours   < 10) {hours   = "0"+hours;}
+    if (minutes < 10) {minutes = "0"+minutes;}
+    if (seconds < 10) {seconds = "0"+seconds;}
+    return days+hours+':'+minutes+':'+seconds;
+};
+
+
+function update() {
+    $.get( '/m/html/index.html', function( data ) {
+
+        var templateScript = Handlebars.compile(data);
+        var context = {}
+
+
+        $.get('/api/cpesmetadata/2773', function( data ) {
+            context.cpe = data
+
+            $.get('/api/customers/' + data.customer, function( data ) {
+                context.customer = data
+
+                html = templateScript(context);
+                $( ".content" ).html( html );
+
+                poll_cpe();
+
+            })
+
+
+
+
+        })
+    });
+}
+
+
+
+function poll_cpe() {
+  //check_cpe_registration_host();
+
+  $.getJSON('/api/kraken/info/2773', function(data){
+
+
+        if ( typeof data.hostevent !== 'undefined' ) {
+          $.each(data.hostevent, function(k,v){
+              if ( typeof v.leased_address !== 'undefined' ) {
+                alertify.log("New IP ADDRESS: " + v.leased_address, "info", 15000);
+              }
+
+          });
+        }
+
+        if(data && data.status) {
+
+            data.status = data.status.replace(/\W+\s+/g, '').toUpperCase()
+
+            $('#registration_state').html(data.status)
+            $('#upbw').html(humanBytes(data.upbw))
+            $('#dnbw').html(humanBytes(data.dnbw))
+            $('#dnrx').html(data.dnrx)
+            $('#uprx').html(data.uprx)
+
+            if (typeof data.ccq !== 'undefined') {
+              $('#ccq').html(data.ccq + "%").show()
+            }
+
+            if (typeof data.catvrx !== 'undefined') {
+              $('#ccq').html("CATV:" + data.catvrx + "").show()
+            }
+
+            if (typeof data.uptime === 'string') {
+              d1 = Date.parse(data.uptime);
+              console.log(d1)
+              d2 = Date.parse(new Date());
+              console.log(d2)
+              delta = (d2 - d1) / 1000;
+              $('#uptime').html(toHHMMSS(delta));
+              if(delta > window.cpe_uptime) {
+                window.cpe_uptime = delta;
+              }
+              $('#last_state_change').html( (new Date(d1)).toString() )
+            }
+
+            if (typeof data.uptime === 'number') {
+              start = Date.parse(new Date()) - data.uptime;
+              delta = data.uptime  /* / 1000 */
+              if(delta > window.cpe_uptime) {
+                window.cpe_uptime = delta;
+              }
+              $('#last_state_change').html( (new Date(start)).toString() )
+            }
+
+
+
+            if (typeof data.status_id !== "undefined") {
+              $('#registration_state').css('color', Krill.getColorState(data.status_id) );
+              $('#status2').html(getHTMLState(data.status_id));
+            }
+
+
+            //console.log(data);
+            //enable or disable buttons
+
+            if ( data.status_id == 0 ) {
+              $('#btn-reboot')      .removeClass("disabled").prop("disabled", false);
+              $('#btn-factrestore') .removeClass("disabled").prop("disabled", false);
+              $('#btn-unprovision') .removeClass("disabled").prop("disabled", false);
+              $('#btn-tr069')       .removeClass("disabled").prop("disabled", false);
+            } else if ( data.status_id == 2 )  {
+              $('#btn-reboot')      .addClass("disabled").prop("disabled", true);
+              $('#btn-factrestore') .addClass("disabled").prop("disabled", true);
+              $('#btn-tr069')       .addClass("disabled").prop("disabled", true);
+              $('#btn-unprovision') .removeClass("disabled").prop("disabled", false);
+            }
+
+            if ( typeof data.cpe_registration_host === 'undefined' ) {
+              $('#btn-reboot')     .addClass("disabled").prop("disabled", true);
+              $('#btn-factrestore').addClass("disabled").prop("disabled", true);
+              $('#btn-unprovision').addClass("disabled").prop("disabled", true);
+              $('#btn-tr069')      .addClass("disabled").prop("disabled", true);
+            } else {
+              $('[data-type="registration-host"]').html(data.cpe_registration_host)
+              $('[data-type="registration-id"]').html(data.cpe_registration_id)
+            }
+
+
+            if ( typeof data.lapse !== 'undefined' ) {
+               CPE_POLL_UPDATE_FREQUENCY = Math.round( (data.lapse * 1000 ) * 1.20 );
+               if ( CPE_POLL_UPDATE_FREQUENCY < 10000 ) {
+                 CPE_POLL_UPDATE_FREQUENCY = 10000;
+               }
+            }
+
+            if ( typeof data.ips !== 'undefined' ) {
+               $("#ips").html('')
+               $.each(data.ips, function(v,k){
+                 $("#ips").append('<a href="http://'+proxy_prefix+k[1]+'.'+proxy_sufix+'">'+k[1]+'</a> | ');
+               })
+            }
+
+            if (typeof data.service_ports !== "undefined") {
+              line = ""
+              $.each(data.service_ports, function(k,v){
+                 line = line + v.service_vlan + '/'+ v.user_vlan
+                 if ( typeof v.native_vlan !== 'undefined' && v.native_vlan ) {
+                   line = line + "N";
+                 }
+                 line = line + " ";
+              })
+              $('#service_ports').html(line)
+            }
+
+            if (data.status && data.status != cpe.state) {
+                cpe.state = data.status;
+            }
+
+            if (typeof data.perfdatas  !== 'undefined') {
+
+              var downstreams = Krill.parsePerfdata(data.perfdatas.downstream);
+              var upstreams   = Krill.parsePerfdata(data.perfdatas.upstream);
+              var qoss        = Krill.parsePerfdata(data.perfdatas.qos);
+
+
+              for (var i = 0; i < downstreams; i++) {
+                if (downstreams[i][0] == 'dnrx') {
+                  //data.dnrx = parseFloat(downstreams[i][1])
+                  data.dnrx = Krill.parsePerfdata(downstreams[i])
+
+                }
+              }
+
+              for (var i = 0; i < upstreams; i++) {
+                if (upstreams[i][0] == 'uptx') {
+                  data.uptx = Krill.parsePerfdata(upstreams[i][1])
+                }
+              }
+
+
+              for (var i = 0; i < qoss; i++) {
+                if (qoss[i][0] == 'dncorr') {
+                  data.dncorr = Krill.parsePerfdata(upstreams[i][1])
+                }
+                if (qoss[i][0] == 'dnko') {
+                  data.dnko = Krill.parsePerfdata(upstreams[i][1])
+                }
+              }
+
+
+              qoss_table          = parsePerfdataTable2(qoss)
+              qoss_table_titles   = Object.keys(qoss_table)
+              qoss_table_rows     = Object.values(qoss_table)
+
+              downstreams_table        = parsePerfdataTable2(downstreams)
+              upstreams_table          = parsePerfdataTable2(upstreams)
+
+              downstreams_table.dncorr = qoss_table.dncorr
+              downstreams_table.dnko   = qoss_table.dnko
+              upstreams_table.upcorr   = qoss_table.upcorr
+              upstreams_table.upko     = qoss_table.upko
+
+              downstreams_table_titles = Object.keys(downstreams_table)
+              downstreams_table_rows   = Object.values(downstreams_table)
+
+              upstreams_table_titles   = Object.keys(upstreams_table)
+              upstreams_table_rows     = Object.values(upstreams_table)
+
+
+              try {
+                $('#docsisDownstreamTable').html(generatePerfTable(downstreams_table_titles, downstreams_table_rows));
+                $('#docsisUpstreamTable').html(generatePerfTable(upstreams_table_titles, upstreams_table_rows));
+              } catch(err) {
+                console.log(err)
+              }
+              //$('#docsisQosTable').html(generatePerfTable(qoss_table_titles, qoss_table_rows));
+
+            }
+
+
+            updateGraphs(data);
+
+        }
+
+    });
+}
+
+update();
+setInterval(function(){ update()}, 10000);
+
+
+</script>
+
+

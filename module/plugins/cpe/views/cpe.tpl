@@ -92,7 +92,7 @@ Invalid element name
 
 <script>
 var CPE_QUICKSERVICES_UPDATE_FREQUENCY = 5000;
-var CPE_POOL_UPDATE_FREQUENCY = 10000;
+var CPE_POLL_UPDATE_FREQUENCY = 10000;
 
 %if app.proxy_sufix:
 var proxy_sufix = "{{app.proxy_sufix}}";
@@ -190,7 +190,7 @@ var STATUS_BLUE    = ["NONE", "NULL", ""];
 function poll_cpe() {
   check_cpe_registration_host();
 
-  $.getJSON('/cpe_poll/{{cpe_host.host_name}}', function(data){
+  $.getJSON('/api/kraken/info/{{cpe_host.host_name[3:]}}', function(data){
 
 
         if ( typeof data.hostevent !== 'undefined' ) {
@@ -277,9 +277,9 @@ function poll_cpe() {
 
 
             if ( typeof data.lapse !== 'undefined' ) {
-               CPE_POOL_UPDATE_FREQUENCY = Math.round( (data.lapse * 1000 ) * 1.20 );
-               if ( CPE_POOL_UPDATE_FREQUENCY < 10000 ) {
-                 CPE_POOL_UPDATE_FREQUENCY = 10000;
+               CPE_POLL_UPDATE_FREQUENCY = Math.round( (data.lapse * 1000 ) * 1.20 );
+               if ( CPE_POLL_UPDATE_FREQUENCY < 10000 ) {
+                 CPE_POLL_UPDATE_FREQUENCY = 10000;
                }
             }
 
@@ -464,7 +464,7 @@ function update_cpe_services() {
 // Poller
 // var realtimeTimer = window.setInterval(function(){
 //   poll_cpe()
-//}, CPE_POOL_UPDATE_FREQUENCY);
+//}, CPE_POLL_UPDATE_FREQUENCY);
 
 
 // lazy start
@@ -475,7 +475,7 @@ $(function(){
     poll_cpe();
     window.cpe_poll_interval = setInterval(function(){
       poll_cpe();
-    }, CPE_POOL_UPDATE_FREQUENCY);
+    }, CPE_POLL_UPDATE_FREQUENCY);
   }
 
   if( typeof window.cpe_update_services_interval === 'undefined' ){
