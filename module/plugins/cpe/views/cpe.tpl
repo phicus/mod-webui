@@ -190,7 +190,7 @@ var STATUS_BLUE    = ["NONE", "NULL", ""];
 function poll_cpe() {
   check_cpe_registration_host();
 
-  $.getJSON('/api/kraken/info/{{cpe_host.host_name[3:]}}', function(data){
+  $.getJSON('/cpe_poll/{{cpe_host.host_name}}', function(data){
 
 
         if ( typeof data.hostevent !== 'undefined' ) {
