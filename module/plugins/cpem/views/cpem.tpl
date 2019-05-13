@@ -7,55 +7,51 @@
 %rebase("layout", js=js, css=css, breadcrumb=breadcrumb, title=title)
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.1.2/handlebars.min.js"></script>
+
+<script src="/static/js/krill.js"></script>
+<script src="/static/cpe/js/jquery.flot.js" charset="utf-8"></script>
+<script src="/static/cpe/js/plots.js" charset="utf-8"></script>
+<script src="/static/cpe/js/vis.min.js" charset="utf-8"></script>
+<script src="/static/cpe/js/datatables.min.js" charset="utf-8"></script>
+<script src="/static/cpe/js/google-charts.min.js" charset="utf-8"></script>
+
 <script>
-function humanBytes(fileSizeInBytes) {
 
-    var i = -1;
-    var byteUnits = ['kb', 'Mb', 'Gb', 'Tb', 'Pb', 'Eb', 'Zb', 'Yb'];
-    do {
-        fileSizeInBytes = fileSizeInBytes / 1024;
-        i++;
-    } while (fileSizeInBytes > 1024);
-
-    return Math.max(fileSizeInBytes, 0.1).toFixed(1) + byteUnits[i];
-};
-
-function humanHertz(frequency) {
-
-    var i = 0;
-    var byteUnits = ['Hz', 'kHz', 'MHz', 'GHz'];
-    do {
-        frequency = frequency / 1000;
-        i++;
-    } while (frequency > 1000);
-
-    return Math.max(frequency, 0).toFixed(0) + byteUnits[i];
-};
-
-function toHHMMSS(num) {
-    var sec_num = parseInt(num, 10); // don't forget the second param
-    var days    = Math.floor(sec_num / (3600 * 24));
-    var hours   = Math.floor((sec_num / 3600) % 24);
-    var minutes = Math.floor((sec_num / 60) % 60);
-    var seconds = sec_num % 60;
-
-    if (days    >  0) {days    = days + "d " } else { days = ""}
-    if (hours   < 10) {hours   = "0"+hours;}
-    if (minutes < 10) {minutes = "0"+minutes;}
-    if (seconds < 10) {seconds = "0"+seconds;}
-    return days+hours+':'+minutes+':'+seconds;
-};
+// For old compatibility
+var cpe = {}
+var services = {}
+var cpe_name = "";
+var proxy_prefix = "";
+var proxy_sufix = ".phicus.net"
+var cpe_graphs = {} 
 
 
-function update() {
+
+
+function update_cpe() {
     $.get( '/m/html/index.html', function( data ) {
 
         var templateScript = Handlebars.compile(data);
         var context = {}
 
+        $.get('/api/cpesmetadata/' + window.cpe_id, function( data ) {
+            context.cpe = data;
 
-        $.get('/api/cpesmetadata/2773', function( data ) {
-            context.cpe = data
+            console.log(context.graphs);
+
+            cpe = data;
+            services = [] 
+            
+            data._services.forEach(function(element) {
+              services.push({
+                'name': element,
+                'state_id': 0,
+                'url': 'about:blank',
+                'content': '&nbsp;'
+              })
+            });
+
+          
 
             $.get('/api/customers/' + data.customer, function( data ) {
                 context.customer = data
@@ -64,10 +60,10 @@ function update() {
                 $( ".content" ).html( html );
 
                 poll_cpe();
-
+                cpe_refresh();
             })
 
-
+            
 
 
         })
@@ -76,10 +72,32 @@ function update() {
 
 
 
+
+
+
+function update_target() {
+  var cpe_hash = window.location.hash.match(/(\w{3})(\d+)$/);
+  var cpe_href  = window.location.href.match(/(\w{3})(\d+)$/);
+  
+  if ( cpe_hash ) {
+    window.cpe_ream = cpe_hash[1];
+    window.cpe_id   = cpe_hash[2];
+  } else if( cpe_href ) {
+    window.cpe_ream = cpe_href[1];
+    window.cpe_id   = cpe_href[2];
+  }
+
+  //Old
+  cpe_name = window.cpe_ream + window.cpe_id;
+
+}
+
 function poll_cpe() {
   //check_cpe_registration_host();
 
-  $.getJSON('/api/kraken/info/2773', function(data){
+
+
+  $.getJSON('/api/kraken/info/' + window.cpe_id, function(data){
 
 
         if ( typeof data.hostevent !== 'undefined' ) {
@@ -264,9 +282,62 @@ function poll_cpe() {
     });
 }
 
-update();
-setInterval(function(){ update()}, 10000);
+// Actualizador servicios
+function update_cpe_services() {
+  $.ajax({
+    url: '/cpe/quickservices/' + cpe_name,
+    success: function(data) {
+      var html = $('ul',data);
+      $('li', html).on('click', function(){
+         //console.log($(this).text());
 
+         var _txt = $(this).clone().children().remove().end().text();
+         _txt = _txt.split(":")
+         _txt.shift()
+         _txt = _txt.join(":")
+
+         $('#search').val( _txt  );
+      });
+      $('#quickservices').html( $(html).html()
+            .replace(/\$PROXY_SUFIX/g,proxy_sufix)
+            .replace(/\$PROXY_PREFIX/g,proxy_prefix)
+       );
+    },
+  });
+}
+
+
+$(function(){
+  update_target();
+  update_cpe();
+  update_cpe_services();
+
+  $(window).on('hashchange', function() {
+    update_target();
+    update_cpe();
+    update_cpe_services();
+  });
+
+  if( typeof window.cpe_update_interval === 'undefined' ){
+    window.cpe_update_interval = setInterval(function(){
+      update_cpe();
+    }, 600000);
+  }
+
+  if( typeof window.cpe_poll_interval === 'undefined' ){
+    poll_cpe();
+    window.cpe_poll_interval = setInterval(function(){
+      poll_cpe();
+    }, 10000);
+  }
+
+  if( typeof window.cpe_update_services_interval === 'undefined' ){
+    window.cpe_update_services_interval = setInterval(function(){
+      update_cpe_services();
+    }, 5000);
+  }
+
+});
 
 </script>
 

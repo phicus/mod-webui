@@ -11,13 +11,13 @@ from shinken.log import logger
 def kiwi_api_proxy(filepath):
 
     url = app.request.url
-    
     path = "/".join(url.split('/')[3:])
-            
-    url = "http://localhost:4280/{}".format(path)
+    port = app.request.GET.get('_api_port', 4280)
+
+    kiwi_url = "http://localhost:{}/{}".format(port,path)
 
     try:
-        r = requests.get(url)
+        r = requests.get(kiwi_url)
         if r.status_code != 200:
             logger.error("[kws-api-proxy]  not found: %d - %s", r.status_code, url)
             app.bottle.response.status = r.status_code

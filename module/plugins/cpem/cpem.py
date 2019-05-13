@@ -12,6 +12,9 @@ webuimod_dir = os.path.abspath(os.path.dirname(__file__))
 def show_m(host):
     return {}
 
+def show_m_hash():
+    return {}
+
 def load_html(path):
 
     static_folder = os.path.join(webuimod_dir, 'htdocs/html')
@@ -27,6 +30,10 @@ def load_html(path):
 pages = {
     show_m: {
         'name': 'Cpe', 'route': '/m/:host', 'view': 'cpem', 'static': True,
+    },
+
+    show_m_hash: {
+        'name': 'Cpe', 'route': '/m/', 'view': 'cpem', 'static': True,
     },
 
     load_html: {
