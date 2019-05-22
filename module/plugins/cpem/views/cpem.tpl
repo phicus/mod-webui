@@ -114,6 +114,7 @@ function poll_cpe() {
             data.status = data.status.replace(/\W+\s+/g, '').toUpperCase()
 
             $('#registration_state').html(data.status)
+            $('#registration_state').next().remove()
             $('#upbw').html(humanBytes(data.upbw))
             $('#dnbw').html(humanBytes(data.dnbw))
             $('#dnrx').html(data.dnrx)
