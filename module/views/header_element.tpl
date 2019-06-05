@@ -209,7 +209,7 @@
             var search = $('#search').val()
             if (!search) {
                 search = "type:host bp:>2"
-            } 
+            }
             </script>
             <li> <a onclick="window.top.location.href = '{{ app.get_url('Impacts') }}' + '?search=' + $('#search').val()"> <span class="fa fa-bolt sidebar-icon"></span> Impacts </a> </li>
             <li> <a onclick="window.top.location.href = '{{ app.get_url('Minemap') }}' + '?search=' + $('#search').val()"> <span class="fa fa-table sidebar-icon"></span> Minemap </a> </li>

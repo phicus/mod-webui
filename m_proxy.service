@@ -1,0 +1,13 @@
+[Unit]
+Description=M proxy
+After=network.target
+
+[Service]
+Type=forking
+User=phicus
+Group=phicus
+ExecStart=/usr/bin/python /tmp/m_proxy.py
+ExecStop=/bin/sh -c 'pkill -f -9 m_proxy'
+
+[Install]
+WantedBy=multi-user.target
