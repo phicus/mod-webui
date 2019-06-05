@@ -370,17 +370,18 @@ class KrillUIDataManager(WebUIDataManager):
             if t == 'perf':
                 match = re.compile('(?P<attr>[\w_]+)(?P<operator>>=|>|==|<|<=)(?P<value>[-\d\.]+)').match(s)
                 operator_str2function = {'>=':operator.ge, '>':operator.gt, '=':operator.eq, '==':operator.eq, '<':operator.lt, '<=':operator.le}
-                oper = operator_str2function[match.group('operator')]
                 new_items = []
                 if match:
+                    oper = operator_str2function[match.group('operator')]
                     for i in items:
                         if i.process_perf_data:
                             perf_datas = PerfDatas(i.perf_data)
-                            if match.group('attr') in perf_datas:
-                                if oper(float(perf_datas[match.group('attr')].value), float(match.group('value'))):
-                                    # new_items.append(i)
+                            matched_perfdatas = [p for p in perf_datas if match.group('attr') in p.name]
+                            for perfdata in matched_perfdatas:
+                                if oper(float(perf_datas[perfdata.name].value), float(match.group('value'))):
                                     _append_based_on_filtered_by_type(new_items, i, filtered_by_type)
                 items = new_items
+
 
             if t == 'reg':
                 new_items = []
