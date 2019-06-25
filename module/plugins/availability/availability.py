@@ -104,7 +104,7 @@ def get_availability_json(name):
     user = app.bottle.request.environ['USER']
     name = urllib.unquote(name)
     elt = app.datamgr.get_element(name, user) or app.redirect404()
-    return {'elt': elt, 'records': _get_availability_report(elt)}
+    return _get_availability_report(elt)
 
 
 pages = {
