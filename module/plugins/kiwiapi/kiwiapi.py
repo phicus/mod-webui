@@ -7,17 +7,20 @@ import random
 import time
 import requests
 from shinken.log import logger
+from libkrill.config import Config as KrillConfig
 
 def kiwi_api_proxy(filepath):
 
     url = app.request.url
     path = "/".join(url.split('/')[3:])
-    port = app.request.GET.get('_api_port', 4280)
-
-    kiwi_url = "http://localhost:{}/{}".format(port,path)
+    port = app.request.GET.pop('_api_port', 4280)
+    kws_list = KrillConfig().kws_list
+    default_kiwi = "http://localhost:{}/".format(port)
+    realm = path.split("/")[-1][:3]
+    kiwi_url = next((kws["uri"] for kws in kws_list if kws["realm"] == realm), default_kiwi)
 
     try:
-        r = requests.get(kiwi_url)
+        r = requests.get(kiwi_url, params=app.request.GET)
         if r.status_code != 200:
             logger.error("[kws-api-proxy]  not found: %d - %s", r.status_code, url)
             app.bottle.response.status = r.status_code
