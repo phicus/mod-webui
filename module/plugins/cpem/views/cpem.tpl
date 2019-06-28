@@ -97,7 +97,7 @@ function poll_cpe() {
 
 
 
-  $.getJSON('/api/kraken/info/' + window.cpe_id, function(data){
+  $.getJSON('/api/kraken/info/' +  window.cpe_ream + window.cpe_id, function(data){
 
 
         if ( typeof data.hostevent !== 'undefined' ) {
