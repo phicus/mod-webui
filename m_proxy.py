@@ -29,6 +29,8 @@ def _kiwi_url(last_url_slice):
 def proxy(path):
     req = request  # type: Request
     cookie = cookie_decode(req.cookies.get("user"), "CHANGEME")
+    username = cookie[-1]["login"]
+    app.logger.error("user {} had requested /{}".format(username, path))
     if not cookie or not cookie[-1]:
         return "Not authorized", 401
 
