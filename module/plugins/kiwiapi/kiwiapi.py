@@ -31,7 +31,7 @@ def kiwi_api_proxy(filepath):
 
     except Exception as e:
         logger.error("[kws-api-proxy] exception: %s", str(e))
-        app.bottle.response.status = 409
+        app.bottle.response.status = 500
         app.bottle.response.content_type = 'application/json'
         return json.dumps(
             {'status': 'ko', 'message': str(e)}
