@@ -1,3 +1,4 @@
+from functools import wraps
 from os import getenv
 
 import requests
@@ -6,6 +7,7 @@ from flask import Flask, Response, make_response, request
 from flask import Request
 from libkrill.config import Config
 from requests import Response
+from werkzeug.datastructures import Authorization
 
 app = Flask(__name__)
 
@@ -25,14 +27,24 @@ def _kiwi_url(last_url_slice):
     return kiwi_url
 
 
+def shinken_login_required(handler):
+    @wraps(handler)
+    def wrapper(*args, **kwargs):
+        req = request  # type: Request
+        cookie = cookie_decode(req.cookies.get("user"), "CHANGEME")
+        if not cookie or not cookie[-1]:
+            return "Not authorized", 401
+        req.authorization = Authorization("shinken-cookie", dict(username=cookie[-1]["login"]))
+        return handler(*args, **kwargs)
+
+    return wrapper
+
+
 @app.route("/<path:path>")
+@shinken_login_required
 def proxy(path):
     req = request  # type: Request
-    cookie = cookie_decode(req.cookies.get("user"), "CHANGEME")
-    username = cookie[-1]["login"]
-    app.logger.error("user {} had requested /{}".format(username, path))
-    if not cookie or not cookie[-1]:
-        return "Not authorized", 401
+    app.logger.error("user {} had requested /{}".format(req.authorization.username, path))
 
     last_url_slice = [x for x in path.split("/") if x][-1]
     kiwi_url = _kiwi_url(last_url_slice)
@@ -47,4 +59,4 @@ def proxy(path):
     return response
 
 
-app.run("0.0.0.0", getenv("PORT", 4258))
+app.run(getenv("HOST", "0.0.0.0"), getenv("PORT", 4258))
