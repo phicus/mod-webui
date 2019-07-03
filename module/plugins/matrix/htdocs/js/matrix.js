@@ -369,3 +369,7 @@ $(document).ready( function (){
 
 
 } );
+
+$(function () {
+    disable_refresh();
+});
