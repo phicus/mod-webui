@@ -34,7 +34,7 @@ function update_cpe() {
         var templateScript = Handlebars.compile(data);
         var context = {}
 
-        $.get('/api/cpesmetadata/' + window.cpe_id, function( data ) {
+        $.get('/api/cpesmetadata/' + window.cpe_realm + window.cpe_id, function( data ) {
             context.cpe = data;
 
             console.log(context.graphs);
