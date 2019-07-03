@@ -53,7 +53,7 @@ function update_cpe() {
 
           
 
-            $.get('/api/customers/' + data.customer, function( data ) {
+            $.get('/api/customers/' + data.customer + '?realm=' + window.cpe_realm, function( data ) {
                 context.customer = data
 
                 html = templateScript(context);
