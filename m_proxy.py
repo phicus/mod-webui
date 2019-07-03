@@ -6,7 +6,6 @@ from bottle import cookie_decode
 from flask import Flask, Response, make_response, request
 from flask import Request
 from libkrill.config import Config
-from requests import Response
 from werkzeug.datastructures import Authorization
 
 app = Flask(__name__)
