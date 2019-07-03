@@ -24,13 +24,12 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with Shinken.  If not, see <http://www.gnu.org/licenses/>.
 
-import time
 import datetime
-import arrow
+import time
 import urllib
-
 from collections import OrderedDict
 
+import arrow
 from shinken.log import logger
 
 # Will be populated by the UI with it's own value
@@ -49,8 +48,11 @@ def get_element(name):
     user = app.bottle.request.environ['USER']
     name = urllib.unquote(name)
     elt = app.datamgr.get_element(name, user) or app.redirect404()
+    return {'elt': elt, 'records': (_get_availability_report(elt))}
 
-    today = arrow.now().replace(hour=0,minute=0,second=0)
+
+def _get_availability_report(elt):
+    today = arrow.now().replace(hour=0, minute=0, second=0)
     records = OrderedDict()
     records['Today'] = _get_availability(elt=elt, range_start=today.timestamp)
     records['This week'] = _get_availability(elt=elt,
@@ -60,12 +62,11 @@ def get_element(name):
                                              range_start=today.replace(days=-1).timestamp,
                                              range_end=today.timestamp)
     records['Last week'] = _get_availability(elt=elt,
-                                             range_start=today.replace(days=-(7+today.weekday())).timestamp,
+                                             range_start=today.replace(days=-(7 + today.weekday())).timestamp,
                                              range_end=today.replace(days=-today.weekday()).timestamp)
     records['Last month'] = _get_availability(elt=elt,
                                               range_start=today.replace(day=1, months=-1).timestamp,
                                               range_end=today.replace(day=1).timestamp)
-
     # Find as many months as possible in the past
     start = today.replace(day=1, months=-2)
     while True:
@@ -76,8 +77,7 @@ def get_element(name):
             break
         records[start.format('MM-YYYY')] = record
         start = start.replace(months=-1)
-
-    return {'elt': elt, 'records': records}
+    return records
 
 
 def get_page():
@@ -100,11 +100,24 @@ def get_page():
     return {'records': records, 'range_start': range_start, 'range_end': range_end}
 
 
+def get_availability_json(name):
+    user = app.bottle.request.environ['USER']
+    name = urllib.unquote(name)
+    elt = app.datamgr.get_element(name, user) or app.redirect404()
+    return {'elt': elt, 'records': _get_availability_report(elt)}
+
+
 pages = {
+    get_availability_json: {
+        'name': 'Availibility JSON',
+        'route': '/availability/inner/json/<name:path>',
+    },
     get_element: {
-        'name': 'AvailabilityInner', 'route': '/availability/inner/<name:path>', 'view': 'availability-elt', 'static': True
+        'name': 'AvailabilityInner', 'route': '/availability/inner/<name:path>', 'view': 'availability-elt',
+        'static': True
     },
     get_page: {
-        'name': 'Availability', 'route': '/availability', 'view': 'availability-all', 'static': True, 'search_engine': True
+        'name': 'Availability', 'route': '/availability', 'view': 'availability-all', 'static': True,
+        'search_engine': True
     }
 }
