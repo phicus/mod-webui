@@ -80,15 +80,15 @@ function update_target() {
   var cpe_href  = window.location.href.match(/(\w{3})(\d+)$/);
   
   if ( cpe_hash ) {
-    window.cpe_ream = cpe_hash[1];
+    window.cpe_realm = cpe_hash[1];
     window.cpe_id   = cpe_hash[2];
   } else if( cpe_href ) {
-    window.cpe_ream = cpe_href[1];
+    window.cpe_realm = cpe_href[1];
     window.cpe_id   = cpe_href[2];
   }
 
   //Old
-  cpe_name = window.cpe_ream + window.cpe_id;
+  cpe_name = window.cpe_realm + window.cpe_id;
 
 }
 
@@ -97,7 +97,7 @@ function poll_cpe() {
 
 
 
-  $.getJSON('/api/kraken/info/' +  window.cpe_ream + window.cpe_id, function(data){
+  $.getJSON('/api/kraken/info/' +  window.cpe_realm + window.cpe_id, function(data){
 
 
         if ( typeof data.hostevent !== 'undefined' ) {
