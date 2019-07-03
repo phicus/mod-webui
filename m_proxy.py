@@ -16,12 +16,9 @@ def request_to_kiwi(kiwi_url, path, headers, query):
     return r
 
 
-def _kiwi_url(last_url_slice):
+def _kiwi_url(realm):
     kws_list = Config().kws_list
-    default_kiwi = kws_list[0]
-    if last_url_slice == "hostevents":
-        return default_kiwi
-    realm = last_url_slice[:3]
+    default_kiwi = kws_list[0]['uri']
     kiwi_url = next((kws["uri"] for kws in kws_list if kws["realm"] == realm), default_kiwi)
     return kiwi_url
 
@@ -45,12 +42,14 @@ def proxy(path):
     req = request  # type: Request
     app.logger.error("user {} had requested /{}".format(req.authorization.username, path))
 
-    last_url_slice = [x for x in path.split("/") if x][-1]
-    kiwi_url = _kiwi_url(last_url_slice)
+    realm = req.args.get("realm")
+    kiwi_url = _kiwi_url(realm)
     headers = dict(req.headers)
     headers.pop("Host", '')
     headers.pop("Content-Length", '')
-    kiwi_response = request_to_kiwi(kiwi_url, path[4:], headers, dict(req.args))
+    args = dict(req.args)
+    args.pop("realm")
+    kiwi_response = request_to_kiwi(kiwi_url, path[4:], headers, args)
 
     response = make_response(kiwi_response.content)  # type: Response
     response.content_type = kiwi_response.headers["Content-Type"]
