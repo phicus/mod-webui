@@ -340,6 +340,9 @@ $(function(){
 
 });
 
+$(function () {
+    disable_refresh();
+});
 </script>
 
 
