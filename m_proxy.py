@@ -57,4 +57,5 @@ def proxy(path):
     return response
 
 
-app.run(getenv("HOST", "0.0.0.0"), getenv("PORT", 4258))
+if __name__ == '__main__':
+    app.run(getenv("HOST", "0.0.0.0"), getenv("PORT", 4258), debug=True)
