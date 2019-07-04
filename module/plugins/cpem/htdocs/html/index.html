@@ -64,9 +64,11 @@
     <div class="col-md-4">
         <div class="btn-group pull-right" role="group">
             {{#each cpe._links.actions}}
+            {{#when @key 'noteq' 'info'}}
             <button data-action="{{ this }}" id="btn-{{@key}}" type="button" class="btn btn-default">
                 <i class="fa fa-gears" aria-hidden="true"></i>&nbsp; {{@key}}
             </button>
+            {{/when}}
             {{/each}}
         </div>
     </div>
