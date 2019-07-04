@@ -10,7 +10,7 @@
 
 <script src="/static/js/krill.js"></script>
 <script src="/static/cpe/js/jquery.flot.js" charset="utf-8"></script>
-<script src="/static/cpe/js/plots.js" charset="utf-8"></script>
+<script src="/static/cpem/js/plots.js" charset="utf-8"></script>
 <script src="/static/cpe/js/vis.min.js" charset="utf-8"></script>
 <script src="/static/cpe/js/datatables.min.js" charset="utf-8"></script>
 <script src="/static/cpe/js/google-charts.min.js" charset="utf-8"></script>
@@ -37,7 +37,7 @@ function update_cpe() {
         $.get('/api/cpesmetadata/' + window.cpe_realm + window.cpe_id + '?realm=' + window.cpe_realm, function( data ) {
             context.cpe = data;
 
-            console.log(context.graphs);
+            //console.log(context.graphs);
 
             cpe = data;
             services = [] 
@@ -58,7 +58,7 @@ function update_cpe() {
 
                 html = templateScript(context);
                 $( ".content" ).html( html );
-
+                loadPlots();
                 poll_cpe();
                 cpe_refresh();
             })
@@ -130,9 +130,9 @@ function poll_cpe() {
 
             if (typeof data.uptime === 'string') {
               d1 = Date.parse(data.uptime);
-              console.log(d1)
+              //console.log(d1)
               d2 = Date.parse(new Date());
-              console.log(d2)
+              //console.log(d2)
               delta = (d2 - d1) / 1000;
               $('#uptime').html(toHHMMSS(delta));
               if(delta > window.cpe_uptime) {

@@ -171,9 +171,7 @@ var plotData = {
     ],
 }
 
-setTimeout(function(){
-
-$( function(){
+function loadPlots(){
   if( $("#plot_bw").length !==0 ) {
     plots['bw']  = $.plot("#plot_bw",  plotData['bw'],  plotOptions['bw']);
   }
@@ -185,9 +183,7 @@ $( function(){
   if( $("#plot_ccq").length !==0  ) {
     plots['ccq'] = $.plot("#plot_ccq", plotData['ccq'], plotOptions['ccq']);
   }
-});
-
-}, 1000);
+}
 
 
 function updateGraphs(data) {
