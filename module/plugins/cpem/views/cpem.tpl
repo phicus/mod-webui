@@ -10,7 +10,7 @@
 
 <script src="/static/js/krill.js"></script>
 <script src="/static/cpe/js/jquery.flot.js" charset="utf-8"></script>
-<script src="/static/cpe/js/plots.js" charset="utf-8"></script>
+<script src="/static/cpem/js/plots.js" charset="utf-8"></script>
 <script src="/static/cpe/js/vis.min.js" charset="utf-8"></script>
 <script src="/static/cpe/js/datatables.min.js" charset="utf-8"></script>
 <script src="/static/cpe/js/google-charts.min.js" charset="utf-8"></script>
@@ -25,7 +25,20 @@ var proxy_prefix = "";
 var proxy_sufix = ".phicus.net"
 var cpe_graphs = {} 
 
+Handlebars.registerHelper( "when",function(operand_1, operator, operand_2, options) {
+  var operators = {
+   'eq': function(l,r) { return l == r; },
+   'noteq': function(l,r) { return l != r; },
+   'gt': function(l,r) { return Number(l) > Number(r); },
+   'or': function(l,r) { return l || r; },
+   'and': function(l,r) { return l && r; },
+   '%': function(l,r) { return (l % r) === 0; }
+  }
+  , result = operators[operator](operand_1,operand_2);
 
+  if (result) return options.fn(this);
+  else  return options.inverse(this);
+});
 
 
 function update_cpe() {
@@ -34,10 +47,10 @@ function update_cpe() {
         var templateScript = Handlebars.compile(data);
         var context = {}
 
-        $.get('/api/cpesmetadata/' + window.cpe_realm + window.cpe_id, function( data ) {
+        $.get('/api/cpesmetadata/' + window.cpe_realm + window.cpe_id + '?realm=' + window.cpe_realm, function( data ) {
             context.cpe = data;
 
-            console.log(context.graphs);
+            //console.log(context.graphs);
 
             cpe = data;
             services = [] 
@@ -58,7 +71,7 @@ function update_cpe() {
 
                 html = templateScript(context);
                 $( ".content" ).html( html );
-
+                loadPlots();
                 poll_cpe();
                 cpe_refresh();
             })
@@ -97,7 +110,7 @@ function poll_cpe() {
 
 
 
-  $.getJSON('/api/kraken/info/' +  window.cpe_realm + window.cpe_id, function(data){
+  $.getJSON('/api/kraken/info/' +  window.cpe_realm + window.cpe_id + '?realm=' + window.cpe_realm, function(data){
 
 
         if ( typeof data.hostevent !== 'undefined' ) {
@@ -130,9 +143,9 @@ function poll_cpe() {
 
             if (typeof data.uptime === 'string') {
               d1 = Date.parse(data.uptime);
-              console.log(d1)
+              //console.log(d1)
               d2 = Date.parse(new Date());
-              console.log(d2)
+              //console.log(d2)
               delta = (d2 - d1) / 1000;
               $('#uptime').html(toHHMMSS(delta));
               if(delta > window.cpe_uptime) {
@@ -340,6 +353,9 @@ $(function(){
 
 });
 
+$(function () {
+    disable_refresh();
+});
 </script>
 
 

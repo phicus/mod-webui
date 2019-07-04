@@ -419,9 +419,9 @@ function createTimeline(min_date, max_date) {
     var container = document.getElementById('timeline');
 
     var groups = [];
-    groups.push({id: cpe.name, content: '<span id="status2">'+getHostHTMLState(cpe.state_id)+'</span>' + '<a href="'+cpe.url+'">'+cpe.name+'</a>'});
+    groups.push({id: cpe.name, content: '<span id="status2">'+getHostHTMLState(cpe.state_id)+'</span>' + '<a href="/host/'+cpe_name+'">'+cpe_name+'</a>'});
     services.forEach(function(service) {
-        groups.push({id: service.name, content: getHTMLState(service.state_id) + '<a href="'+service.url+'">'+service.name+'</a>'});
+        groups.push({id: service.name, content: getHTMLState(service.state_id) + '<a href="/service/'+cpe_name+'/'+ service.name +'">'+service.name+'</a>'});
     });
     //groups.push({id: 'iplease', content: 'iplease'});
     var options = {
