@@ -58,6 +58,11 @@
 
             <span style="color: #9E9E9E"><i class="fa fa-arrow-circle-o-down"></i>{{profile.downstream}}</span>
             <span style="color: #9E9E9E"><i class="fa fa-arrow-circle-o-up"></i>{{profile.upstream}}</span>
+            {{#each cpe.potses}}
+            {{#if this.cli}}
+            | <span style="color: #607D8B">{{ this.order }}<i class="fa fa-phone" aria-hidden="true"></i> {{ this.cli }}</span>
+            {{/if}}
+            {{/each}}
         </div>
     </div>
 
