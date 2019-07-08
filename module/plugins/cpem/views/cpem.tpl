@@ -53,8 +53,8 @@ function update_cpe() {
             //console.log(context.graphs);
 
             cpe = data;
-            services = [] 
-            
+            services = []
+
             data._services.forEach(function(element) {
               services.push({
                 'name': element,
@@ -64,19 +64,17 @@ function update_cpe() {
               })
             });
 
-          
-
             $.get('/api/customers/' + data.customer + '?realm=' + window.cpe_realm, function( data ) {
                 context.customer = data
-
-                html = templateScript(context);
-                $( ".content" ).html( html );
-                loadPlots();
-                poll_cpe();
-                cpe_refresh();
+                $.get('/api/cpe_profiles/' + cpe.profile + '?realm=' + window.cpe_realm, function( data ) {
+                    context.profile = data
+                    html = templateScript(context);
+                    $( ".content" ).html( html );
+                    loadPlots();
+                    poll_cpe();
+                    cpe_refresh();
+                })
             })
-
-            
 
 
         })
