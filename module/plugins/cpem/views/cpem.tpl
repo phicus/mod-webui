@@ -49,9 +49,12 @@ function update_cpe() {
 
         $.get('/api/cpesmetadata/' + window.cpe_realm + window.cpe_id + '?realm=' + window.cpe_realm, function( data ) {
             context.cpe = data;
-
-            //console.log(context.graphs);
-
+            context.ordered_actions = [
+                "unprovision",
+                "factory",
+                "reboot",
+                "reconfig",
+            ];
             cpe = data;
             services = []
 
@@ -70,6 +73,13 @@ function update_cpe() {
                     context.profile = data
                     html = templateScript(context);
                     $( ".content" ).html( html );
+                    action_to_icon = {
+                        unprovision: "reply",
+                        factory: "fast-backward",
+                        reboot: "refresh",
+                        reconfig: "gears"
+                    }
+                    Object.keys(action_to_icon).forEach(k => $("#btn-" + k).children().addClass("fa-" + action_to_icon[k]))
                     loadPlots();
                     poll_cpe();
                     cpe_refresh();
