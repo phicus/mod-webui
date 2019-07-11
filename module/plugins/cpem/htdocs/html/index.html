@@ -40,6 +40,13 @@
                 <i class="fa fa-spinner fa-spin"></i>
             </span>
         </div>
+        <div style="font-size: 18px; color: #333;" id="ips">
+            {{#if poll}}
+            {{#each poll.ips}}
+            <a target="_blank" href="http://{{ this }}.{{ location.hostname }}">{{ this }}</a>
+            {{/each}}
+            {{/if}}
+        </div>
         <div style="font-size: 18px; color: #999;">
             {{#if cpe.active}}:
             <span style="color: #64DD17" alt="Enabled Internet access" title="CPE Enabled"><i

@@ -45,7 +45,10 @@ function update_cpe() {
     $.get( '/m/html/index.html', function( data ) {
 
         var templateScript = Handlebars.compile(data);
-        var context = {}
+        var context = {
+            location: window.location,
+            poll: window.poll,
+        }
 
         $.get('/api/cpesmetadata/' + window.cpe_realm + window.cpe_id + '?realm=' + window.cpe_realm, function( data ) {
             context.cpe = data;
@@ -119,7 +122,7 @@ function poll_cpe() {
 
 
   $.getJSON('/api/kraken/info/' +  window.cpe_realm + window.cpe_id + '?realm=' + window.cpe_realm, function(data){
-
+        window.poll = data;
 
         if ( typeof data.hostevent !== 'undefined' ) {
           $.each(data.hostevent, function(k,v){
