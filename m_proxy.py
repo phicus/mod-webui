@@ -30,9 +30,9 @@ def shinken_login_required(handler):
         cookie = req.cookies.get("user", req.cookies.get("user_session"))
         decoded_cookie = list(cookie_decode(cookie, "CHANGEME"))
         decoded_cookie = decoded_cookie[0] if len(decoded_cookie) == 1 else decoded_cookie[1]
-        if not decoded_cookie or not decoded_cookie[-1]:
+        if not decoded_cookie:
             return "Not authorized", 401
-        req.authorization = Authorization("shinken-cookie", dict(username=decoded_cookie[-1]["login"]))
+        req.authorization = Authorization("shinken-cookie", dict(username=decoded_cookie["login"]))
         return handler(*args, **kwargs)
 
     return wrapper
