@@ -43,9 +43,9 @@ import os
 ALIGNAK = False
 if os.environ.get('ALIGNAK_SHINKEN_UI', None):
     ALIGNAK = True
-else:
-    if os.path.exists('/usr/local/share/alignak'):
-        ALIGNAK = True
+# else:
+#     if os.path.exists('/usr/local/share/alignak'):
+#         ALIGNAK = True
 
 import traceback
 import sys
