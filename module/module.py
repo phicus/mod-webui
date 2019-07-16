@@ -980,7 +980,7 @@ class Webui_broker(BaseModule, Daemon):
             user = request.environ.get('USER', None)
 
         try:
-            retval = user and ((not self.manage_acl) or user.is_administrator() or user.can_submit_commands())
+            retval = user and ((not self.manage_acl) or user.is_administrator() or user.can_submit_commands)
         except Exception as e:
             retval = False
         return retval
