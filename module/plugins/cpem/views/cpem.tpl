@@ -51,45 +51,48 @@ function update_cpe() {
         }
 
         $.get('/api/cpesmetadata/' + window.cpe_realm + window.cpe_id + '?realm=' + window.cpe_realm, function( data ) {
-            context.cpe = data;
-            context.ordered_actions = [
-                "unprovision",
-                "factory",
-                "reboot",
-                "reconfig",
-            ];
-            cpe = data;
-            services = []
+            $.get("/api/potses/?cpe=" + window.cpe_id, function(potses) {
+                data.potses = potses;
+                context.cpe = data;
+                context.ordered_actions = [
+                    "unprovision",
+                    "factory",
+                    "reboot",
+                    "reconfig",
+                ];
+                cpe = data;
+                services = []
 
-            data._services.forEach(function(element) {
-              services.push({
-                'name': element,
-                'state_id': 0,
-                'url': 'about:blank',
-                'content': '&nbsp;'
-              })
-            });
+                data._services.forEach(function(element) {
+                  services.push({
+                    'name': element,
+                    'state_id': 0,
+                    'url': 'about:blank',
+                    'content': '&nbsp;'
+                  })
+                });
 
-            $.get('/api/customers/' + data.customer + '?realm=' + window.cpe_realm, function( data ) {
-                context.customer = data
-                $.get('/api/cpe_profiles/' + cpe.profile + '?realm=' + window.cpe_realm, function( data ) {
-                    context.profile = data
-                    html = templateScript(context);
-                    $( ".content" ).html( html );
-                    action_to_icon = {
-                        unprovision: "reply",
-                        factory: "fast-backward",
-                        reboot: "refresh",
-                        reconfig: "gears"
-                    }
-                    Object.keys(action_to_icon).forEach(k => $("#btn-" + k).children().addClass("fa-" + action_to_icon[k]))
-                    loadPlots();
-                    poll_cpe();
-                    cpe_refresh();
+                $.get('/api/customers/' + data.customer + '?realm=' + window.cpe_realm, function( data ) {
+                    context.customer = data
+                    $.get('/api/cpe_profiles/' + cpe.profile + '?realm=' + window.cpe_realm, function( data ) {
+                        context.profile = data
+                        html = templateScript(context);
+                        $( ".content" ).html( html );
+                        action_to_icon = {
+                            unprovision: "reply",
+                            factory: "fast-backward",
+                            reboot: "refresh",
+                            reconfig: "gears"
+                        }
+                        Object.keys(action_to_icon).forEach(k => $("#btn-" + k).children().addClass("fa-" + action_to_icon[k]))
+                        loadPlots();
+                        poll_cpe();
+                        cpe_refresh();
+                    })
                 })
-            })
 
 
+            });
         })
     });
 }
