@@ -51,7 +51,7 @@ function update_cpe() {
         }
 
         $.get('/api/cpesmetadata/' + window.cpe_realm + window.cpe_id + '?realm=' + window.cpe_realm, function( data ) {
-            $.get("/api/potses/?cpe=" + window.cpe_id, function(potses) {
+            $.get("/api/potses/?cpe=" + window.cpe_id + '&realm=' + window.cpe_realm, function(potses) {
                 data.potses = potses;
                 context.cpe = data;
                 context.ordered_actions = [
