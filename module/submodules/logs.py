@@ -212,7 +212,7 @@ class MongoDBLogs():
                 if '_id' in log:
                     del log['_id']
                 records.append(log)
-            logger.debug("[mongo-logs] %d records fetched from database.", records.count())
+            logger.debug("[mongo-logs] %d records fetched from database.", len(records))
         except Exception, exp:
             logger.error("[mongo-logs] Exception when querying database: %s", str(exp))
 
