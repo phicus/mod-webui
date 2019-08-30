@@ -8,7 +8,7 @@
 
 %search_string = app.get_search_string()
 
-%rebase("layout", title='Krill - Matrix for hosts/services', css=['matrix/css/matrix.css'], js=['matrix/js/matrix.js'], breadcrumb=[ ['All hosts', '/matrix'] ])
+%rebase("layout", title='Krill - Matrix for hosts/services', css=['radius/css/radius.css'], js=['radius/js/radius.js'], breadcrumb=[ ['All hosts', '/matrix'] ])
 
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs/dt-1.10.16/datatables.min.css"/>
 <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css"/>
