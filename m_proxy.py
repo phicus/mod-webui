@@ -2,10 +2,10 @@ from functools import wraps
 from os import getenv
 
 import requests
+import yaml
 from bottle import cookie_decode
 from flask import Flask, Response, make_response, request
 from flask import Request
-from libkrill.config import Config
 from werkzeug.datastructures import Authorization
 
 app = Flask(__name__)
@@ -17,7 +17,7 @@ def request_to_kiwi(kiwi_url, path, headers, query):
 
 
 def _kiwi_url(realm):
-    kws_list = Config().kws_list
+    kws_list = yaml.load(open("/etc/krill/variables.yml"))["kws_list"]
     default_kiwi = kws_list[0]['uri']
     kiwi_url = next((kws["uri"] for kws in kws_list if kws["realm"] == realm), default_kiwi)
     return kiwi_url
