@@ -4,7 +4,7 @@
 %import json
 %import yaml
 
-%from alignak.misc.perfdata import PerfDatas
+%from shinken.misc.perfdata import PerfDatas
 %now = int(time.time())
 
 %# If got no element, bailout
@@ -17,7 +17,7 @@ Invalid element name
 
 %helper = app.helper
 
-%from alignak.macroresolver import MacroResolver
+%from shinken.macroresolver import MacroResolver
 
 %# Main variables
 %if hasattr(cpe.__class__, 'my_type'):

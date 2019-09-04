@@ -2,7 +2,7 @@
 %import re
 %import ast
 %import json
-%from alignak.misc.perfdata import PerfDatas
+%from shinken.misc.perfdata import PerfDatas
 %now = int(time.time())
 %helper = app.helper
 
