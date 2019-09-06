@@ -203,8 +203,8 @@ def set_trivial_setting():
     data = json.load(app.request.body or '{}')
     saved_data = get_trivial_setting()
     saved_data.update(data)
-    app.prefs_module.set_ui_common_preference('trivial', json.dumps(saved_data))
-
+    user = app.request.environ['USER']
+    app.prefs_module.set_ui_common_preference('trivial_{}'.format(user), json.dumps(saved_data))
     return {'status': 'ok'}
 
 def get_trivial_setting():
@@ -216,6 +216,11 @@ def get_trivial_setting():
     # app.response.set_header("Content-Type", 'application/octet-stream')
     # It works
     # app.response.set_header("Test-Header", 'Some awesome value')
+    user = app.request.environ['USER']
+    data = json.loads(app.prefs_module.get_ui_common_preference('trivial_{}'.format(user)) or '{}')
+    if data:
+        return data
+
     return json.loads(app.prefs_module.get_ui_common_preference('trivial') or '{}')
 
 
