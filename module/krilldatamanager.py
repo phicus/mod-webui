@@ -404,6 +404,20 @@ class KrillUIDataManager(WebUIDataManager):
                 # logger.info("[WebUI-REG] s=%s -> len(new_items)=%d", s.split(','), len(new_items))
                 items = new_items
 
+            if t == 'regstate':
+                new_items = []
+                for i in items:
+                    l1 = s.split('|')
+                    if i.__class__.my_type == 'service':
+                        l2 = i.host.cpe_registration_state
+                    elif i.__class__.my_type == 'host':
+                        l2 = i.cpe_registration_state
+                    else:
+                        l2 = ''
+                    if s in l2:
+                        _append_based_on_filtered_by_type(new_items, i, filtered_by_type)
+                items = new_items
+
             if t == 'loc':
                 pat = re.compile(s, re.IGNORECASE)
                 new_items = []
