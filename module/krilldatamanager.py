@@ -370,9 +370,9 @@ class KrillUIDataManager(WebUIDataManager):
             if t == 'perf':
                 match = re.compile('(?P<attr>[\w_]+)(?P<operator>>=|>|==|<|<=)(?P<value>[-\d\.]+)').match(s)
                 operator_str2function = {'>=':operator.ge, '>':operator.gt, '=':operator.eq, '==':operator.eq, '<':operator.lt, '<=':operator.le}
-                oper = operator_str2function[match.group('operator')]
                 new_items = []
                 if match:
+                    oper = operator_str2function[match.group('operator')]
                     for i in items:
                         if i.process_perf_data:
                             perf_datas = PerfDatas(i.perf_data)
