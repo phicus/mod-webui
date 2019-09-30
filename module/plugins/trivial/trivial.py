@@ -122,7 +122,7 @@ def show_trivial_json():
 
             data.get('nodes').append(_node)
 
-    # Second Round: Detect ophan edges
+    # Second Round: Generate edges
     for h in hosts_items:
         try: # for help debug
             _host = h.get_name()
@@ -152,12 +152,21 @@ def show_trivial_json():
                 ### IF HOST IS CPE
                 if hasattr(h, 'cpe_registration_host'):
                     _parent = getattr(h, 'cpe_registration_host')
+
+                    if (not _parent or
+                       _parent in locs or
+                       _parent not in hosts or
+                       _parent == _host):
+                        continue
+
+
                     edge.get('data').update({
                         "id": "{}:{}".format(_parent,_host),
                         "source": _host,
                         "target": _parent,
                         "color": '#3f51b5',
-                        "label": ''
+                        "label": '',
+                        "cpe": True
                     })
 
             dnbw, upbw = (None,None)

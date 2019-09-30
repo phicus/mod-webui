@@ -21,7 +21,7 @@ var LAYOUT1 = {
     },
     randomize: true,
     gravityRangeCompound: 0.25,
-    nodeDimensionsIncludeLabels: false,
+    nodeDimensionsIncludeLabels: true,
     nodeRepulsion: 1000 * 1000,
     tile: true
 }
@@ -161,8 +161,9 @@ function loadPositionFromServer(shouldUnlock) {
         url: '/trivial/settings/load',
         success: data => {
             console.log("LOAD");
-            setPositions(data.save1);
-            setPositions(data.save1);
+            if (data.save1) {
+                setPositions(data.save1);
+            }
             if (!shouldUnlock) {
                 cy.nodes().lock();
             }
