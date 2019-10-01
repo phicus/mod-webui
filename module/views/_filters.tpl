@@ -56,7 +56,7 @@
           </div>
 
 
-          <div class="dropdown form-group text-right">
+          <div class="dropdown form-group text-right" id="search-dropdown">
             <a href="#" class="dropdown-toggle" type="button" id="search_menu" data-toggle="dropdown" aria-expanded="false" title="Search"><i class="fa fa-search"></i><span class="hidden-sm hidden-xs hidden-md"></a>
             <ul class="dropdown-menu" role="menu" aria-labelledby="search_menu">
               <li><a role="menuitem" href="/all?search={{ app.get_search_string() }}">
