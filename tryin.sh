@@ -7,4 +7,9 @@ if [ -n "$2" ]; then
 fi
 
 rsync -av --cvs-exclude ./module/$subpath ${xyz}.phicus.es:/var/lib/shinken/modules/webui2/$subpath;
-#ssh ${xyz}.phicus.es "service shinken-broker restart; service shinken reload"
+rsync -av --cvs-exclude ../webui-plugins/* ${xyz}.phicus.es:/var/lib/shinken/modules/webui2/plugins/;
+
+ssh ${xyz}.phicus.es "service shinken-broker restart; service shinken reload"
+
+
+

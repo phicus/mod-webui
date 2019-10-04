@@ -508,17 +508,17 @@ class KrillUIDataManager(WebUIDataManager):
                 logger.error("[WebUI] wololooo", len(new_items))
                 new_items = []
                 only_hosts = [i for i in items if i.__class__.my_type == 'host']
-                if s.lower() == 'descendents':
+                if s.lower() == ('descendents', 'descendants'):
                     for item in only_hosts:
                         logger.error("[WebUI] wololooo", len(new_items))
                         new_items = list(set(new_items + [item] + get_childs_recursive(item)))
 
-                if s.lower() == 'ascendents':
+                if s.lower() in ('ascendents', 'ascendants'):
                     for item in only_hosts:
                         logger.error("[WebUI] wololooo", len(new_items))
                         new_items = list(set(new_items + [item] + get_parents_recursive(item)))
 
-                if s.lower() == 'family':
+                if s.lower() == ('family', 'all'):
                     for item in only_hosts:
                         logger.error("[WebUI] wololooo", len(new_items))
                         new_items = list(set(new_items + [item] +  get_parents_recursive(item) + get_childs_recursive(item)))
