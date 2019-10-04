@@ -71,6 +71,27 @@ class KrillUIDataManager(WebUIDataManager):
 
             return False
 
+        def get_parents_recursive(item):
+            if len(item.parents) > 0:
+                parents = []
+                for parent in item.parents:
+                    parents.append(parent)
+                    parents = parents + get_parents_recursive(parent)
+                return parents
+            else:
+                return []
+
+        def get_childs_recursive(item):
+            if len(item.childs) > 0:
+                childs = []
+                for child in item.childs:
+                    childs.append(child)
+                    childs = childs + get_childs_recursive(child)
+                return childs
+            else:
+                return []
+
+
         # Make user an User object ... simple protection.
         if isinstance(user, basestring):
             user = self.rg.contacts.find_by_name(user)
@@ -480,6 +501,30 @@ class KrillUIDataManager(WebUIDataManager):
                     patterns.append( ("is", "downtime") )
             if t == 'crit':
                 patterns.append( ("is", "critical") )
+
+
+            logger.error("[WebUI] t=%s", t)
+            if t == 'mode':
+                logger.error("[WebUI] wololooo", len(new_items))
+                new_items = []
+                only_hosts = [i for i in items if i.__class__.my_type == 'host']
+                if s.lower() == 'descendents':
+                    for item in only_hosts:
+                        logger.error("[WebUI] wololooo", len(new_items))
+                        new_items = list(set(new_items + [item] + get_childs_recursive(item)))
+
+                if s.lower() == 'ascendents':
+                    for item in only_hosts:
+                        logger.error("[WebUI] wololooo", len(new_items))
+                        new_items = list(set(new_items + [item] + get_parents_recursive(item)))
+
+                if s.lower() == 'family':
+                    for item in only_hosts:
+                        logger.error("[WebUI] wololooo", len(new_items))
+                        new_items = list(set(new_items + [item] +  get_parents_recursive(item) + get_childs_recursive(item)))
+
+
+                items = new_items
 
         if sorter is not None:
             items.sort(sorter)
