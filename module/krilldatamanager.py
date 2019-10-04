@@ -507,7 +507,7 @@ class KrillUIDataManager(WebUIDataManager):
             if t == 'mode':
                 new_items = []
                 only_hosts = [i for i in items if i.__class__.my_type == 'host']
-                if s.lower() == ('descendents', 'descendants'):
+                if s.lower() in ('descendents', 'descendants'):
                     for item in only_hosts:
                         new_items = list(set(new_items + [item] + get_childs_recursive(item)))
 
@@ -519,8 +519,8 @@ class KrillUIDataManager(WebUIDataManager):
                     for item in only_hosts:
                         new_items = list(set(new_items + [item] +  get_parents_recursive(item) + get_childs_recursive(item)))
 
-
-                items = new_items
+                if new_items:
+                    items = new_items
 
         if sorter is not None:
             items.sort(sorter)
