@@ -15,6 +15,8 @@
 }
 </style>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/js-cookie/2.2.1/js.cookie.js" integrity="sha256-P8jY+MCe6X2cjNSmF4rQvZIanL5VwUUT4MBnOMncjRU=" crossorigin="anonymous"></script>
+
 <!-- Header Navbar -->
 <nav class="header navbar navbar-static-top navbar-inverse navbar-fixed-top" role="navigation">
    <div class="navbar-header">
@@ -154,18 +156,43 @@
            <!--<i class="fa fa-user" title="{{ username }}"></i>-->
          </a>
 
+
+
          <ul class="dropdown-menu">
            <li class="dropdown-header">{{ username }}</li>
            <li class="divider"></li>
            <li><a href="https://github.com/shinken-monitoring/mod-webui/wiki" target="_blank">Documentation</a></li>
            <li class="disabled"><a href="#actions" data-toggle="modal">Actions</a></li>
+
            <li><a href="/user/pref" data-toggle="modal">Preferences</a></li>
            <li class="divider"></li>
+
+           <li class="dropdown-header" id="beta-features"><label>Beta Features&nbsp;
+            <input type="checkbox" id="beta-features-toggle" data-toggle="toggle">
+           </label></li>
            <li><a href="/user/logout" data-toggle="modal" data-target="/user/logout"><i class="fa fa-sign-out"></i> Logout</a></li>
          </ul>
       </li>
    </ul>
 
+  <script>
+  $(document).ready(function(){
+    window.beta_features = Cookies.get('beta_features');
+    if(beta_features === 'true') {
+      $('#beta-features-toggle').prop('checked', true);
+    } else {
+      $('#beta-features-toggle').prop('checked', false);
+    }
+
+    $('#beta-features-toggle').on('change', function(){
+      console.log("beta_features: " + $(this).prop( "checked" ));
+      Cookies.set('beta_features', $(this).prop( "checked" ));
+
+    })
+
+
+  });
+  </script>
 
   <!--SIDEBAR-->
   <div class="navbar-default sidebar" role="navigation">
