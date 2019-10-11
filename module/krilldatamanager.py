@@ -501,9 +501,7 @@ class KrillUIDataManager(WebUIDataManager):
                     patterns.append( ("is", "downtime") )
             if t == 'crit':
                 patterns.append( ("is", "critical") )
-
-
-            logger.error("[WebUI] t=%s", t)
+                
             if t == 'mode':
                 new_items = []
                 only_hosts = [i for i in items if i.__class__.my_type == 'host']
