@@ -176,6 +176,12 @@
    </ul>
 
   <script>
+%import os.path
+%if os.path.exists('/etc/krill/beta_features'):
+  //Force beta features
+  Cookies.set('beta_features', true);
+%end
+
   $(document).ready(function(){
     window.beta_features = Cookies.get('beta_features');
     if(beta_features === 'true') {
