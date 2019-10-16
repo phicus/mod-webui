@@ -35,6 +35,12 @@
       <meta name="viewport" content="width=device-width, initial-scale=1">
       <title>{{title or 'No title'}}</title>
 
+%import os.path
+%if os.path.exists('/etc/krill/beta_features'):
+<script>var force_beta_features = 1;</script>
+%end
+
+
       <!--
          This file is a part of Shinken.
 
@@ -83,6 +89,7 @@
       ================================================== -->
       <script src="/static/js/jquery-1.12.0.min.js"></script>
       <script src="/static/js/shinken-bookmarks.js?v={{app.app_version}}"></script>
+
    </head>
 
    <body>
