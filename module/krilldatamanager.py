@@ -513,7 +513,7 @@ class KrillUIDataManager(WebUIDataManager):
                     for item in only_hosts:
                         new_items = list(set(new_items + [item] + get_parents_recursive(item)))
 
-                if s.lower() == ('family', 'all'):
+                if s.lower() in ('family', 'all'):
                     for item in only_hosts:
                         new_items = list(set(new_items + [item] +  get_parents_recursive(item) + get_childs_recursive(item)))
 
