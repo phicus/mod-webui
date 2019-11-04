@@ -241,8 +241,9 @@ function poll_cpe() {
 
             if ( typeof data.ips !== 'undefined' ) {
                $("#ips").html('')
-               $.each(data.ips, function(v,k){
-                 $("#ips").append('<a href="http://'+proxy_prefix+k[1]+'.'+proxy_sufix+'">'+k[1]+'</a> | ');
+               $.each(data.ips, function(k, v){
+                 ip = (Array.isArray(v) ? v[1] : v)
+                 $("#ips").append('<a href="http://'+proxy_prefix+ip+'.'+proxy_sufix+'">'+ip+'</a> | ');
                })
             }
 
