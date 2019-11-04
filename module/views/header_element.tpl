@@ -179,7 +179,7 @@
 %import os.path
 %if os.path.exists('/etc/krill/beta_features'):
   //Force beta features
-  Cookies.set('beta_features', true);
+  Cookies.set('beta_features', true, { expires: 7 });
 %end
 
   $(document).ready(function(){
