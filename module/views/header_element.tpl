@@ -287,6 +287,12 @@
               <a href="{{c['uri']}}" target="_blank"><span class="fa fa-rocket sidebar-icon"></span> {{c['label']}}</a>
             </li>
             %end
+            <li>
+              <a href="/radius" target="_blank"><span class="fa fa-wifi sidebar-icon"></span> Radius</a>
+            </li>
+            <li>
+              <a href="/cdrs" target="_blank"><span class="fa fa-phone-square sidebar-icon"></span> CDRs table</a>
+            </li>
           </ul>
         </li>
         %end
