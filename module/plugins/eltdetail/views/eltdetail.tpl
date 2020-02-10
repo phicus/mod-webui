@@ -81,7 +81,7 @@ Invalid element name
 
 
    %groups = elt_service.servicegroups if elt_service else elt_host.hostgroups
-   %groups = sorted(groups, key=lambda x:x.level)
+   % #groups = sorted(groups, key=lambda x:x.level)
    %tags = elt_service.get_service_tags() if elt_service else elt_host.get_host_tags()
    <!-- First row : tags and actions ... -->
    %if elt.action_url or tags or groups:
