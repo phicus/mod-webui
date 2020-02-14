@@ -93,7 +93,7 @@ Invalid element name
          <ul class="dropdown-menu pull-right">
          %for g in groups:
             <li>
-            <a href="/{{elt_type}}s-group/{{g.get_name()}}">{{g.level if g.level else '0'}} - {{g.alias if g.alias else g.get_name()}}</a>
+            <a href="/{{elt_type}}s-group/{{g.get_name()}}">{{g.level if hasattr(g, 'level') and g.level else '0'}} - {{g.alias if g.alias else g.get_name()}}</a>
             </li>
          %end
          </ul>
