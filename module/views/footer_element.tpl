@@ -7,7 +7,7 @@
 
 %username = 'anonymous'
 <!-- Footer -->
-<footer>
+<footer class="hidden-xs">
    <nav class="navbar navbar-default navbar-fixed-bottom">
       <div class="container-fluid">
          <a href="javascript:;" onclick="swappSidebar()"><i class="fa fa-bars"></i></a>
