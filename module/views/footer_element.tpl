@@ -8,7 +8,7 @@
 
 %username = 'anonymous'
 <!-- Footer -->
-<footer>
+<footer class="hidden-xs">
    <nav class="navbar navbar-default navbar-fixed-bottom">
       <div class="container-fluid">
          <div onclick="display_modal('/modal/about')">
