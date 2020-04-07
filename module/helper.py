@@ -413,7 +413,7 @@ class Helper(object):
             return colors['UNKNOWN']
 
     def get_perfdata_pie(self, p):
-        if p.max is not None:
+        if p.max is not None and p.value is not None:
             color = self.get_html_color('OK')
             used_value = p.value - (p.min or 0)
             unused_value = p.max - (p.min or 0) - used_value

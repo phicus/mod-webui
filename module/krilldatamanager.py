@@ -391,6 +391,7 @@ class KrillUIDataManager(WebUIDataManager):
             if t == 'perf':
                 match = re.compile('(?P<attr>[\w_]+)(?P<operator>>=|>|==|<|<=)(?P<value>[-\d\.]+)').match(s)
                 operator_str2function = {'>=':operator.ge, '>':operator.gt, '=':operator.eq, '==':operator.eq, '<':operator.lt, '<=':operator.le}
+                oper = operator_str2function[match.group('operator')]
                 new_items = []
                 if match:
                     oper = operator_str2function[match.group('operator')]
@@ -402,7 +403,6 @@ class KrillUIDataManager(WebUIDataManager):
                                 if oper(float(perf_datas[perfdata.name].value), float(match.group('value'))):
                                     _append_based_on_filtered_by_type(new_items, i, filtered_by_type)
                 items = new_items
-
 
             if t == 'reg':
                 new_items = []
@@ -426,24 +426,18 @@ class KrillUIDataManager(WebUIDataManager):
                 # logger.info("[WebUI-REG] s=%s -> len(new_items)=%d", s.split(','), len(new_items))
                 items = new_items
 
-
-            if t == 'state':
+            if t == 'regstate':
                 new_items = []
-
                 for i in items:
                     l1 = s.split('|')
                     if i.__class__.my_type == 'service':
-                        l2 = i.host.cpe_registration_state.split(',')
-                    if i.__class__.my_type == 'host':
-                        l2 = i.cpe_registration_state.split(',')
+                        l2 = i.host.cpe_registration_state
+                    elif i.__class__.my_type == 'host':
+                        l2 = i.cpe_registration_state
                     else:
-                        l2 = []
-
-                    found = [x for x in l1 if x in l2]
-                    if found:
+                        l2 = ''
+                    if s in l2:
                         _append_based_on_filtered_by_type(new_items, i, filtered_by_type)
-
-                # logger.info("[WebUI-REG] s=%s -> len(new_items)=%d", s.split(','), len(new_items))
                 items = new_items
 
             if t == 'loc':
@@ -521,7 +515,7 @@ class KrillUIDataManager(WebUIDataManager):
                     patterns.append( ("is", "downtime") )
             if t == 'crit':
                 patterns.append( ("is", "critical") )
-                
+
             if t == 'mode':
                 new_items = []
                 only_hosts = [i for i in items if i.__class__.my_type == 'host']
