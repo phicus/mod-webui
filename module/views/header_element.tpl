@@ -288,11 +288,15 @@
             </li>
             %end
             <li>
+              <a href="/sonar" target="_blank"><span class="fa fa-rocket sidebar-icon"></span> Krill Sonar</a>
+            </li>
+            <li>
               <a href="/radius" target="_blank"><span class="fa fa-wifi sidebar-icon"></span> Radius</a>
             </li>
             <li>
               <a href="/cdrs" target="_blank"><span class="fa fa-phone-square sidebar-icon"></span> CDRs table</a>
             </li>
+
           </ul>
         </li>
         %end
