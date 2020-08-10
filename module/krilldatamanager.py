@@ -71,6 +71,27 @@ class KrillUIDataManager(WebUIDataManager):
 
             return False
 
+        def get_parents_recursive(item):
+            if len(item.parents) > 0:
+                parents = []
+                for parent in item.parents:
+                    parents.append(parent)
+                    parents = parents + get_parents_recursive(parent)
+                return parents
+            else:
+                return []
+
+        def get_childs_recursive(item):
+            if len(item.childs) > 0:
+                childs = []
+                for child in item.childs:
+                    childs.append(child)
+                    childs = childs + get_childs_recursive(child)
+                return childs
+            else:
+                return []
+
+
         # Make user an User object ... simple protection.
         if isinstance(user, basestring):
             user = self.rg.contacts.find_by_name(user)
@@ -370,15 +391,16 @@ class KrillUIDataManager(WebUIDataManager):
             if t == 'perf':
                 match = re.compile('(?P<attr>[\w_]+)(?P<operator>>=|>|==|<|<=)(?P<value>[-\d\.]+)').match(s)
                 operator_str2function = {'>=':operator.ge, '>':operator.gt, '=':operator.eq, '==':operator.eq, '<':operator.lt, '<=':operator.le}
+                oper = operator_str2function[match.group('operator')]
                 new_items = []
                 if match:
                     oper = operator_str2function[match.group('operator')]
                     for i in items:
                         if i.process_perf_data:
                             perf_datas = PerfDatas(i.perf_data)
-                            if match.group('attr') in perf_datas:
-                                if oper(float(perf_datas[match.group('attr')].value), float(match.group('value'))):
-                                    # new_items.append(i)
+                            matched_perfdatas = [p for p in perf_datas if match.group('attr') in p.name]
+                            for perfdata in matched_perfdatas:
+                                if oper(float(perf_datas[perfdata.name].value), float(match.group('value'))):
                                     _append_based_on_filtered_by_type(new_items, i, filtered_by_type)
                 items = new_items
 
@@ -493,6 +515,24 @@ class KrillUIDataManager(WebUIDataManager):
                     patterns.append( ("is", "downtime") )
             if t == 'crit':
                 patterns.append( ("is", "critical") )
+
+            if t == 'mode':
+                new_items = []
+                only_hosts = [i for i in items if i.__class__.my_type == 'host']
+                if s.lower() in ('descendents', 'descendants'):
+                    for item in only_hosts:
+                        new_items = list(set(new_items + [item] + get_childs_recursive(item)))
+
+                if s.lower() in ('ascendents', 'ascendants'):
+                    for item in only_hosts:
+                        new_items = list(set(new_items + [item] + get_parents_recursive(item)))
+
+                if s.lower() in ('family', 'all'):
+                    for item in only_hosts:
+                        new_items = list(set(new_items + [item] +  get_parents_recursive(item) + get_childs_recursive(item)))
+
+                if new_items:
+                    items = new_items
 
         if sorter is not None:
             items.sort(sorter)

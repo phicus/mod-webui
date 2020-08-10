@@ -83,6 +83,7 @@
       ================================================== -->
       <script src="/static/js/jquery-1.12.0.min.js"></script>
       <script src="/static/js/shinken-bookmarks.js?v={{app.app_version}}"></script>
+
    </head>
 
    <body>
@@ -126,7 +127,8 @@
                          %end
                        </ol>
                      </h3>
-
+                     -->
+                     
                   </section>
 
                   <!-- Page content -->

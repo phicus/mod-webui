@@ -56,23 +56,23 @@
           </div>
 
 
-          <div class="dropdown form-group text-right">
+          <div class="dropdown form-group text-right" id="search-dropdown">
             <a href="#" class="dropdown-toggle" type="button" id="search_menu" data-toggle="dropdown" aria-expanded="false" title="Search"><i class="fa fa-search"></i><span class="hidden-sm hidden-xs hidden-md"></a>
             <ul class="dropdown-menu" role="menu" aria-labelledby="search_menu">
               <li><a role="menuitem" href="/all?search={{ app.get_search_string() }}">
-                <span class="btn fa fa-search"></span>All</a></li>
+                <span class="btn"><span class="fa fa-fw fa-search" style="margin-left: 0!important"></span></span> All</a></li>
               <li><a role="menuitem" href="/impacts?search={{ app.get_search_string() }}">
-                <span class="btn fa fa-bolt"></span>Impacts</a></li>
+                <span class="btn"><span class="fa fa-fw fa-bolt" style="margin-left: 0!important"></span></span> Impacts</a></li>
               <li><a role="menuitem" href="/worldmap?search={{ app.get_search_string() }}">
-                <span class="btn fa fa-map"></span>Worldmap</a></li>
+                <span class="btn"><span class="fa fa-fw fa-map" style="margin-left: 0!important"></span></span> Worldmap</a></li>
               <li><a role="menuitem" href="/minemap?search={{ app.get_search_string() }}">
-                <span class="btn fa fa-table"></span>Minemap</a></li>
+                <span class="btn"><span class="fa fa-fw fa-table" style="margin-left: 0!important"></span></span> Minemap</a></li>
               <li><a role="menuitem" href="/wall?search={{ app.get_search_string() }}">
-                <span class="btn fa fa-th-large"></span>Wall</a></li>
+                <span class="btn"><span class="fa fa-fw fa-th-large" style="margin-left: 0!important"></span></span> Wall</a></li>
               <li><a role="menuitem" href="/matrix?search={{ app.get_search_string() }}">
-                <span class="btn fa fa-th"></span>Matrix</a></li>
+                <span class="btn"><span class="fa fa-fw fa-th" style="margin-left: 0!important"></span></span> Matrix</a></li>
               <li><a role="menuitem" href="/trivial?search={{ app.get_search_string() }}">
-                <span class="btn fa fa-code-fork"></span>Trivial</a></li>
+                <span class="btn"><span class="fa fa-fw fa-code-fork" style="margin-left: 0!important"></span></span> Trivial</a></li>
             </ul>
         </div>
 

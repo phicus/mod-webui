@@ -111,7 +111,7 @@ def user_logout():
 def user_auth():
     login = app.request.forms.get('login', '')
     password = app.request.forms.get('password', '')
-    path = app.request.forms.get('path', '')
+    path = app.request.GET.get('path', '')
 
     logger.info("[WebUI]  user '%s' is signing in ...", login)
 

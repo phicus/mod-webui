@@ -81,7 +81,7 @@ Invalid element name
 
 
    %groups = elt_service.servicegroups if elt_service else elt_host.hostgroups
-   %groups = sorted(groups, key=lambda x:x.level)
+   % #groups = sorted(groups, key=lambda x:x.level)
    %tags = elt_service.get_service_tags() if elt_service else elt_host.get_host_tags()
    <!-- First row : tags and actions ... -->
    %if elt.action_url or tags or groups:
@@ -93,7 +93,7 @@ Invalid element name
          <ul class="dropdown-menu pull-right">
          %for g in groups:
             <li>
-            <a href="/{{elt_type}}s-group/{{g.get_name()}}">{{g.level if g.level else '0'}} - {{g.alias if g.alias else g.get_name()}}</a>
+            <a href="/{{elt_type}}s-group/{{g.get_name()}}">{{g.level if hasattr(g, 'level') and g.level else '0'}} - {{g.alias if g.alias else g.get_name()}}</a>
             </li>
          %end
          </ul>
