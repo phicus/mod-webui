@@ -221,7 +221,7 @@
                         <li> <a onclick="window.top.location.href = '/matrix?search=' + $('#search').val()"> <span class="fa fa-th-large sidebar-icon"></span> Matrix </a> </li>
                         <li> <a onclick="window.top.location.href = '/trivial?search=' + ($('#search').val() || 'type:host bp:>2')"> <span class="fa fa-code-fork sidebar-icon"></span> Trivial </a> </li>
                         <li> <a href="/sonar"> <span class="fa fa-feed sidebar-icon"></span> Sonar </a> </li>
-                        <li> <a href="/unconfigured"> <span class="fa fa-plug sidebar-icon"></span> GPON Unconfigured ONUs </a> </li>
+                        <li> <a href="/unconfigured"> <span class="fa fa-plug sidebar-icon"></span> Unconfigured</a> </li>
                         %if app.logs_module.is_available():
                         <li> <a href="{{ app.get_url('Availability') }}"> <span class="fa fa-bar-chart sidebar-icon"></span> Availability </a> </li>
                         %end
