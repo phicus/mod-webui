@@ -179,7 +179,7 @@ class KrillUIDataManager(WebUIDataManager):
                 items = new_items
                 logger.debug("[WebUI - datamanager] host:%s, %d matching items", s, len(items))
                 # for item in items:
-                #     logger.info("[WebUI - datamanager] item %s is %s", item.get_name(), item.__class__)
+                #     logger.debug("[WebUI - datamanager] item %s is %s", item.get_name(), item.__class__)
 
             if (t == 's' or t == 'service') and s.lower() != 'all':
                 logger.debug("[WebUI - datamanager] searching for a service %s", s)
@@ -192,7 +192,7 @@ class KrillUIDataManager(WebUIDataManager):
                 items = new_items
                 logger.debug("[WebUI - datamanager] service:%s, %d matching items", s, len(items))
                 # for item in items:
-                #     logger.info("[WebUI - datamanager] item %s is %s", item.get_name(), item.__class__)
+                #     logger.debug("[WebUI - datamanager] item %s is %s", item.get_name(), item.__class__)
 
             if (t == 'c' or t == 'contact') and s.lower() != 'all':
                 logger.debug("[WebUI - datamanager] searching for a contact %s", s)
@@ -214,7 +214,7 @@ class KrillUIDataManager(WebUIDataManager):
                     # Items have a item.get_groupnames() method that returns a comma separated string ... strange format!
                     for item in items:
                         #if group.get_name() in item.get_groupnames().split(', '):
-                            # logger.info("[WebUI - datamanager] => item %s is a known member!", item.get_name())
+                            # logger.debug("[WebUI - datamanager] => item %s is a known member!", item.get_name())
 
                         if group.get_name() in item.get_groupnames().split(', '):
                             new_items.append(item)
@@ -233,7 +233,7 @@ class KrillUIDataManager(WebUIDataManager):
 
             #@mohierf: to be refactored!
             if (t == 'cg' or t == 'cgroup') and s.lower() != 'all':
-                # logger.info("[WebUI - datamanager] searching for items related with the contactgroup %s", s)
+                # logger.debug("[WebUI - datamanager] searching for items related with the contactgroup %s", s)
                 group = self.get_contactgroup(s, user)
                 if not group:
                     return []
@@ -241,7 +241,7 @@ class KrillUIDataManager(WebUIDataManager):
                 #for item in items:
                 #    for contact in item.contacts:
                 #        if group.get_name() in contact.get_groupnames().split(', '):
-                #            logger.info("[WebUI - datamanager] => contact %s is a known member!", contact.get_name())
+                #            logger.debug("[WebUI - datamanager] => contact %s is a known member!", contact.get_name())
 
                 contacts = [c for c in self.get_contacts(user=user) if c in group.members]
                 items = list(set(itertools.chain(*[self._only_related_to(items, self.rg.contacts.find_by_name(c)) for c in contacts])))
@@ -265,9 +265,9 @@ class KrillUIDataManager(WebUIDataManager):
             if t == 'type' and s.lower() != 'all':
                 filtered_by_type = True
                 items = [i for i in items if i.__class__.my_type == s]
-                # logger.info("[WebUI - datamanager] type:%s, %d matching items", s, len(items))
+                # logger.debug("[WebUI - datamanager] type:%s, %d matching items", s, len(items))
                 # for item in items:
-                #     logger.info("[WebUI - datamanager] item %s is %s", item.get_name(), item.__class__)
+                #     logger.debug("[WebUI - datamanager] item %s is %s", item.get_name(), item.__class__)
 
             if t == 'bp' or t == 'bi':
                 if s.startswith('>='):
@@ -384,7 +384,7 @@ class KrillUIDataManager(WebUIDataManager):
 
             if t == 'reg':
                 new_items = []
-                # logger.info("[WebUI-REG] s=%s -> len(items)=%d", s.split(','), len(items))
+                # logger.debug("[WebUI-REG] s=%s -> len(items)=%d", s.split(','), len(items))
                 # pat = re.compile(s, re.IGNORECASE)
                 for i in items:
                     l1 = s.split('|')
@@ -395,13 +395,13 @@ class KrillUIDataManager(WebUIDataManager):
                     else:
                         l2 = []
 
-                    # logger.info("[WebUI-REG] item %s -> regtags: %s", i, l2)
+                    # logger.debug("[WebUI-REG] item %s -> regtags: %s", i, l2)
                     found = [x for x in l1 if x in l2]
                     if found:
-                        # logger.info("[WebUI-REG] found %s", i)
+                        # logger.debug("[WebUI-REG] found %s", i)
                         _append_based_on_filtered_by_type(new_items, i, filtered_by_type)
 
-                # logger.info("[WebUI-REG] s=%s -> len(new_items)=%d", s.split(','), len(new_items))
+                # logger.debug("[WebUI-REG] s=%s -> len(new_items)=%d", s.split(','), len(new_items))
                 items = new_items
 
             if t == 'regstate':
@@ -422,7 +422,7 @@ class KrillUIDataManager(WebUIDataManager):
                 pat = re.compile(s, re.IGNORECASE)
                 new_items = []
                 for i in items:
-                    logger.info("[WebUI-LOC] i={} c={}".format(i, i.customs))
+                    # logger.debug("[WebUI-LOC] i={} c={}".format(i, i.customs))
 
                     if pat.match(i.customs.get('_LOCATION', '')):
                         new_items.append(i)
@@ -465,7 +465,7 @@ class KrillUIDataManager(WebUIDataManager):
 
             if t == 'his':
                 new_items = []
-                # logger.info("[WebUI-HIS] his s=%s -> len(items)=%d", s, len(items))
+                # logger.debug("[WebUI-HIS] his s=%s -> len(items)=%d", s, len(items))
                 for i in items:
                     if i.__class__.my_type == 'service':
                         found = len(s) == 1 and i.host.state_id == int(s) or i.host.state == s.upper()
@@ -477,7 +477,7 @@ class KrillUIDataManager(WebUIDataManager):
                         if found:
                             _append_based_on_filtered_by_type(new_items, i, filtered_by_type)
 
-                # logger.info("[WebUI-HIS] s=%s -> len(new_items)=%d", s, len(new_items))
+                # logger.debug("[WebUI-HIS] s=%s -> len(new_items)=%d", s, len(new_items))
                 items = new_items
 
             # :COMMENT:maethor:150616: Legacy filters, kept for bookmarks compatibility
